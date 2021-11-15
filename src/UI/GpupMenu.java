@@ -1,8 +1,8 @@
 package UI;
 
 
-import dependency.graph.DependencyGraph;
-import dependency.graph.target.Target;
+import engine.dependency.graph.DependencyGraph;
+import engine.dependency.target.Target;
 import engine.jaxb.generated.GPUPDescriptor;
 import engine.validation.GraphExtractor;
 import engine.validation.GraphValidator;

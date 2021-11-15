@@ -1,6 +1,9 @@
-package dependency.graph.target;
+
+
+package    engine.dependency.target;
 
 import java.util.Set;
+
 
 
 public class Target {
@@ -11,7 +14,7 @@ public class Target {
     private String name;
     private Set<Target> requiredFor;
     private Set<Target> dependsOn;
-    private dependency.graph.target.TargetData data;
+    private TargetData data;
     private DependencyLevel dependencyLevel;
 
     public Target(String name) {

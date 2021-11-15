@@ -3,8 +3,8 @@ import java.awt.Menu;
 import org.jgrapht.alg.shortestpath.*;
 
 import UI.*;
-import dependency.graph.DependencyGraph;
-import dependency.graph.target.Target;
+import engine.dependency.graph.DependencyGraph;
+import engine.dependency.target.Target;
 import org.jgrapht.Graph;
 import org.jgrapht.alg.shortestpath.KShortestSimplePaths;
 import org.jgrapht.graph.DefaultEdge;
