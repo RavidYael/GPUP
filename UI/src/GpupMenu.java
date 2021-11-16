@@ -1,11 +1,10 @@
-package UI;
 
 
-import engine.dependency.graph.DependencyGraph;
-import engine.dependency.target.Target;
-import engine.jaxb.generated.GPUPDescriptor;
-import engine.validation.GraphExtractor;
-import engine.validation.GraphValidator;
+import dependency.graph.DependencyGraph;
+import dependency.target.Target;
+import jaxb.generated.GPUPDescriptor;
+import validation.GraphExtractor;
+import validation.GraphValidator;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -13,7 +12,6 @@ import java.util.Scanner;
 
 public class GpupMenu {
 
-    public static enum menuOptions { Dummy,LoadFile, DisplayGraph,DisplayTarget,FindPath,RunTask,CheckCycle,Exit}
 
     private DependencyGraph dependencyGraph;
 
