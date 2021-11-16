@@ -1,17 +1,16 @@
 package validation;
 
 import jaxb.generated.GPUPDescriptor;
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.nio.file.Path;
 
 public class GraphExtractor {
+
     private final static String JAXB_XML_PACKAGE_NAME = "engine.jaxb.generated";
 
 
@@ -19,9 +18,9 @@ public class GraphExtractor {
         return generatedGraph;
     }
 
-    private GPUPDescriptor generatedGraph;
-    private GraphValidator graphValidator;
+    private final GPUPDescriptor generatedGraph;
     private  boolean valid = true;
+
 
 
     public GraphExtractor(Path directory) throws Exception {
@@ -30,12 +29,10 @@ public class GraphExtractor {
 
         }
         else
-            generatedGraph = extractGraphFromFile(directory);
-
-
+            generatedGraph = getGraphFromXml(directory);
     }
 
-    public  GPUPDescriptor extractGraphFromFile (Path directory) {
+    public  GPUPDescriptor getGraphFromXml(Path directory) {
         try {
             InputStream inputStream = new FileInputStream(directory.toString());
             JAXBContext jc = JAXBContext.newInstance(JAXB_XML_PACKAGE_NAME);
