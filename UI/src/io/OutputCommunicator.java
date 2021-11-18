@@ -1,6 +1,7 @@
 package io;
 
 import dependency.target.Target;
+import execution.Task;
 import validation.GraphExtractor;
 import validation.GraphValidator;
 
@@ -15,5 +16,6 @@ import java.util.Scanner;
      void displayGraphInformation();
      void displayTargetInformation(String targetName);
      void displayPathBetweenTwoTargets(String name1, String name2, String dependencyType);
+     void runTask();
 
 }

@@ -3,6 +3,9 @@ package console;
 import dependency.graph.DependencyGraph;
 import dependency.graph.GraphFactory;
 import dependency.target.Target;
+import execution.SimulationTask;
+import execution.Task;
+import execution.TaskExecution;
 import io.InputCommunicator;
 import io.OutputCommunicator;
 
@@ -82,6 +85,28 @@ public class ConsloeAppUI implements OutputCommunicator, InputCommunicator {
         else
             System.out.println("Target is needed for: " + dispTarget.getRequiredFor().toString());
         }
+
+    @Override
+    public void runTask() {
+        SimulationTask task;
+        boolean random;
+        System.out.println("How long will the task run? (in ms)");
+        int processTime = Integer.parseInt(getInputFromUser());
+        System.out.println("Is task run time Random? 'y'/'n'" );
+        random = getInputFromUser().equals("y");
+
+        System.out.println("what is the probability of success?");
+        float probSuccess = Float.parseFloat(getInputFromUser());
+
+        System.out.println("what is the probability of success with warning?");
+        float probWarning = Float.parseFloat(getInputFromUser());
+
+        task = new SimulationTask(processTime,random,probSuccess,probWarning);
+        TaskExecution taskExecution = new TaskExecution(dependencyGraph,task);
+        taskExecution.runTaskFromScratch();
+
+
+    }
 
     @Override
     public void displayPathBetweenTwoTargets(String name1, String name2, String dependencyTypeStr) {

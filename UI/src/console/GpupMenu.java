@@ -1,5 +1,6 @@
 package console;
 
+import execution.SimulationTask;
 import io.InputCommunicator;
 import io.OutputCommunicator;
 
@@ -86,6 +87,16 @@ public class GpupMenu {
 
 
                     outputCommunicator.displayPathBetweenTwoTargets(name1,name2,dependencyType);
+                    break;
+
+                case 5: // run simulation task
+                    outputCommunicator.runTask();
+
+
+
+
+
+
 
 
                 case 7:

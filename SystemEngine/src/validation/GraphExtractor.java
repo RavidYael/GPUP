@@ -24,11 +24,11 @@ public class GraphExtractor {
 
 
     public GraphExtractor(Path directory) throws Exception {
-        if (!directory.endsWith("xml")) {
-            throw (new Exception("File doesn't end with .xml"));
+//        if (!directory.endsWith("xml")) {
+//            throw (new Exception("File doesn't end with .xml"));
 
-        }
-        else
+//        }
+//        else
             generatedGraph = getGraphFromXml(directory);
     }
 
