@@ -2,6 +2,7 @@
 
 package dependency.target;
 
+import java.util.HashSet;
 import java.util.Set;
 
 
@@ -12,13 +13,17 @@ public class Target {
   public static enum Dependency {DependsOn , RequiredFor}
 
     private String name;
-    private Set<Target> requiredFor;
-    private Set<Target> dependsOn;
-    private TargetData data;
+    private Set<String> requiredFor;
+    private Set<String> dependsOn;
+    private String data;
     private DependencyLevel dependencyLevel;
 
-    public Target(String name) {
+    public Target(String name,String data) {
+
         this.name = name;
+        this.data = data;
+        requiredFor = new HashSet<>();
+        dependsOn = new HashSet<>();
     }
 
     public String getName() {
@@ -29,15 +34,15 @@ public class Target {
         return dependencyLevel;
     }
 
-    public Set<Target> getRequiredFor() {
+    public Set<String> getRequiredFor() {
         return requiredFor;
     }
 
-    public Set<Target> getDependsOn() {
+    public Set<String> getDependsOn() {
         return dependsOn;
     }
 
-    public Set<Target> getDependsOnOrNeededFor(Dependency depEnum)
+    public Set<String> getDependsOnOrNeededFor(Dependency depEnum)
     {
         if (depEnum == Dependency.DependsOn)
             return getDependsOn();
@@ -46,11 +51,18 @@ public class Target {
             return getRequiredFor();
     }
 
-
-
-    public TargetData getData() {
-        return data;
+    public void addToRequiredFor(String name)
+    {
+        requiredFor.add(name);
     }
+
+    public void addToDependsOn(String name)
+    {
+        dependsOn.add(name);
+    }
+
+
+
 
     @Override
     public String toString() {

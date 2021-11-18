@@ -61,7 +61,7 @@ import javax.xml.bind.annotation.XmlValue;
 public class GPUPTargetDependencies {
 
     @XmlElement(name = "GPUG-Dependency", required = true)
-    protected List<GPUPTargetDependencies.GPUGDependency> gpugDependency;
+        protected List<GPUPTargetDependencies.GPUGDependency> gpugDependency;
 
     /**
      * Gets the value of the gpugDependency property.

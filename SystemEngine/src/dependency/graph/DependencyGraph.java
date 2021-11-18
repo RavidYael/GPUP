@@ -19,19 +19,14 @@ public class DependencyGraph {
     private Map<String, Target> allTargets;
     private Map<Target.DependencyLevel,Set<Target>> targetsByDependencyLevel;
 
+    public DependencyGraph() {}
     public Map<String,Target> getAllTargets() {
         return allTargets;
     }
-
     public Set<Target> getTargetsByLevel(Target.DependencyLevel level) {
         return targetsByDependencyLevel.get(level);
     }
-
-    public Target getTargetByName(String targetName)
-    {
-        return allTargets.get(targetName);
-    }
-
+    public Target getTargetByName(String targetName) {return allTargets.get(targetName);}
     public Integer getTargetsCountByLevel(Target.DependencyLevel level) {
         return getTargetsByLevel(level).size();
     }
@@ -43,33 +38,60 @@ public class DependencyGraph {
         Boolean[] flag = new Boolean[] {new Boolean(false)};
         getAllPathsUtils(src,dest,isVisited,pathList,dependedOnOrNeeded, flag);
         return flag[0];
-
-
     }
 
     private void getAllPathsUtils(Target src, Target dest, Map<Target,Boolean> isVisited, ArrayList<String> pathList, Target.Dependency requiredOrNeeded, Boolean[] flag ) {
 
-        if(src.equals(dest)){
-         System.out.println(pathList.toString());
-        flag[0] = true; // May Not Work
+        if (src.equals(dest)) {
+            System.out.println(pathList.toString());
+            flag[0] = true; // May Not Work
         }
 
-        isVisited.put(src,true);
-        Set<Target> curSet = src.getDependsOnOrNeededFor(requiredOrNeeded);
-        for(Target t : curSet)
-            if(isVisited.get(t) == false)
-            {
-             pathList.add(t.getName());
-             getAllPathsUtils(t,dest,isVisited,pathList,requiredOrNeeded,flag);
+        isVisited.put(src, true);
+        Set<String> curSet = src.getDependsOnOrNeededFor(requiredOrNeeded);
+        for (String targetName : curSet) {
+            Target t = getTargetByName(targetName);
+            if (isVisited.get(t) == false) {
+                pathList.add(targetName);
+                getAllPathsUtils(t, dest, isVisited, pathList, requiredOrNeeded, flag);
 
-             pathList.remove(t);
+                pathList.remove(targetName);
             }
 
-        isVisited.put(src,false);
+            isVisited.put(src, false);
 
+        }
     }
 
-//    public Boolean isInCycle(Target src)
+    public void setAllTargets(Map<String, Target> allTargets) {
+        this.allTargets = allTargets;
+    }
+
+    public void addTargetToGraph(String name, Target toAdd) {
+        allTargets.put(name,toAdd);
+    }
+
+    public void setTargetsByDependencyLevel() {
+        boolean noDepends,noRequired;
+        for (Target target:
+             allTargets.values()) {
+            noDepends = target.getDependsOn().isEmpty();
+            noRequired = target.getRequiredFor().isEmpty();
+            if (noDepends && noRequired)
+                targetsByDependencyLevel.get(Target.DependencyLevel.Independed).add(target);
+            else if(noDepends && !noRequired)
+                targetsByDependencyLevel.get(Target.DependencyLevel.Leaf).add(target);
+            else if(!noDepends && noRequired)
+                targetsByDependencyLevel.get(Target.DependencyLevel.Root).add(target);
+            else if (!noDepends && !noRequired)
+                targetsByDependencyLevel.get(Target.DependencyLevel.Middle).add(target);
+
+
+
+        }
+    }
+
+    //    public Boolean isInCycle(Target src)
 //    {
 //
 //    }
