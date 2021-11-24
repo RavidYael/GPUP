@@ -99,6 +99,7 @@ public class TaskExecution {
         }
 
         printExecutionSummary();
+        //TODO print to log file
 
 
     }
