@@ -9,8 +9,7 @@ import org.w3c.dom.ranges.Range;
 import javax.xml.bind.SchemaOutputResolver;
 import java.util.Random;
 
-// ch ch changes ravid adding shit to this project again and again and again
-// אל תעכבי אותנו
+// תלחץ פה ילד
 public class main {
     //    public static void main(String[] args) {
 //
