@@ -9,7 +9,7 @@ import org.w3c.dom.ranges.Range;
 import javax.xml.bind.SchemaOutputResolver;
 import java.util.Random;
 
-// תלחץ פה ילד
+//עכשיו זה כבר לא אדום פה הכל
 public class main {
     //    public static void main(String[] args) {
 //
@@ -19,6 +19,7 @@ public class main {
 //
 //    }
     public static void main(String[] args) {
+
 
         GpupMenu menu = new GpupMenu();
         menu.executeMenu();
