@@ -100,8 +100,14 @@ public class GpupMenu {
                         break;
                     }
 
+                case 6:
+                    //TODO implement cycle algorithm ravid!
+                    break;
+
 
                 case 7:
+                    //TODO add on option to save system to file, (could be any type of file) page 19 in GPUP word file
+                case 8:
                     System.out.println("Good bye!!");
                     System.exit(0);
                     break;

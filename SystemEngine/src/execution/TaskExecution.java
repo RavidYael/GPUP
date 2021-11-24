@@ -99,6 +99,7 @@ public class TaskExecution {
         }
 
         printExecutionSummary();
+        // TODO print how much time it took the task to run
         //TODO print to log file
 
 

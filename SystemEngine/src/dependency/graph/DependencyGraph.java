@@ -41,6 +41,7 @@ public class DependencyGraph {
 
 
     public boolean displayAllPathsBetweenTwoTargets(Target src, Target dest, Target.Dependency dependedOnOrNeeded) {
+        //TODO function returns only one path, needs to return all paths יאח
         Map<Target, Boolean> isVisited = new HashMap<>();
         for (Target target : allTargets.values()){
             isVisited.put(target,false);
