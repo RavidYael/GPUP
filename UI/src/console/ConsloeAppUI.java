@@ -6,23 +6,34 @@ import dependency.target.Target;
 import execution.SimulationTask;
 import execution.Task;
 import execution.TaskExecution;
-import io.InputCommunicator;
-import io.OutputCommunicator;
+import io.Communicator;
+
 
 import java.util.Scanner;
 
-public class ConsloeAppUI implements OutputCommunicator, InputCommunicator {
+public class ConsloeAppUI implements Communicator {
 
     private DependencyGraph dependencyGraph;
+    private TaskExecution lastTaskExecution;
 
 
 
     @Override
     public void LoadFromFile(String directory) throws Exception {
-            dependencyGraph =  GraphFactory.newGraphWithData(directory);
+
+        DependencyGraph tempgGraph = GraphFactory.newGraphWithData(directory);
+        if (tempgGraph !=null)
+            dependencyGraph = tempgGraph;
 
     }
 
+    public String getFileNameFromUser()
+    {
+        System.out.println("Please enter file name");
+        Scanner s = new Scanner(System.in);
+        String directory = s.nextLine();
+        return directory;
+    }
     @Override
     public String getInputFromUser() {
         Scanner s = new Scanner(System.in);
@@ -33,17 +44,17 @@ public class ConsloeAppUI implements OutputCommunicator, InputCommunicator {
 
     @Override
     public void displayGraphInformation() {
-        System.out.println("There are " + dependencyGraph.getAllTargets().size() + "targets");
-        System.out.println(dependencyGraph.getTargetsCountByLevel(Target.DependencyLevel.Root) + "are roots");
-        System.out.println(dependencyGraph.getTargetsCountByLevel(Target.DependencyLevel.Middle) + "are middles");
-        System.out.println(dependencyGraph.getTargetsCountByLevel(Target.DependencyLevel.Leaf) + "are leafes");
-        System.out.println(dependencyGraph.getTargetsCountByLevel(Target.DependencyLevel.Independed) + "are independents");
+        System.out.println("There are " + dependencyGraph.getAllTargets().size() + " targets");
+        System.out.println(dependencyGraph.getTargetsCountByLevel(Target.DependencyLevel.Root) + " are roots");
+        System.out.println(dependencyGraph.getTargetsCountByLevel(Target.DependencyLevel.Middle) + " are middles");
+        System.out.println(dependencyGraph.getTargetsCountByLevel(Target.DependencyLevel.Leaf) + " are leafes");
+        System.out.println(dependencyGraph.getTargetsCountByLevel(Target.DependencyLevel.Independed) + " are independents");
 
     }
     private Target getAndVerifyTargetByName(String targetName) {
         Target resTarget = dependencyGraph.getTargetByName(targetName);
         while (resTarget == null) {
-            System.out.println("target does not exists in Graph, please try again, or enter # to go back.");
+            System.out.println("Target does not exists in Graph, please try again, or enter # to go back.");
             String name = getInputFromUser();
             if (name.equals("#")) return null;
             resTarget = dependencyGraph.getTargetByName(name);
@@ -55,7 +66,7 @@ public class ConsloeAppUI implements OutputCommunicator, InputCommunicator {
     {
         while(!dependencyName.equals("DependsOn") && !dependencyName.equals("RequiredFor"))
         {
-            System.out.println("dependency type invalid, should be 'RequiredFor' or 'DependsOn',  (enter '#' to go back)");
+            System.out.println("Dependency type invalid, should be 'RequiredFor' or 'DependsOn',  (enter '#' to go back)");
             String newName = getInputFromUser();
             if (newName.equals("#")) return null;
         }
@@ -73,7 +84,7 @@ public class ConsloeAppUI implements OutputCommunicator, InputCommunicator {
        if (dispTarget == null) return;
 
         System.out.println("Target name:" + dispTarget.getName() + "\n" +
-                "Target dependecy level in graph is: " + dispTarget.getDependencyLevel() + "\n");
+                " Target dependecy level in graph is: " + dispTarget.getDependencyLevel() + "\n");
 
         if (dispTarget.getDependsOn().size() == 0)
             System.out.println("Target isn't directly depended on any other target");
@@ -90,6 +101,7 @@ public class ConsloeAppUI implements OutputCommunicator, InputCommunicator {
     public void runTask() {
         SimulationTask task;
         boolean random;
+
         System.out.println("How long will the task run? (in ms)");
         int processTime = Integer.parseInt(getInputFromUser());
         System.out.println("Is task run time Random? 'y'/'n'" );
@@ -100,10 +112,28 @@ public class ConsloeAppUI implements OutputCommunicator, InputCommunicator {
 
         System.out.println("what is the probability of success with warning?");
         float probWarning = Float.parseFloat(getInputFromUser());
-
         task = new SimulationTask(processTime,random,probSuccess,probWarning);
-        TaskExecution taskExecution = new TaskExecution(dependencyGraph,task);
-        taskExecution.runTaskFromScratch();
+
+
+        System.out.println("would you like to run a task on the previous graph? 'y'/'n'");
+        String choice = getInputFromUser();
+        if (choice.equals("y")){
+            if (lastTaskExecution == null)
+            {
+                System.out.println("No previos execution was found, running from scratch");
+                lastTaskExecution = new TaskExecution(dependencyGraph,task);
+                lastTaskExecution.runTaskFromScratch();
+            }
+            else{
+                lastTaskExecution.runTaskIncrementally();
+
+            }
+        }
+        else{
+            lastTaskExecution = new TaskExecution(dependencyGraph,task);
+            lastTaskExecution.runTaskFromScratch();
+        }
+
 
 
     }
@@ -115,9 +145,8 @@ public class ConsloeAppUI implements OutputCommunicator, InputCommunicator {
         if (t1 == null || t2 == null) return;
         Target.Dependency dependencyType = getAndVerifyDependencyByString(dependencyTypeStr);
         if (dependencyType == null) return;
-        dependencyGraph.displayAllPathsBetweenTwoTargets(t1,t2,dependencyType);
-
-
+        if(dependencyGraph.displayAllPathsBetweenTwoTargets(t1,t2,dependencyType) == false)
+            System.out.println("No path Found");
 
 
     }

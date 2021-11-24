@@ -1,19 +1,19 @@
 package console;
 
 import execution.SimulationTask;
-import io.InputCommunicator;
-import io.OutputCommunicator;
+import io.Communicator;
+
 
 import java.util.Scanner;
 
 public class GpupMenu {
 
-    OutputCommunicator outputCommunicator;
-    InputCommunicator inputCommunicator;
+   private Communicator communicator;
 
-    public GpupMenu( ) {
-        this.outputCommunicator = new ConsloeAppUI();
-        this.inputCommunicator = new ConsloeAppUI();
+    public GpupMenu() {
+
+        this.communicator = new ConsloeAppUI();
+
     }
 
     public void printMenu()
@@ -38,9 +38,9 @@ public class GpupMenu {
         while (choice != 7) {
             switch (choice) {
                 case 1: // load file
-                    String directory = inputCommunicator.getInputFromUser();
+                    String directory = communicator.getFileNameFromUser();
                     try {
-                        inputCommunicator.LoadFromFile(directory);
+                        communicator.LoadFromFile(directory);
                     }
                     catch (Exception e)
                     {
@@ -48,12 +48,13 @@ public class GpupMenu {
                         System.out.println("Please try again");
                         break;
                     }
+
                     caseCount++;
                     break;
 
                 case 2: // Display dependency graph info
                     if (caseCount >= 1) {
-                        outputCommunicator.displayGraphInformation();
+                        communicator.displayGraphInformation();
                     }
                     else System.out.println("Please load file First");
                     break;
@@ -61,9 +62,10 @@ public class GpupMenu {
                 case 3: //Display specific target info
                     if (caseCount >=1) {
                         System.out.println("Please enter name of target, or '#' to go back");
-                        String targetName = inputCommunicator.getInputFromUser();
+                        String targetName = communicator.getInputFromUser();
                         if (targetName.equals("#")) break;
-                        outputCommunicator.displayTargetInformation(targetName);
+                        communicator.displayTargetInformation(targetName);
+                        break;
                     }
 
                     else {
@@ -74,33 +76,34 @@ public class GpupMenu {
 
                 case 4: // Find path between two targets
                     System.out.println("Please enter names of 2 targets, or # to go back");
-                    String name1 = inputCommunicator.getInputFromUser();
+                    String name1 = communicator.getInputFromUser();
                     if (name1.equals("#")) break;
 
-                    String name2 = inputCommunicator.getInputFromUser();
+                    String name2 = communicator.getInputFromUser();
                     if (name2.equals("#")) break;
 
 
                     System.out.println("Plese enter dependency between said targets: 'DependsOn' or 'RequiredFor' ");
-                    String dependencyType = inputCommunicator.getInputFromUser();
+                    String dependencyType = communicator.getInputFromUser();
                     if (dependencyType.equals("#")) break;
 
 
-                    outputCommunicator.displayPathBetweenTwoTargets(name1,name2,dependencyType);
+                    communicator.displayPathBetweenTwoTargets(name1,name2,dependencyType);
                     break;
 
                 case 5: // run simulation task
-                    outputCommunicator.runTask();
+                    if (caseCount >= 1)
+                    communicator.runTask();
 
-
-
-
-
-
+                    else{
+                        System.out.println("Please load file First");
+                        break;
+                    }
 
 
                 case 7:
-
+                    System.out.println("Good bye!!");
+                    System.exit(0);
                     break;
 
 

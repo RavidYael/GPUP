@@ -11,7 +11,7 @@ public class Target {
 
   public static enum DependencyLevel {Root,Middle,Leaf, Independed}
   public static enum Dependency {DependsOn , RequiredFor}
-    public static enum TargetStatus { Frozen, Skipped, Waiting ,InProcess, Finished}
+    public static enum TargetStatus { Frozen, Skipped, Waiting ,InProcess, Finished, Done}
     public static enum TaskResult {Success, Warning, Failure}
 
 
@@ -32,6 +32,25 @@ public class Target {
         dependsOn = new HashSet<>();
     }
 
+    public Target (Target other){
+
+        this.setName(other.getName());
+        this.setData(other.data);
+        this.setTaskResult(other.getTaskResult());
+        this.requiredFor = new HashSet<>();
+        for (String req : other.requiredFor){
+            requiredFor.add(req);
+        }
+        this.dependsOn = new HashSet<>();
+        for (String dep : other.dependsOn){
+            dependsOn.add(dep);
+        }
+
+        this.setTargetStatus(other.targetStatus);
+        this.setDependencyLevel(other.dependencyLevel);
+
+    }
+
     public String getName() {
         return name;
     }
@@ -43,8 +62,7 @@ public class Target {
     }
     public Set<String> getDependsOn() {return dependsOn;}
     public String getData() {return data;}
-    public Set<String> getDependsOnOrNeededFor(Dependency depEnum)
-    {
+    public Set<String> getDependsOnOrNeededFor(Dependency depEnum) {
         if (depEnum == Dependency.DependsOn)
             return getDependsOn();
 
@@ -63,6 +81,23 @@ public class Target {
         return taskResult;
     }
 
+
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setRequiredFor(Set<String> requiredFor) {
+        this.requiredFor = requiredFor;
+    }
+
+    public void setDependsOn(Set<String> dependsOn) {
+        this.dependsOn = dependsOn;
+    }
+
+    public void setData(String data) {
+        this.data = data;
+    }
     public void setTargetStatus(TargetStatus targetStatus) {
         this.targetStatus = targetStatus;
     }

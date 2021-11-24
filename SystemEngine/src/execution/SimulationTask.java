@@ -27,8 +27,9 @@ public class SimulationTask extends Task {
     @Override
     public Target.TaskResult runTaskOnTarget(Target target) {
         Target.TaskResult resStatus;
+        target.setTargetStatus(Target.TargetStatus.InProcess);
         double rand = new Random().nextDouble();
-        System.out.println("Target " + target.getName() + "is now processing ");
+        System.out.println("Target " + target.getName() + " is now processing ");
         System.out.println("Target information: " + target.getData());
 
         try {
@@ -36,10 +37,11 @@ public class SimulationTask extends Task {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        System.out.print("Target" +target.getName()+ " completed with status: ");
+        System.out.print("Target " +target.getName()+ " completed with status: ");
         if (rand < successProb)
         {
-            if (rand < successWithWarningProb) {
+            double newRand = new Random().nextDouble();
+            if (newRand < successWithWarningProb) {
                 resStatus = Target.TaskResult.Warning;
                 System.out.println("Warning.");
 
@@ -56,7 +58,7 @@ public class SimulationTask extends Task {
             System.out.println("Failure.");
 
         }
-
+        System.out.println();
         return resStatus;
 
 

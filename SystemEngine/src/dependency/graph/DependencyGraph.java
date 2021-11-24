@@ -2,19 +2,24 @@ package dependency.graph;
 
 
 import dependency.target.Target;
-import dependency.target.Target;
-import dependency.target.Target;
 
 
 import java.util.*;
 
 
-public class DependencyGraph  implements Cloneable{
+public class DependencyGraph {
 
     private Map<String, Target> allTargets;
     private Map<Target.DependencyLevel, Set<Target>> targetsByDependencyLevel;
 
     public DependencyGraph() {
+        allTargets = new HashMap<>();
+        targetsByDependencyLevel = new HashMap<>();
+        targetsByDependencyLevel.put(Target.DependencyLevel.Leaf ,new HashSet<>());
+        targetsByDependencyLevel.put(Target.DependencyLevel.Middle, new HashSet<>());
+        targetsByDependencyLevel.put(Target.DependencyLevel.Root, new HashSet<>());
+        targetsByDependencyLevel.put(Target.DependencyLevel.Independed, new HashSet<>());
+
     }
 
     public Map<String, Target> getAllTargets() {
@@ -33,8 +38,15 @@ public class DependencyGraph  implements Cloneable{
         return getTargetsByLevel(level).size();
     }
 
+
+
     public boolean displayAllPathsBetweenTwoTargets(Target src, Target dest, Target.Dependency dependedOnOrNeeded) {
         Map<Target, Boolean> isVisited = new HashMap<>();
+        for (Target target : allTargets.values()){
+            isVisited.put(target,false);
+        }
+
+        isVisited.values().forEach(bool -> bool = false);
         ArrayList<String> pathList = new ArrayList<>();
         pathList.add(src.getName());
         Boolean[] flag = new Boolean[]{new Boolean(false)};
@@ -53,11 +65,13 @@ public class DependencyGraph  implements Cloneable{
         Set<String> curSet = src.getDependsOnOrNeededFor(requiredOrNeeded);
         for (String targetName : curSet) {
             Target t = getTargetByName(targetName);
-            if (isVisited.get(t) == false) {
-                pathList.add(targetName);
-                getAllPathsUtils(t, dest, isVisited, pathList, requiredOrNeeded, flag);
+            if (!isVisited.isEmpty()) {
+                if (isVisited.get(t) == false) {
+                    pathList.add(targetName);
+                    getAllPathsUtils(t, dest, isVisited, pathList, requiredOrNeeded, flag);
 
-                pathList.remove(targetName);
+                    pathList.remove(targetName);
+                }
             }
 
             isVisited.put(src, false);
@@ -68,12 +82,15 @@ public class DependencyGraph  implements Cloneable{
     public void setAllTargets(Map<String, Target> allTargets) {
         this.allTargets = allTargets;
     }
+    public void updateAllTargetDependencyLevel(Map<Target.DependencyLevel, Set<Target>> targetsByDependencyLevel) {
+        this.targetsByDependencyLevel = targetsByDependencyLevel;
+    }
 
     public void addTargetToGraph(String name, Target toAdd) {
         allTargets.put(name, toAdd);
     }
 
-    public void setTargetsByDependencyLevel() {
+    public void updateAllTargetDependencyLevel() {
         boolean noDepends, noRequired;
         for (Target target :
                 allTargets.values()) {
@@ -82,9 +99,11 @@ public class DependencyGraph  implements Cloneable{
             if (noDepends && noRequired) {
                 targetsByDependencyLevel.get(Target.DependencyLevel.Independed).add(target);
                 target.setDependencyLevel(Target.DependencyLevel.Independed);
+                target.setTargetStatus(Target.TargetStatus.Waiting);
             } else if (noDepends && !noRequired) {
                 targetsByDependencyLevel.get(Target.DependencyLevel.Leaf).add(target);
                 target.setDependencyLevel(Target.DependencyLevel.Leaf);
+                target.setTargetStatus(Target.TargetStatus.Waiting);
             } else if (!noDepends && noRequired) {
                 targetsByDependencyLevel.get(Target.DependencyLevel.Root).add(target);
                 target.setDependencyLevel(Target.DependencyLevel.Root);
@@ -97,13 +116,12 @@ public class DependencyGraph  implements Cloneable{
 
         }
     }
-
     public Set<String> setAndUpdateTargetSuccess(Target target) {
         Set<String> waitingTargets = new HashSet<>();
         target.setTargetStatus(Target.TargetStatus.Finished);
         for (String targetName : target.getRequiredFor()) {
             Target t = allTargets.get(targetName);
-            t.getDependsOn().remove(t.getName());
+            t.getDependsOn().remove(target.getName());
             if (t.getDependsOn().isEmpty()) {
                 t.setTargetStatus(Target.TargetStatus.Waiting);
                 waitingTargets.add(t.getName());
@@ -111,7 +129,6 @@ public class DependencyGraph  implements Cloneable{
         }
         return waitingTargets;
     }
-
     public Set<String> setAndUpdateTargetFailure(Target target) {
         Set<String> skippedTargets = new HashSet<>();
         for (String targetName : target.getRequiredFor()) {
@@ -122,9 +139,43 @@ public class DependencyGraph  implements Cloneable{
         }
         return skippedTargets;
     }
+    public void fixTargetsDependencies()
+    {
+        for (Target target : allTargets.values())
+        {
+            for (String depends : target.getDependsOn())
+            {
+                allTargets.get(depends).addToRequiredFor(target.getName());
+            }
+            for(String required : target.getRequiredFor()){
+                allTargets.get(required).addToDependsOn(target.getName());
+            }
+        }
+    }
 
-    public Object clone() throws CloneNotSupportedException {
-        return super.clone();
+    public void updateTargetStatusForIncrementalExecution(){
+        for (Target target : allTargets.values()){
+            if (target.getTaskResult() == Target.TaskResult.Failure)
+                target.setTargetStatus(Target.TargetStatus.Waiting);
+            else if(target.getTargeStatus() == Target.TargetStatus.Skipped){
+                target.setTargetStatus(Target.TargetStatus.Frozen);
+            }
+            else if(target.getTaskResult() == Target.TaskResult.Success){
+                target.setTargetStatus(Target.TargetStatus.Done);
+            }
+        }
+    }
+
+    public DependencyGraph createDeepCopy() {
+        DependencyGraph copyGraph = new DependencyGraph();
+        for (String targetName : allTargets.keySet()){
+            copyGraph.allTargets.put(targetName,new Target(allTargets.get(targetName)));
+        }
+
+        copyGraph.updateAllTargetDependencyLevel();
+        return copyGraph;
+
+
     }
 
 

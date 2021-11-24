@@ -11,7 +11,7 @@ import java.nio.file.Path;
 
 public class GraphExtractor {
 
-    private final static String JAXB_XML_PACKAGE_NAME = "engine.jaxb.generated";
+    private final static String JAXB_XML_PACKAGE_NAME = "jaxb.generated";
 
 
     public GPUPDescriptor getGeneratedGraph() {
@@ -23,18 +23,18 @@ public class GraphExtractor {
 
 
 
-    public GraphExtractor(Path directory) throws Exception {
-//        if (!directory.endsWith("xml")) {
-//            throw (new Exception("File doesn't end with .xml"));
+    public GraphExtractor(String directory) throws Exception {
+       if (!directory.endsWith("xml")) {
+           throw (new Exception("File doesn't end with .xml"));
 
-//        }
-//        else
+        }
+       else
             generatedGraph = getGraphFromXml(directory);
     }
 
-    public  GPUPDescriptor getGraphFromXml(Path directory) {
+    public  GPUPDescriptor getGraphFromXml(String directory) {
         try {
-            InputStream inputStream = new FileInputStream(directory.toString());
+            InputStream inputStream = new FileInputStream(directory);
             JAXBContext jc = JAXBContext.newInstance(JAXB_XML_PACKAGE_NAME);
             Unmarshaller u = jc.createUnmarshaller();
             return (GPUPDescriptor) u.unmarshal(inputStream);
@@ -43,10 +43,12 @@ public class GraphExtractor {
             e.printStackTrace();
         } catch (JAXBException e) {
             e.printStackTrace();
-        }
 
+        }
         valid = false;
         return null;
+
+
     }
 
     }

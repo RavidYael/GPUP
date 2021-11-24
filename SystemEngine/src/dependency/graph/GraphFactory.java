@@ -7,9 +7,6 @@ import jaxb.generated.GPUPTargetDependencies;
 import validation.GraphExtractor;
 import validation.GraphValidator;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 public class GraphFactory {
     private static DependencyGraph dependencyGraph;
     private static GPUPDescriptor generatedGraph;
@@ -17,9 +14,9 @@ public class GraphFactory {
 
 
     private static boolean loadAndValidateGraphFromFile(String directory) throws Exception {
-        Path path = Paths.get(directory);
+       // Path path = Paths.get(directory);
         try {
-            generatedGraph = new GraphExtractor(path).getGeneratedGraph();
+            generatedGraph = new GraphExtractor(directory).getGeneratedGraph();
         } catch (Exception e) {
             System.out.println(e.getMessage());
             throw e;
@@ -34,23 +31,28 @@ public class GraphFactory {
 
        if (!loadAndValidateGraphFromFile(directory))
            return null;
+
         dependencyGraph = new DependencyGraph();
+        Target toAdd;
         for(GPUPTarget curTarget : generatedGraph.getGPUPTargets().getGPUPTarget())
         {
-            Target temp = new Target(curTarget.getName(),curTarget.getGPUPUserData());
-            for (GPUPTargetDependencies.GPUGDependency gpupDependency :
-                 curTarget.getGPUPTargetDependencies().getGPUGDependency()) {
-                if (gpupDependency.getType().equals("DependsOn"))
-                    temp.addToDependsOn(gpupDependency.getValue());
-                else
-                    temp.addToRequiredFor(gpupDependency.getValue());
+            toAdd = new Target(curTarget.getName(),curTarget.getGPUPUserData());
+            if (curTarget.getGPUPTargetDependencies()!= null) {
+                for (GPUPTargetDependencies.GPUGDependency gpupDependency :
+                        curTarget.getGPUPTargetDependencies().getGPUGDependency()) {
+                    if (gpupDependency.getType().equals("requiredFor"))
+                        toAdd.addToRequiredFor(gpupDependency.getValue());
+                    else
+                        toAdd.addToDependsOn(gpupDependency.getValue());
 
+                }
             }
-            dependencyGraph.addTargetToGraph(temp.getName(),temp);
+            dependencyGraph.addTargetToGraph(toAdd.getName(),toAdd);
         }
-        dependencyGraph.setTargetsByDependencyLevel();
-        return dependencyGraph;
+        dependencyGraph.fixTargetsDependencies();
+       dependencyGraph.updateAllTargetDependencyLevel();
 
+        return dependencyGraph;
 
     }
 }

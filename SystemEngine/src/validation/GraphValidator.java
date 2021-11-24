@@ -24,31 +24,21 @@ public class GraphValidator {
         }
     }
 
-    public boolean startValidation()
-    {
+    public boolean startValidation() throws Exception {
         // conduct all test in order
-        try {
-            isAllTargetsExist();
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+
+
+           // isAllTargetsExist();
+
+
+        if (valid) {
+            isTargetNameUnique();
         }
+
 
         if (valid)
         {
-            try {
-                isTargetNameUnique();
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-            }
-        }
-
-        if (valid)
-        {
-            try {
-                containsDependencyConflict();
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-            }
+            containsDependencyConflict();
         }
 
         return valid;
@@ -66,14 +56,13 @@ public class GraphValidator {
 
     public void isAllTargetsExist() throws Exception
     {
-        for(GPUPTarget gt : name2Target.values())
-        {
-            for (GPUPTargetDependencies.GPUGDependency gpupDependency : gt.getGPUPTargetDependencies().getGPUGDependency())
-            {
-                if (!name2Target.containsKey(gpupDependency.getValue()))
-                {
-                    valid = false;
-                    throw(new Exception("One or more target described in dependencies does not exist"));
+        for(GPUPTarget gt : name2Target.values()) {
+            if (gt.getGPUPTargetDependencies() != null) {
+                for (GPUPTargetDependencies.GPUGDependency gpupDependency : gt.getGPUPTargetDependencies().getGPUGDependency()) {
+                    if (!name2Target.containsKey(gpupDependency.getValue())) {
+                        valid = false;
+                        throw (new Exception("Target named : " +gpupDependency.getValue() + "  described in dependency doesn't exists"));
+                    }
                 }
             }
         }
@@ -81,20 +70,19 @@ public class GraphValidator {
 
     public void containsDependencyConflict() throws Exception
     {
-        for (GPUPTarget curTarget : name2Target.values())  {
-            for (GPUPTargetDependencies.GPUGDependency curDependency : curTarget.getGPUPTargetDependencies().getGPUGDependency()) {
-                String dependencyType = curDependency.getType();
-                if (dependencyType.equals("dependsOn")) // reverse type of dependency
-                    dependencyType = "requiredFor";
-                else
-                    dependencyType = "dependsOn";
-                GPUPTarget relatedTarget = name2Target.get(curDependency.getValue());
-                GPUPTargetDependencies.GPUGDependency oppositeRelation = new GPUPTargetDependencies.GPUGDependency();
-                oppositeRelation.setValue(curTarget.getName()); // create Dependency object with opposite relation and
-                oppositeRelation.setType(dependencyType);        // name of the target we started with in order to find the conflict
-                if (relatedTarget.getGPUPTargetDependencies().getGPUGDependency().contains(oppositeRelation)) {
-                    valid = false;
-                    throw(new Exception("Graph contains a conflict of dependencies between  target:" + oppositeRelation.getValue() + "And target:" +curDependency.getValue()));
+        for (GPUPTarget curTarget : name2Target.values()) {
+            if (curTarget.getGPUPTargetDependencies() != null) {
+                for (GPUPTargetDependencies.GPUGDependency curDependency : curTarget.getGPUPTargetDependencies().getGPUGDependency()) {
+                    String dependencyType = curDependency.getType();
+                    GPUPTarget relatedTarget = name2Target.get(curDependency.getValue());
+                    if (relatedTarget.getGPUPTargetDependencies() != null) {
+                        for(GPUPTargetDependencies.GPUGDependency gpupTargetDependency : relatedTarget.getGPUPTargetDependencies().getGPUGDependency()) {
+                            if (gpupTargetDependency.getType().equals(dependencyType) && gpupTargetDependency.getValue().equals(curTarget.getName())) {
+                                valid = false;
+                                throw (new Exception("Graph contains a conflict of dependencies between  target:" + relatedTarget.getName() + " And target:" + curTarget.getName()));
+                            }
+                        }
+                    }
                 }
             }
         }
