@@ -10,6 +10,7 @@ import javax.xml.bind.SchemaOutputResolver;
 import java.util.Random;
 
 // ch ch changes ravid adding shit to this project again and again and again
+// אל תעכבי אותנו
 public class main {
     //    public static void main(String[] args) {
 //
