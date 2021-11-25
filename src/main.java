@@ -9,7 +9,8 @@ import org.w3c.dom.ranges.Range;
 import javax.xml.bind.SchemaOutputResolver;
 import java.util.Random;
 
-//עכשיו זה כבר לא אדום פה הכל
+//with Cycle Detection
+
 public class main {
     //    public static void main(String[] args) {
 //

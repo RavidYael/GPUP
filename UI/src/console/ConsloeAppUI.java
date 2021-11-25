@@ -147,8 +147,17 @@ public class ConsloeAppUI implements Communicator {
         if (dependencyType == null) return;
         if(dependencyGraph.displayAllPathsBetweenTwoTargets(t1,t2,dependencyType) == false)
             System.out.println("No path Found");
+    }
 
+    public void isTargetInCycle(String t) {
+    Target target = getAndVerifyTargetByName(t);
 
+    if(target == null)
+        return;
+
+    if(!dependencyGraph.isTargetInCycle(target)){
+        System.out.println("the target "+target.getName()+" isn't  in any cycle");
+        }
     }
 }
 

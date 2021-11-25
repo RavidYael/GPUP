@@ -19,6 +19,7 @@ public interface Communicator {
         public void LoadFromFile(String directory) throws Exception;
         public String getInputFromUser();
         String getFileNameFromUser();
+        void isTargetInCycle(String targetName);
 
     }
 

@@ -101,7 +101,9 @@ public class GpupMenu {
                     }
 
                 case 6:
-                    //TODO implement cycle algorithm ravid!
+                    System.out.println("Please enter name of target, or '#' to go back");
+                    String targetName = communicator.getInputFromUser();
+                    communicator.isTargetInCycle(targetName);
                     break;
 
 

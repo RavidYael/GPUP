@@ -179,17 +179,56 @@ public class DependencyGraph {
 
     }
 
+    public boolean isTargetInCycle(Target investigatedTarget)
+    {
+
+        Map<String, Boolean> isVisited = new HashMap<>();
+
+        for (Target target : allTargets.values()){
+            isVisited.put(target.getName(),false);
+        }
+
+        List<String> traverse = new ArrayList<>();
+        traverse.add(investigatedTarget.getName());
+
+        for (String curTarget : investigatedTarget.getDependsOn())
+            if (isCyclicUtil(investigatedTarget,curTarget, isVisited,traverse))
+                return true;
+
+        return false;
+    }
+
+    private boolean isCyclicUtil(Target investigatedTarget,String curTarget,Map<String,Boolean> isVisited,List<String> theTraverse) {
+
+        if (isVisited.get(curTarget)) {
+            theTraverse.remove(curTarget);
+            return false;
+        }
+
+        theTraverse.add(curTarget);
+
+        if (getTargetByName(curTarget) == investigatedTarget) {
+            System.out.println(theTraverse);
+            return true;
+        }
+
+        isVisited.put(curTarget, true);
+
+        Set<String> curTargetDependOn = getTargetByName(curTarget).getDependsOn();
+
+        for (String neighbor : curTargetDependOn)
+            if(isCyclicUtil(investigatedTarget, neighbor, isVisited,theTraverse)) {
+                return true;
+            }
+
+        theTraverse.remove(curTarget);
+        return false;
+
+    }
+
 
 }
 
-
-
-
-
-    //    public Boolean isInCycle(Target src)
-//    {
-//
-//    }
 
 
 
