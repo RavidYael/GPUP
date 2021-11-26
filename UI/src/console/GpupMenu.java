@@ -100,7 +100,9 @@ public class GpupMenu {
                     System.out.println("Good bye!!");
                     System.exit(0);
                     break;
-
+                default:
+                    System.out.println("Please enter a valid input");
+                    break;
 
             }
 

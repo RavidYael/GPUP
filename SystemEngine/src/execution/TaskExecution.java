@@ -9,6 +9,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.Format;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -103,14 +105,14 @@ public class TaskExecution {
         while(iter.hasNext())
         {
             Target target = iter.next();
-
-            Long start = System.currentTimeMillis();
+            Instant start = Instant.now();
             Target.TaskResult result = task.runOnTarget(target);
-            Long finish = System.currentTimeMillis();
-            Long timeElapsed = finish - start;
-            target2summary.get(target).setDuration(timeElapsed);
+            Instant finish = Instant.now();
+            Duration duration = Duration.between(start,finish);
+            Long s = duration.getSeconds();
+            target2summary.get(target).setDuration(s);
             target.setTaskResult(result);
-            incrementTotalDuration(timeElapsed);
+            incrementTotalDuration(s);
             if(result == Target.TaskResult.Success || result == Target.TaskResult.Warning)
             {
                 updatedTargets =  graphInExecution.setAndUpdateTargetSuccess(target);
@@ -132,8 +134,6 @@ public class TaskExecution {
         updateTarget2summary();
         printExecutionSummary();
         printTargetExecutionSummary();
-
-
 
     }
 
@@ -172,7 +172,8 @@ public class TaskExecution {
 
     private void printExecutionSummary(){
         System.out.println("Task completed");
-        System.out.println("Task ran for: " +totalDuration +" ms.");
+        String runTime = String.format("%02d:%02d:%02d", totalDuration / 3600, (totalDuration % 3600) / 60, (totalDuration % 60));
+        System.out.println("Task ran for: " +runTime);
         System.out.println(status2Targets.get(Target.TargetStatus.Finished).stream().filter(t -> t.getTaskResult() == Target.TaskResult.Success).count() + " Targets succeeded");
         System.out.println(status2Targets.get(Target.TargetStatus.Finished).stream().filter(t-> t.getTaskResult() == Target.TaskResult.Failure).count()+ " Targets Failed");
         System.out.println(status2Targets.get(Target.TargetStatus.Finished).stream().filter(t-> t.getTaskResult() == Target.TaskResult.Failure).collect(Collectors.toSet()).toString());

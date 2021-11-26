@@ -45,11 +45,13 @@ public class TargetExecutionSummary {
 
     @Override
     public String toString() {
+
         String res =
                 "\nTargetName: " + targetName +
                 "\nTask ended with: " + taskResult;
         if (duration != null){
-            String durationStr = "\nTask ran for: " + duration.toString() + " ms";
+            String runTime = String.format("%02d:%02d:%02d", duration / 3600, (duration % 3600) / 60, (duration % 60));
+            String durationStr = "\nTask ran for: " + runTime;
             res+=durationStr;
         }
         return res;
