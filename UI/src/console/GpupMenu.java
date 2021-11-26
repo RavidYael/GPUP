@@ -26,21 +26,21 @@ public class GpupMenu {
                         "4. Find path between two targets\n"+
                         "5. Run task\n" +
                         "6. Check if target is in a cycle\n" +
-                        "7. Exit \n");
+                        "7. Save system to file \n" +
+                        "8. Exit \n");
     }
 
     public void executeMenu() {
-        int choice;
+        String choice;
         printMenu();
-        Scanner s = new Scanner(System.in);
-        choice = s.nextInt();
+
+        choice = communicator.getInputFromUser();
         int caseCount = 0;
-        while (choice != 7) {
+        while (true) {
             switch (choice) {
-                case 1: // load file
-                    String directory = communicator.getFileNameFromUser();
-                    try {
-                        communicator.LoadFromFile(directory);
+                case "1": // load file
+                    try{
+                        communicator.LoadFromFile();
                     }
                     catch (Exception e)
                     {
@@ -52,14 +52,14 @@ public class GpupMenu {
                     caseCount++;
                     break;
 
-                case 2: // Display dependency graph info
+                case "2": // Display dependency graph info
                     if (caseCount >= 1) {
                         communicator.displayGraphInformation();
                     }
                     else System.out.println("Please load file First");
                     break;
 
-                case 3: //Display specific target info
+                case "3": //Display specific target info
                     if (caseCount >=1) {
                         System.out.println("Please enter name of target, or '#' to go back");
                         String targetName = communicator.getInputFromUser();
@@ -74,11 +74,14 @@ public class GpupMenu {
                     }
 
 
-                case 4: // Find path between two targets
+                case "4": // Find path between two targets
+                    if (caseCount >=1)
                     communicator.displayPathBetweenTwoTargets();
+                    else
+                        System.out.println("please load file first");
                     break;
 
-                case 5: // run simulation task
+                case "5": // run simulation task
                     if (caseCount >= 1) {
                         communicator.runTask();
                     }
@@ -87,27 +90,41 @@ public class GpupMenu {
                     }
                     break;
 
-                case 6:
-                    System.out.println("Please enter name of target, or '#' to go back");
-                    String targetName = communicator.getInputFromUser();
-                    communicator.isTargetInCycle(targetName);
+                case "6":
+                    if (caseCount >= 1) {
+                        System.out.println("Please enter name of target, or '#' to go back");
+                        String targetName = communicator.getInputFromUser();
+                        communicator.isTargetInCycle(targetName);
+                    }
+                    else
+                        System.out.println("Please load File First");
+
                     break;
 
-                case 7:
-                    //TODO add on option to save system to file, (could be any type of file) page 19 in GPUP word file
+                case "7":
 
-                case 8:
+                    System.out.println("Please enter full path of file to save into");
+                    String directory = communicator.getInputFromUser();
+                    communicator.saveToFile(directory);
+                    break;
+
+                case "8":
                     System.out.println("Good bye!!");
+                    try {
+                        Thread.sleep(700);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                     System.exit(0);
                     break;
                 default:
-                    System.out.println("Please enter a valid input");
+                    System.out.println("Please enter a valid input! \n");
                     break;
 
             }
 
             printMenu();
-            choice = s.nextInt();
+            choice = communicator.getInputFromUser();
         }
     }
 }

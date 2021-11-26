@@ -2,9 +2,10 @@ package execution;
 
 import dependency.target.Target;
 
+import java.io.Serializable;
 import java.util.Random;
 
-public class SimulationTask extends Task {
+public class SimulationTask  extends Task implements Serializable {
     private String taskName = "Simulation";
     private int processTime;
     private boolean isRandomTime;

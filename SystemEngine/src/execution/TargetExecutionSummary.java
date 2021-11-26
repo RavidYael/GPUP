@@ -2,10 +2,11 @@ package execution;
 
 import dependency.target.Target;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 
-public class TargetExecutionSummary {
+public class TargetExecutionSummary implements Serializable {
     private String targetName;
     private Target.TaskResult taskResult;
     private Long duration;

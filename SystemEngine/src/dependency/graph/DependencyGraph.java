@@ -4,10 +4,11 @@ package dependency.graph;
 import dependency.target.Target;
 
 
+import java.io.Serializable;
 import java.util.*;
 
 
-public class DependencyGraph {
+public class DependencyGraph implements Serializable {
 
     private Map<String, Target> allTargets;
     private Map<Target.DependencyLevel, Set<Target>> targetsByDependencyLevel;

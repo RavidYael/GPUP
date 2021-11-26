@@ -17,7 +17,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class TaskExecution {
+public class TaskExecution implements Serializable {
     private Task task;
     private DependencyGraph graphInExecution;
     private Map<Target.TargetStatus,Set<Target>> status2Targets;

@@ -19,36 +19,34 @@ public class GraphExtractor {
     }
 
     private final GPUPDescriptor generatedGraph;
-    private  boolean valid = true;
-
+    private boolean valid = true;
 
 
     public GraphExtractor(String directory) throws Exception {
-       if (!directory.endsWith("xml")) {
-           throw (new Exception("Unsupported file type, file must end with .xml"));
+        if (!directory.endsWith("xml")) {
+            throw (new Exception("Unsupported file type, file must end with .xml"));
 
-        }
-       else
+        } else
             generatedGraph = getGraphFromXml(directory);
     }
 
-    public  GPUPDescriptor getGraphFromXml(String directory) {
+    public GPUPDescriptor getGraphFromXml(String directory) throws Exception {
         try {
             InputStream inputStream = new FileInputStream(directory);
             JAXBContext jc = JAXBContext.newInstance(JAXB_XML_PACKAGE_NAME);
             Unmarshaller u = jc.createUnmarshaller();
             return (GPUPDescriptor) u.unmarshal(inputStream);
-        }
-        catch (FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
+            throw (new Exception("File not found, please try again"));
+
         } catch (JAXBException e) {
             e.printStackTrace();
 
         }
+
         valid = false;
         return null;
 
-
     }
-
-    }
+}

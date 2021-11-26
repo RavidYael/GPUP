@@ -9,36 +9,92 @@ import execution.TaskExecution;
 import io.Communicator;
 
 
+import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Scanner;
 
-public class ConsloeAppUI implements Communicator {
+public class ConsloeAppUI implements Communicator, Serializable {
 
     private DependencyGraph dependencyGraph;
     private TaskExecution lastTaskExecution;
 
+    public DependencyGraph getDependencyGraph() {
+        return dependencyGraph;
+    }
+
+    public TaskExecution getLastTaskExecution() {
+        return lastTaskExecution;
+    }
 
     @Override
-    public void LoadFromFile(String directory) throws Exception {
-
-        DependencyGraph tempGraph = GraphFactory.newGraphWithData(directory);
-        if (tempGraph != null)
-            dependencyGraph = tempGraph;
+    public void LoadFromFile() throws Exception {
+        String directory;
+        System.out.println("Would you like to load previous system condition? ('y'/'n')");
+        String choice = getInputFromUser();
+        switch(choice) {
+            case "y":
+                System.out.println("Please enter a file path of the system you would like to load ");
+                directory = getInputFromUser();
+                ConsloeAppUI temp = DeSerialize(directory);
+                if (temp != null){
+                    this.dependencyGraph = temp.getDependencyGraph();
+                    this.lastTaskExecution = temp.getLastTaskExecution();
+                }
+                else
+                    System.out.println("System loading failed, please try again");
+                break;
+            case "n":
+                System.out.println("Please enter xml file path:");
+                directory = getInputFromUser();
+                DependencyGraph tempGraph = GraphFactory.newGraphWithData(directory);
+                if (tempGraph != null)
+                    dependencyGraph = tempGraph;
+                break;
+            default:
+                System.out.println("please enter 'y' or 'n'");
+        }
 
     }
 
-    public String getFileNameFromUser() {
-        System.out.println("Please enter file name");
+    @Override
+    public void saveToFile(String directory) {
+        File file = new File(directory);
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        try {
+            try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
+                oos.writeObject(this);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private ConsloeAppUI DeSerialize(String directory){
+        try {
+            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(directory))) {
+                return (ConsloeAppUI)ois.readObject();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    public String getInputFromUser() {
         Scanner s = new Scanner(System.in);
         String directory = s.nextLine();
         return directory;
     }
 
-    @Override
-    public String getInputFromUser() {
-        Scanner s = new Scanner(System.in);
-        String res = s.next();
-        return res;
-    }
+
 
 
     @Override
@@ -64,12 +120,12 @@ public class ConsloeAppUI implements Communicator {
     }
 
     private Target.Dependency getAndVerifyDependencyByString(String dependencyName) {
-        while (!dependencyName.equals("DependsOn") && !dependencyName.equals("RequiredFor")) {
-            System.out.println("Dependency type invalid, should be 'RequiredFor' or 'DependsOn',  (enter '#' to go back)");
+        while (!dependencyName.equals("depends on") && !dependencyName.equals("required for")) {
+            System.out.println("Dependency type invalid, should be 'required for' or 'depends on',  (enter '#' to go back)");
             String newName = getInputFromUser();
             if (newName.equals("#")) return null;
         }
-        if (dependencyName.equals("DependsOn"))
+        if (dependencyName.equals("depends on"))
             return Target.Dependency.DependsOn;
         else
             return Target.Dependency.RequiredFor;
@@ -103,7 +159,7 @@ public class ConsloeAppUI implements Communicator {
 
         System.out.println("How long will the task run? (in ms)");
         int processTime = Integer.parseInt(getInputFromUser());
-        System.out.println("Is task run time Random? 'y'/'n'");
+        System.out.println("Is task run time Random? ('y'/'n')");
         random = getInputFromUser().equals("y");
 
         System.out.println("what is the probability of success?");
@@ -114,7 +170,7 @@ public class ConsloeAppUI implements Communicator {
         task = new SimulationTask(processTime, random, probSuccess, probWarning);
 
 
-        System.out.println("would you like to run a task on the previous graph? 'y'/'n'");
+        System.out.println("would you like to run a task on the previous graph? ('y'/'n') ");
         String choice = getInputFromUser();
         if (choice.equals("y")) {
             if (lastTaskExecution == null) {

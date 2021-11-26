@@ -16,9 +16,9 @@ public interface Communicator {
         void displayTargetInformation(String targetName);
         void displayPathBetweenTwoTargets();
         void runTask();
-        public void LoadFromFile(String directory) throws Exception;
+        public void LoadFromFile() throws Exception;
+        public void saveToFile(String directory);
         public String getInputFromUser();
-        String getFileNameFromUser();
         void isTargetInCycle(String targetName);
 
     }

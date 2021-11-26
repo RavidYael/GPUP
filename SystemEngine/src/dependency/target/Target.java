@@ -2,12 +2,13 @@
 
 package dependency.target;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
 
 
-public class Target {
+public class Target implements Serializable {
 
   public static enum DependencyLevel {Root,Middle,Leaf, Independed}
   public static enum Dependency {DependsOn , RequiredFor}
