@@ -3,13 +3,9 @@ package execution;
 import dependency.target.Target;
 
 public abstract class Task {
-
-    public abstract Target.TaskResult runTaskOnTarget(Target target);
-
+    private String taskName;
 
 
-
-
-
-
+    public abstract Target.TaskResult runOnTarget(Target target);
+    public abstract String getTaskName();
 }

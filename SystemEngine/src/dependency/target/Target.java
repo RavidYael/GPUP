@@ -12,7 +12,7 @@ public class Target {
   public static enum DependencyLevel {Root,Middle,Leaf, Independed}
   public static enum Dependency {DependsOn , RequiredFor}
     public static enum TargetStatus { Frozen, Skipped, Waiting ,InProcess, Finished, Done}
-    public static enum TaskResult {Success, Warning, Failure}
+    public static enum TaskResult {Success, Warning, Failure,Skipped}
 
 
     private String name;
@@ -21,7 +21,7 @@ public class Target {
     private String data;
     private DependencyLevel dependencyLevel;
     private TargetStatus targetStatus = TargetStatus.Frozen;
-    private TaskResult taskResult;
+    private TaskResult taskResult = TaskResult.Skipped;
 
 
     public Target(String name,String data) {
@@ -37,6 +37,7 @@ public class Target {
         this.setName(other.getName());
         this.setData(other.data);
         this.setTaskResult(other.getTaskResult());
+        this.targetStatus = other.targetStatus;
         this.requiredFor = new HashSet<>();
         for (String req : other.requiredFor){
             requiredFor.add(req);

@@ -3,6 +3,15 @@ package execution;
 import dependency.graph.DependencyGraph;
 import dependency.target.Target;
 
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.Format;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -10,6 +19,9 @@ public class TaskExecution {
     private Task task;
     private DependencyGraph graphInExecution;
     private Map<Target.TargetStatus,Set<Target>> status2Targets;
+    private Map<Target,TargetExecutionSummary> target2summary;
+    private String targetsSummaryDir;
+    private Long totalDuration =0L;
 
 
     public TaskExecution(DependencyGraph dependencyGraph, Task task) {
@@ -23,7 +35,37 @@ public class TaskExecution {
         status2Targets.put(Target.TargetStatus.Finished,new HashSet<>());
         status2Targets.put(Target.TargetStatus.Done,new HashSet<>());
         updateStatus2Target();
+        initializeTarget2summary();
+    }
 
+    private void createTaskWorkingDirectory(){
+        String timeStamp = getTimeStamp("dd.MM.yyyy HH.mm.ss");
+        String workingDirStr =  graphInExecution.getWorkingDir();
+        String taskDirStr = workingDirStr + "\\" + task.getTaskName() +" " + timeStamp;
+        File taskDirectory = new File(taskDirStr);
+        Path path = Paths.get(taskDirStr);
+        this.targetsSummaryDir = path.toString();
+        if (!taskDirectory.exists()) {
+            try {
+                Files.createDirectories(path);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void initializeTarget2summary(){
+        target2summary = new HashMap<>();
+        for (Target target : graphInExecution.getAllTargets().values()){
+            TargetExecutionSummary defaultSummary = new TargetExecutionSummary(target.getName(),target.getTaskResult(),null);
+            target2summary.put(target,defaultSummary);
+        }
+    }
+
+    private void updateTarget2summary(){
+        for (Target target : graphInExecution.getAllTargets().values()){
+            target2summary.get(target).setTaskResult(target.getTaskResult());
+        }
     }
 
     private void clearStatus2Targets() {
@@ -45,42 +87,30 @@ public class TaskExecution {
 
 
 
-//    public void runTaskFromScratch()
-//    {
-//        Set<String> updatedTargets;
-//
-//        for (Target target : status2Targets.get(Target.TargetStatus.Waiting))
-//        {
-//            Target.TaskResult result = task.runTaskOnTarget(target);
-//            target.setTaskResult(result);
-//            if(result == Target.TaskResult.Success || result == Target.TaskResult.Warning)
-//            {
-//               updatedTargets =  graphInExecution.setAndUpdateTargetSuccess(target);
-//                if (!updatedTargets.isEmpty())
-//                    System.out.println("The following targets are now ready to process: " + updatedTargets.toString());
-//            }
-//            else if (result == Target.TaskResult.Failure)
-//            {
-//                 updatedTargets = graphInExecution.setAndUpdateTargetFailure(target);
-//                if (!updatedTargets.isEmpty())
-//                System.out.println("The following targets now cannot be processed: " +updatedTargets.toString());
-//            }
-//            target.setTargetStatus(Target.TargetStatus.Finished);
-//            updateStatus2Target();
-//        }
-//    }
-//
-//}
+
+    private String getTimeStamp(String format){
+        LocalDateTime myDateObj = LocalDateTime.now();
+        DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern(format);
+        String formattedDate = myDateObj.format(myFormatObj);
+        return formattedDate;
+    }
 
     public void runTaskFromScratch()
     {
+        createTaskWorkingDirectory();
         Set<String> updatedTargets;
         Iterator<Target> iter = status2Targets.get(Target.TargetStatus.Waiting).iterator();
         while(iter.hasNext())
         {
             Target target = iter.next();
-            Target.TaskResult result = task.runTaskOnTarget(target);
+
+            Long start = System.currentTimeMillis();
+            Target.TaskResult result = task.runOnTarget(target);
+            Long finish = System.currentTimeMillis();
+            Long timeElapsed = finish - start;
+            target2summary.get(target).setDuration(timeElapsed);
             target.setTaskResult(result);
+            incrementTotalDuration(timeElapsed);
             if(result == Target.TaskResult.Success || result == Target.TaskResult.Warning)
             {
                 updatedTargets =  graphInExecution.setAndUpdateTargetSuccess(target);
@@ -98,11 +128,32 @@ public class TaskExecution {
             iter = status2Targets.get(Target.TargetStatus.Waiting).iterator();
         }
 
+
+        updateTarget2summary();
         printExecutionSummary();
-        // TODO print how much time it took the task to run
-        //TODO print to log file
+        printTargetExecutionSummary();
 
 
+
+    }
+
+    private void printTargetExecutionSummary() {
+   for(Target curTarget : target2summary.keySet())
+   {
+       try {
+           PrintStream printStream = new PrintStream(new File(targetsSummaryDir+"\\"+ curTarget.getName() +".log"));
+           printSimultaniously(target2summary.get(curTarget),System.out,printStream);
+       } catch (FileNotFoundException e) {
+           e.printStackTrace();
+       }
+
+   }
+
+    }
+
+    private void printSimultaniously(Object obj, PrintStream out1, PrintStream out2) {
+    out1.println(obj);
+    out2.println(obj);
     }
 
     public void runTaskIncrementally(){
@@ -121,19 +172,22 @@ public class TaskExecution {
 
     private void printExecutionSummary(){
         System.out.println("Task completed");
+        System.out.println("Task ran for: " +totalDuration +" ms.");
         System.out.println(status2Targets.get(Target.TargetStatus.Finished).stream().filter(t -> t.getTaskResult() == Target.TaskResult.Success).count() + " Targets succeeded");
         System.out.println(status2Targets.get(Target.TargetStatus.Finished).stream().filter(t-> t.getTaskResult() == Target.TaskResult.Failure).count()+ " Targets Failed");
         System.out.println(status2Targets.get(Target.TargetStatus.Finished).stream().filter(t-> t.getTaskResult() == Target.TaskResult.Failure).collect(Collectors.toSet()).toString());
         System.out.println(status2Targets.get(Target.TargetStatus.Finished).stream().filter(t-> t.getTaskResult() == Target.TaskResult.Warning).count() + " Targets succeeded with warning");
         System.out.println(status2Targets.get(Target.TargetStatus.Skipped).size() + " Targets skipped");
 
-
-
-
     }
+
     private boolean isExecutionComplete(){
         return status2Targets.get(Target.TargetStatus.Done).size() == graphInExecution.getAllTargets().size();
 
+    }
+
+    private void incrementTotalDuration(Long targetDuration) {
+        totalDuration += targetDuration;
     }
 }
 

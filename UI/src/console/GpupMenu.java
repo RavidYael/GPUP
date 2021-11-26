@@ -75,30 +75,17 @@ public class GpupMenu {
 
 
                 case 4: // Find path between two targets
-                    System.out.println("Please enter names of 2 targets, or # to go back");
-                    String name1 = communicator.getInputFromUser();
-                    if (name1.equals("#")) break;
-
-                    String name2 = communicator.getInputFromUser();
-                    if (name2.equals("#")) break;
-
-
-                    System.out.println("Plese enter dependency between said targets: 'DependsOn' or 'RequiredFor' ");
-                    String dependencyType = communicator.getInputFromUser();
-                    if (dependencyType.equals("#")) break;
-
-
-                    communicator.displayPathBetweenTwoTargets(name1,name2,dependencyType);
+                    communicator.displayPathBetweenTwoTargets();
                     break;
 
                 case 5: // run simulation task
-                    if (caseCount >= 1)
-                    communicator.runTask();
-
-                    else{
-                        System.out.println("Please load file First");
-                        break;
+                    if (caseCount >= 1) {
+                        communicator.runTask();
                     }
+                    else {
+                        System.out.println("Please load file First");
+                    }
+                    break;
 
                 case 6:
                     System.out.println("Please enter name of target, or '#' to go back");
@@ -106,9 +93,9 @@ public class GpupMenu {
                     communicator.isTargetInCycle(targetName);
                     break;
 
-
                 case 7:
                     //TODO add on option to save system to file, (could be any type of file) page 19 in GPUP word file
+
                 case 8:
                     System.out.println("Good bye!!");
                     System.exit(0);

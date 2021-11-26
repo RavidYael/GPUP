@@ -14,13 +14,8 @@ public class GraphFactory {
 
 
     private static boolean loadAndValidateGraphFromFile(String directory) throws Exception {
-       // Path path = Paths.get(directory);
-        try {
             generatedGraph = new GraphExtractor(directory).getGeneratedGraph();
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            throw e;
-        }
+
 
         GraphValidator graphValidator = new GraphValidator(generatedGraph);
         return graphValidator.startValidation();  // not sure where to catch the exceptions
@@ -33,6 +28,7 @@ public class GraphFactory {
            return null;
 
         dependencyGraph = new DependencyGraph();
+        dependencyGraph.setWorkingDir(generatedGraph.getGPUPConfiguration().getGPUPWorkingDirectory());
         Target toAdd;
         for(GPUPTarget curTarget : generatedGraph.getGPUPTargets().getGPUPTarget())
         {

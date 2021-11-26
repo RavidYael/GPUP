@@ -14,7 +14,7 @@ public interface Communicator {
        // void loadAndValidateGraphFromFile() throws Exception;
         void displayGraphInformation();
         void displayTargetInformation(String targetName);
-        void displayPathBetweenTwoTargets(String name1, String name2, String dependencyType);
+        void displayPathBetweenTwoTargets();
         void runTask();
         public void LoadFromFile(String directory) throws Exception;
         public String getInputFromUser();

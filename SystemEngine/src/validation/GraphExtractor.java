@@ -25,7 +25,7 @@ public class GraphExtractor {
 
     public GraphExtractor(String directory) throws Exception {
        if (!directory.endsWith("xml")) {
-           throw (new Exception("File doesn't end with .xml"));
+           throw (new Exception("Unsupported file type, file must end with .xml"));
 
         }
        else

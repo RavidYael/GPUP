@@ -11,6 +11,8 @@ public class DependencyGraph {
 
     private Map<String, Target> allTargets;
     private Map<Target.DependencyLevel, Set<Target>> targetsByDependencyLevel;
+    private String workingDir;
+
 
     public DependencyGraph() {
         allTargets = new HashMap<>();
@@ -20,6 +22,11 @@ public class DependencyGraph {
         targetsByDependencyLevel.put(Target.DependencyLevel.Root, new HashSet<>());
         targetsByDependencyLevel.put(Target.DependencyLevel.Independed, new HashSet<>());
 
+
+    }
+
+    public String getWorkingDir() {
+        return workingDir;
     }
 
     public Map<String, Target> getAllTargets() {
@@ -38,7 +45,9 @@ public class DependencyGraph {
         return getTargetsByLevel(level).size();
     }
 
-
+    public void setWorkingDir(String workingDir) {
+        this.workingDir = workingDir;
+    }
 
     public boolean displayAllPathsBetweenTwoTargets(Target src, Target dest, Target.Dependency dependedOnOrNeeded) {
         //TODO function returns only one path, needs to return all paths יאח
@@ -169,13 +178,13 @@ public class DependencyGraph {
 
     public DependencyGraph createDeepCopy() {
         DependencyGraph copyGraph = new DependencyGraph();
+        copyGraph.setWorkingDir(this.workingDir);
         for (String targetName : allTargets.keySet()){
             copyGraph.allTargets.put(targetName,new Target(allTargets.get(targetName)));
         }
 
         copyGraph.updateAllTargetDependencyLevel();
         return copyGraph;
-
 
     }
 

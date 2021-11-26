@@ -17,23 +17,22 @@ public class ConsloeAppUI implements Communicator {
     private TaskExecution lastTaskExecution;
 
 
-
     @Override
     public void LoadFromFile(String directory) throws Exception {
 
-        DependencyGraph tempgGraph = GraphFactory.newGraphWithData(directory);
-        if (tempgGraph !=null)
-            dependencyGraph = tempgGraph;
+        DependencyGraph tempGraph = GraphFactory.newGraphWithData(directory);
+        if (tempGraph != null)
+            dependencyGraph = tempGraph;
 
     }
 
-    public String getFileNameFromUser()
-    {
+    public String getFileNameFromUser() {
         System.out.println("Please enter file name");
         Scanner s = new Scanner(System.in);
         String directory = s.nextLine();
         return directory;
     }
+
     @Override
     public String getInputFromUser() {
         Scanner s = new Scanner(System.in);
@@ -51,6 +50,7 @@ public class ConsloeAppUI implements Communicator {
         System.out.println(dependencyGraph.getTargetsCountByLevel(Target.DependencyLevel.Independed) + " are independents");
 
     }
+
     private Target getAndVerifyTargetByName(String targetName) {
         Target resTarget = dependencyGraph.getTargetByName(targetName);
         while (resTarget == null) {
@@ -62,10 +62,9 @@ public class ConsloeAppUI implements Communicator {
         return resTarget;
 
     }
-    private Target.Dependency getAndVerifyDependencyByString(String dependencyName)
-    {
-        while(!dependencyName.equals("DependsOn") && !dependencyName.equals("RequiredFor"))
-        {
+
+    private Target.Dependency getAndVerifyDependencyByString(String dependencyName) {
+        while (!dependencyName.equals("DependsOn") && !dependencyName.equals("RequiredFor")) {
             System.out.println("Dependency type invalid, should be 'RequiredFor' or 'DependsOn',  (enter '#' to go back)");
             String newName = getInputFromUser();
             if (newName.equals("#")) return null;
@@ -80,8 +79,8 @@ public class ConsloeAppUI implements Communicator {
     @Override
     public void displayTargetInformation(String targetName) {
 
-       Target dispTarget = getAndVerifyTargetByName(targetName);
-       if (dispTarget == null) return;
+        Target dispTarget = getAndVerifyTargetByName(targetName);
+        if (dispTarget == null) return;
 
         System.out.println("Target name:" + dispTarget.getName() + "\n" +
                 " Target dependecy level in graph is: " + dispTarget.getDependencyLevel() + "\n");
@@ -95,7 +94,7 @@ public class ConsloeAppUI implements Communicator {
             System.out.println("Target isn't needed for any other Target");
         else
             System.out.println("Target is needed for: " + dispTarget.getRequiredFor().toString());
-        }
+    }
 
     @Override
     public void runTask() {
@@ -104,7 +103,7 @@ public class ConsloeAppUI implements Communicator {
 
         System.out.println("How long will the task run? (in ms)");
         int processTime = Integer.parseInt(getInputFromUser());
-        System.out.println("Is task run time Random? 'y'/'n'" );
+        System.out.println("Is task run time Random? 'y'/'n'");
         random = getInputFromUser().equals("y");
 
         System.out.println("what is the probability of success?");
@@ -112,52 +111,60 @@ public class ConsloeAppUI implements Communicator {
 
         System.out.println("what is the probability of success with warning?");
         float probWarning = Float.parseFloat(getInputFromUser());
-        task = new SimulationTask(processTime,random,probSuccess,probWarning);
+        task = new SimulationTask(processTime, random, probSuccess, probWarning);
 
 
         System.out.println("would you like to run a task on the previous graph? 'y'/'n'");
         String choice = getInputFromUser();
-        if (choice.equals("y")){
-            if (lastTaskExecution == null)
-            {
+        if (choice.equals("y")) {
+            if (lastTaskExecution == null) {
                 System.out.println("No previos execution was found, running from scratch");
-                lastTaskExecution = new TaskExecution(dependencyGraph,task);
+                lastTaskExecution = new TaskExecution(dependencyGraph, task);
                 lastTaskExecution.runTaskFromScratch();
-            }
-            else{
+            } else {
                 lastTaskExecution.runTaskIncrementally();
 
             }
-        }
-        else{
-            lastTaskExecution = new TaskExecution(dependencyGraph,task);
+        } else {
+            lastTaskExecution = new TaskExecution(dependencyGraph, task);
             lastTaskExecution.runTaskFromScratch();
         }
-
 
 
     }
 
     @Override
-    public void displayPathBetweenTwoTargets(String name1, String name2, String dependencyTypeStr) {
+    public void displayPathBetweenTwoTargets() {
+        System.out.println("Please enter names of first target, or # to go back");
+        String name1 = getInputFromUser();
         Target t1 = getAndVerifyTargetByName(name1);
+        System.out.println("Please enter names of second target, or # to go back");
+        String name2 = getInputFromUser();
         Target t2 = getAndVerifyTargetByName(name2);
         if (t1 == null || t2 == null) return;
+        System.out.println("Plese enter dependency between said targets: 'depends on' or required for' ");
+        String dependencyTypeStr = getInputFromUser();
         Target.Dependency dependencyType = getAndVerifyDependencyByString(dependencyTypeStr);
         if (dependencyType == null) return;
-        if(dependencyGraph.displayAllPathsBetweenTwoTargets(t1,t2,dependencyType) == false)
+        if (dependencyGraph.displayAllPathsBetweenTwoTargets(t1, t2, dependencyType) == false)
             System.out.println("No path Found");
     }
 
     public void isTargetInCycle(String t) {
-    Target target = getAndVerifyTargetByName(t);
+        Target target = getAndVerifyTargetByName(t);
 
-    if(target == null)
-        return;
+        if (target == null)
+            return;
 
-    if(!dependencyGraph.isTargetInCycle(target)){
-        System.out.println("the target "+target.getName()+" isn't  in any cycle");
+        if (!dependencyGraph.isTargetInCycle(target)) {
+            System.out.println("the target " + target.getName() + " isn't  in any cycle");
         }
     }
+
+//    public void saveToFile(String directory){
+//        dependencyGraph.
+//    }
+//}
 }
+
 

@@ -5,7 +5,7 @@ import dependency.target.Target;
 import java.util.Random;
 
 public class SimulationTask extends Task {
-
+    private String taskName = "Simulation";
     private int processTime;
     private boolean isRandomTime;
     private float successProb;
@@ -25,7 +25,7 @@ public class SimulationTask extends Task {
     }
 
     @Override
-    public Target.TaskResult runTaskOnTarget(Target target) {
+    public Target.TaskResult runOnTarget(Target target) {
         Target.TaskResult resStatus;
         target.setTargetStatus(Target.TargetStatus.InProcess);
         double rand = new Random().nextDouble();
@@ -61,8 +61,11 @@ public class SimulationTask extends Task {
         System.out.println();
         return resStatus;
 
-
-
-
     }
+
+    @Override
+    public String getTaskName() {
+        return taskName;
+    }
+
 }
