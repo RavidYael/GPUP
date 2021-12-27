@@ -7,6 +7,10 @@ import jaxb.generated.GPUPTargetDependencies;
 import validation.GraphExtractor;
 import validation.GraphValidator;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 public class GraphFactory {
     private static DependencyGraph dependencyGraph;
     private static GPUPDescriptor generatedGraph;
@@ -17,9 +21,19 @@ public class GraphFactory {
             generatedGraph = new GraphExtractor(directory).getGeneratedGraph();
 
 
-        GraphValidator graphValidator = new GraphValidator(generatedGraph);
+        GraphValidator graphValidator = new GraphValidator(generatedGraph); //TODO add new validation according to schema
         return graphValidator.startValidation();  // not sure where to catch the exceptions
 
+    }
+
+    private static void generateSerialSets(){
+
+        for (GPUPDescriptor.GPUPSerialSets.GPUPSerialSet serialSet : generatedGraph.getGPUPSerialSets().getGPUPSerialSet()){
+            Set<String> tempSet = new HashSet<>();
+            String[] nameList = serialSet.getTargets().split(",");
+            Arrays.stream(nameList).forEach(s-> tempSet.add(s));
+            dependencyGraph.addSetToSerialSets(serialSet.getName(),tempSet);
+        }
     }
 
     public static DependencyGraph newGraphWithData(String directory) throws Exception {
@@ -29,8 +43,9 @@ public class GraphFactory {
 
         dependencyGraph = new DependencyGraph();
         dependencyGraph.setWorkingDir(generatedGraph.getGPUPConfiguration().getGPUPWorkingDirectory());
+        dependencyGraph.setMaxParallelism(generatedGraph.getGPUPConfiguration().getGPUPMaxParallelism());
         Target toAdd;
-        for(GPUPTarget curTarget : generatedGraph.getGPUPTargets().getGPUPTarget())
+        for(GPUPTarget curTarget : generatedGraph.getGPUPTargets().getGPUPTarget()) // adding targets to graph
         {
             toAdd = new Target(curTarget.getName(),curTarget.getGPUPUserData());
             if (curTarget.getGPUPTargetDependencies()!= null) {
@@ -47,7 +62,7 @@ public class GraphFactory {
         }
         dependencyGraph.fixTargetsDependencies();
        dependencyGraph.updateAllTargetDependencyLevel();
-
+       generateSerialSets();
         return dependencyGraph;
 
     }

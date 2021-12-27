@@ -13,6 +13,8 @@ public class DependencyGraph implements Serializable {
     private Map<String, Target> allTargets;
     private Map<Target.DependencyLevel, Set<Target>> targetsByDependencyLevel;
     private String workingDir;
+    private Map<String, Set<String>> name2SerialSet;
+    private int maxParallelism;
 
 
     public DependencyGraph() {
@@ -22,6 +24,7 @@ public class DependencyGraph implements Serializable {
         targetsByDependencyLevel.put(Target.DependencyLevel.Middle, new HashSet<>());
         targetsByDependencyLevel.put(Target.DependencyLevel.Root, new HashSet<>());
         targetsByDependencyLevel.put(Target.DependencyLevel.Independed, new HashSet<>());
+        name2SerialSet = new HashMap<>();
 
 
     }
@@ -149,6 +152,15 @@ public class DependencyGraph implements Serializable {
             setAndUpdateTargetFailure(parentTarget);
         }
         return skippedTargets;
+    }
+
+    public void addSetToSerialSets(String name, Set<String> serialSet) {
+        name2SerialSet.put(name, serialSet);
+    }
+
+
+    public void setMaxParallelism(int maxParallelism) {
+        this.maxParallelism = maxParallelism;
     }
     public void fixTargetsDependencies()
     {

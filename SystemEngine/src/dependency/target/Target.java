@@ -15,7 +15,6 @@ public class Target implements Serializable {
     public static enum TargetStatus { Frozen, Skipped, Waiting ,InProcess, Finished, Done}
     public static enum TaskResult {Success, Warning, Failure,Skipped}
 
-
     private String name;
     private Set<String> requiredFor;
     private Set<String> dependsOn;

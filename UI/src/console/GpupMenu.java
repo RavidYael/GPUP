@@ -102,10 +102,13 @@ public class GpupMenu {
                     break;
 
                 case "7":
-
-                    System.out.println("Please enter full path of file to save into");
-                    String directory = communicator.getInputFromUser();
-                    communicator.saveToFile(directory);
+                    if (caseCount >=1) {
+                        System.out.println("Please enter full path of file to save into");
+                        String directory = communicator.getInputFromUser();
+                        communicator.saveToFile(directory);
+                    }
+                    else
+                        System.out.println("Please load File First");
                     break;
 
                 case "8":
