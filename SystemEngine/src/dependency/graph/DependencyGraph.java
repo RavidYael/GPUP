@@ -60,37 +60,44 @@ public class DependencyGraph implements Serializable {
             isVisited.put(target,false);
         }
 
-        isVisited.values().forEach(bool -> bool = false);
         ArrayList<String> pathList = new ArrayList<>();
+
         pathList.add(src.getName());
+
         Boolean[] flag = new Boolean[]{new Boolean(false)};
+
         getAllPathsUtils(src, dest, isVisited, pathList, dependedOnOrNeeded, flag);
+
         return flag[0];
     }
 
     private void getAllPathsUtils(Target src, Target dest, Map<Target, Boolean> isVisited, ArrayList<String> pathList, Target.Dependency requiredOrNeeded, Boolean[] flag) {
 
-        if (src.equals(dest)) {
+        if (src == dest) {
             System.out.println(pathList.toString());
             flag[0] = true; // May Not Work
         }
 
         isVisited.put(src, true);
+
         Set<String> curSet = src.getDependsOnOrNeededFor(requiredOrNeeded);
+
         for (String targetName : curSet) {
+
             Target t = getTargetByName(targetName);
-            if (!isVisited.isEmpty()) {
+
                 if (isVisited.get(t) == false) {
+
                     pathList.add(targetName);
+
                     getAllPathsUtils(t, dest, isVisited, pathList, requiredOrNeeded, flag);
 
                     pathList.remove(targetName);
                 }
-            }
-
-            isVisited.put(src, false);
 
         }
+
+        isVisited.put(src, false);
     }
 
     public void setAllTargets(Map<String, Target> allTargets) {
