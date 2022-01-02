@@ -256,13 +256,17 @@ public class DependencyGraph implements Serializable {
     }
 
     public int getTotalDependencies(String targetName, Target.Dependency dependency) {
+        // this method CANT help with cycle find !!
         Set<Target> DependencyRelated = new HashSet<>();
         Set<String> visited = new HashSet<>();
         getTotalDependenciesRec(targetName, dependency,DependencyRelated);
+        DependencyRelated.remove(getTargetByName(targetName));
+        //due to this line btw
         return DependencyRelated.size();
     }
 //
     public void getTotalDependenciesRec(String targetName, Target.Dependency dependency, Set<Target> DependencyRelated) {
+
         Target curTarget = allTargets.get(targetName);
         if (DependencyRelated.contains(targetName)) return;
 
