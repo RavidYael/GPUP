@@ -123,7 +123,6 @@ public class GpupMenu {
                 default:
                     System.out.println("Please enter a valid input! \n");
                     break;
-
             }
 
             printMenu();

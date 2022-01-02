@@ -10,24 +10,10 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
-
 
 <BorderPane prefHeight="702.0" prefWidth="1031.0" stylesheets="@darkStyle.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="MainScreen.MainController">
    <center>
-      <BorderPane>
-         <top>
-            <AnchorPane BorderPane.alignment="CENTER">
-               <children>
-                        <Label layoutX="262.0" layoutY="300.0" opacity="0.74" prefHeight="35.0" prefWidth="233.0" text="Welcome To GPUP" textFill="#9f9f9f" AnchorPane.bottomAnchor="300.0" AnchorPane.leftAnchor="262.0" AnchorPane.rightAnchor="280.0" AnchorPane.topAnchor="300.0">
-                            <font>
-                                <Font size="24.0" />
-                            </font>
-                        </Label>
-               </children>
-            </AnchorPane>
-         </top>
-      </BorderPane>
+      <BorderPane fx:id="centerPane" />
    </center>
    <left>
         <VBox alignment="TOP_CENTER" prefHeight="576.0" prefWidth="256.0" style="-fx-background-color: #05071F;" stylesheets="@darkStyle.css" BorderPane.alignment="CENTER">
@@ -54,7 +40,7 @@
                         <Insets left="50.0" />
                     </padding>
                 </Button>
-                <Button fx:id="grapInfoButton" alignment="BASELINE_LEFT" graphicTextGap="22.0" mnemonicParsing="false" onAction="#graphInfoButtonAction" prefHeight="42.0" prefWidth="259.0" stylesheets="@style.css" text="Graph Info">
+                <Button fx:id="graphInfoButton" alignment="BASELINE_LEFT" graphicTextGap="22.0" mnemonicParsing="false" onAction="#graphInfoButtonAction" prefHeight="42.0" prefWidth="259.0" stylesheets="@style.css" text="Graph Info">
                     <graphic>
                         <ImageView fitHeight="23.0" fitWidth="27.0" pickOnBounds="true" preserveRatio="true">
                             <image>
@@ -84,6 +70,7 @@
    <top>
       <HBox prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: #05071F;" BorderPane.alignment="CENTER">
          <children>
+            <AnchorPane prefHeight="200.0" prefWidth="200.0" />
             <ToggleButton fx:id="switchSkinToggle" mnemonicParsing="false" onAction="#switchSkinToggleAction" style="-fx-background-color: #05071F;" text="switchSkin">
                <HBox.margin>
                   <Insets left="900.0" top="15.0" />

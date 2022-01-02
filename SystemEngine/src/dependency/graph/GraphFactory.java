@@ -27,13 +27,15 @@ public class GraphFactory {
     }
 
     private static void generateSerialSets(){
-
-        for (GPUPDescriptor.GPUPSerialSets.GPUPSerialSet serialSet : generatedGraph.getGPUPSerialSets().getGPUPSerialSet()){
+    if (generatedGraph.getGPUPSerialSets() != null) {
+        for (GPUPDescriptor.GPUPSerialSets.GPUPSerialSet serialSet : generatedGraph.getGPUPSerialSets().getGPUPSerialSet()) {
             Set<String> tempSet = new HashSet<>();
             String[] nameList = serialSet.getTargets().split(",");
-            Arrays.stream(nameList).forEach(s-> tempSet.add(s));
-            dependencyGraph.addSetToSerialSets(serialSet.getName(),tempSet);
+            Arrays.stream(nameList).forEach(s -> tempSet.add(s));
+            dependencyGraph.addSetToSerialSets(serialSet.getName(), tempSet);
         }
+    }
+
     }
 
     public static DependencyGraph newGraphWithData(String directory) throws Exception {

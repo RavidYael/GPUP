@@ -138,6 +138,7 @@ public class TaskExecution implements Serializable {
     }
 
     private void printTargetExecutionSummary() {
+
    for(Target curTarget : target2summary.keySet())
    {
        try {

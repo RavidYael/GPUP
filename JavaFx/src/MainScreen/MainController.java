@@ -1,15 +1,20 @@
 package MainScreen;
 
 
+import FXData.BackEndMediator;
+import MainScreen.graphInfoScreen.GraphInfoScreenController;
+import MainScreen.taskscreen.TaskScreenController;
 import com.sun.tracing.dtrace.DependencyClass;
 import dependency.graph.DependencyGraph;
 import dependency.graph.GraphFactory;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
@@ -29,6 +34,7 @@ public class MainController {
 
     @FXML
     private Button taskButton;
+
     @FXML
     private Label fileLoadLabel;
 
@@ -36,14 +42,35 @@ public class MainController {
     private ToggleButton switchSkinToggle;
 
     @FXML
-    private Pane centerPane;
+    private BorderPane centerPane;
 
-    DependencyGraph dependencyGraph;
+    private Parent tasksScreen;
+    private Parent graphInfoScreen;
+    private TaskScreenController taskScreenController;
+    private GraphInfoScreenController graphInfoScreenController;
+    private BackEndMediator backEndMediator =  new BackEndMediator();
+
+    @FXML
+    public void initialize() throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader();
+        fxmlLoader.setLocation(getClass().getResource("tasks screen.fxml"));
+        tasksScreen = fxmlLoader.load();
+        taskScreenController = fxmlLoader.getController();
+        taskScreenController.setBackEndMediator(backEndMediator);
+
+        FXMLLoader fxmlLoader1 = new FXMLLoader(getClass().getResource("graph info screen.fxml"));
+        graphInfoScreen = fxmlLoader1.load();
+        graphInfoScreenController = fxmlLoader1.getController();
+        graphInfoScreenController.setBackEndMediator(backEndMediator);
+
+
+    }
 
     @FXML
     void graphInfoButtonAction(ActionEvent event) throws IOException {
-        Parent root = FXMLLoader.load(getClass().getResource("secondaryScene.fxml"));
-        centerPane.getChildren().add(root);
+        FXMLLoader fxmlLoader1 = new FXMLLoader(getClass().getResource("graph info screen.fxml"));
+        graphInfoScreenController.myInitializer();
+        centerPane.setCenter(graphInfoScreen);
     }
 
     @FXML
@@ -52,24 +79,29 @@ public class MainController {
         File xml = fileChooser.showOpenDialog(null);
         String message = "File loaded successfully";
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        boolean loadSuccess = true;
 
         try {
-            dependencyGraph = GraphFactory.newGraphWithData(xml.getPath().toString());
+            backEndMediator.setDependencyGraph(GraphFactory.newGraphWithData(xml.getPath().toString()));
         } catch (Exception e) {
             e.printStackTrace();
             message = "file loading failed!\n" + e.getMessage();
             alert.setAlertType(Alert.AlertType.ERROR);
+            loadSuccess = false;
         }
-
         alert.setContentText(message);
         alert.showAndWait();
+        if (loadSuccess)
+            graphInfoButton.fire();
+
 
 
     }
 
     @FXML
-    void taskButtonAction(ActionEvent event) {
+    void taskButtonAction(ActionEvent event) throws IOException {
 
+        centerPane.setCenter(tasksScreen);
     }
     @FXML
     void switchSkinToggleAction(ActionEvent event) {

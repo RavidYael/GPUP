@@ -255,8 +255,32 @@ public class DependencyGraph implements Serializable {
 
     }
 
+    public int getTotalDependencies(String targetName, Target.Dependency dependency) {//TODO not working
+        int count = 0;
+        Set<String> visited = new HashSet<>();
+        return getTotalDependenciesRec(targetName, visited,dependency,count);
 
-}
+    }
+    public int getTotalDependenciesRec(String targetName, Set<String> visited, Target.Dependency dependency, int count) {
+        Target target = allTargets.get(targetName);
+        if (visited.contains(targetName)) return 0;
+
+        if (target.getDependsOnOrNeededFor(dependency).isEmpty())
+            return 1;
+
+        for(String nextTargetName :target.getDependsOnOrNeededFor(dependency)){
+            visited.add(targetName);
+           count+= getTotalDependenciesRec(nextTargetName,visited,dependency,count);
+           // visited.remove(targetName);
+        }
+    return count;
+
+    }
+
+
+
+    }
+
 
 
 
