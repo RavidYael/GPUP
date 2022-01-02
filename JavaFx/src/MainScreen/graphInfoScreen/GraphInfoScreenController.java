@@ -3,6 +3,8 @@ package MainScreen.graphInfoScreen;
 import FXData.BackEndMediator;
 import FXData.TargetInTable;
 import dependency.target.Target;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -20,7 +22,7 @@ public class GraphInfoScreenController {
     private Label totalTargetsCounter;
 
     @FXML
-    private Label LeafsCounter;
+    private Label rootsCounter;
 
     @FXML
     private Label independentCounter;
@@ -29,7 +31,7 @@ public class GraphInfoScreenController {
     private Label MiddlesCounter;
 
     @FXML
-    private Label rootsCounter;
+    private Label leafsCounter;
 
     @FXML
     private TableView<TargetInTable> targetsTable;
@@ -86,7 +88,7 @@ public class GraphInfoScreenController {
     private ListView<?> findPathList;
 
     @FXML
-    private ComboBox<?> dependencyComboBox;
+    private ComboBox<String> dependencyComboBox;
 
     @FXML
     private Label whatIfSelectedTarget;
@@ -105,7 +107,11 @@ public class GraphInfoScreenController {
 
     @FXML
     public void initialize(){
-
+        ObservableList depList = FXCollections.observableArrayList("DependsOn", "RequiredFor");
+        dependencyComboBox.setItems(depList);
+        dependencyComboBox.setPromptText("Dependency Type");
+        dependencyComboBox1.setItems(depList);
+        dependencyComboBox1.setPromptText("Dependency Type");
 
     }
     public void myInitializer(){
@@ -117,7 +123,13 @@ public class GraphInfoScreenController {
         extraInfoColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable,String>("extraInfo"));
         targetsTable.setItems(backEndMediator.getTargets());
         //targetsTable.getColumns().add(targetNameColumn);
+
         System.out.println("tabel created");
+        totalTargetsCounter.setText(String.valueOf(backEndMediator.getTotalNumOfTargets()));
+        rootsCounter.setText(String.valueOf(backEndMediator.getNumOfTargetsByDependencyLevel(Target.DependencyLevel.Root)));
+        independentCounter.setText(String.valueOf(backEndMediator.getNumOfTargetsByDependencyLevel(Target.DependencyLevel.Independed)));
+        MiddlesCounter.setText(String.valueOf(backEndMediator.getNumOfTargetsByDependencyLevel(Target.DependencyLevel.Middle)));
+        leafsCounter.setText(String.valueOf(backEndMediator.getNumOfTargetsByDependencyLevel(Target.DependencyLevel.Leaf)));
 
     }
 

@@ -40,4 +40,13 @@ public class BackEndMediator {
         return targetInTables;
     }
 
+    public int getTotalNumOfTargets(){
+        return dependencyGraph.getAllTargets().size();
+
+    }
+
+    public int getNumOfTargetsByDependencyLevel(Target.DependencyLevel dependencyLevel){
+        return dependencyGraph.getTargetsByLevel(dependencyLevel).size();
+    }
+
 }
