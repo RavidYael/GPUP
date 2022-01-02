@@ -106,6 +106,7 @@ public class GraphInfoScreenController {
     @FXML
     public void initialize(){
 
+
     }
     public void myInitializer(){
 
