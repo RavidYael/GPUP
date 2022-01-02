@@ -15,7 +15,6 @@ public class GpupApp extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader();
         //BorderPane root = FXMLLoader.load(getClass().getResource("mainScene.fxml"));
         Parent root = FXMLLoader.load(getClass().getResource("MainScreen.fxml"));
-
         Scene mainScene = new Scene(root,1000,1000);
         primaryStage.setScene(mainScene);
         primaryStage.show();
