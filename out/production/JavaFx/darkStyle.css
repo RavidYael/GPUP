@@ -2,6 +2,7 @@
 {
 -fx-background-color : #05071F;
 -fx-text-fill : #e7e5e5;
+
 }
 .button:hover{
 -fx-background-color : #10165F;
@@ -32,6 +33,13 @@
 }
 
 .scroll-bar:horizontal .thumb,
+   -fx-background-radius: 30;
+   -fx-border-radius: 30;
+   -fx-border-width:5;
+   -fx-border-color: #FC3D44;
+}
+
+
 .scroll-bar:vertical .thumb {
     -fx-background-color: #10165F;
     -fx-background-radius: 5em;
@@ -39,6 +47,8 @@
 
 .scroll-pane > .corner {
     -fx-background-color: black;
+
 }
 
 -fx-background-color:  #02030A
+

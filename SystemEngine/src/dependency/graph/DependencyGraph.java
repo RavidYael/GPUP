@@ -255,31 +255,27 @@ public class DependencyGraph implements Serializable {
 
     }
 
-    public int getTotalDependencies(String targetName, Target.Dependency dependency) {//TODO not working
-        int count = 0;
+    public int getTotalDependencies(String targetName, Target.Dependency dependency) {
+        Set<Target> DependencyRelated = new HashSet<>();
         Set<String> visited = new HashSet<>();
-        return getTotalDependenciesRec(targetName, visited,dependency,count);
-
+        getTotalDependenciesRec(targetName, dependency,DependencyRelated);
+        return DependencyRelated.size();
     }
-    public int getTotalDependenciesRec(String targetName, Set<String> visited, Target.Dependency dependency, int count) {
-        Target target = allTargets.get(targetName);
-        if (visited.contains(targetName)) return 0;
 
-        if (target.getDependsOnOrNeededFor(dependency).isEmpty())
-            return 1;
+    public void getTotalDependenciesRec(String targetName, Target.Dependency dependency, Set<Target> DependencyRelated) {
+        Target curTarget = allTargets.get(targetName);
+        if (DependencyRelated.contains(targetName)) return;
 
-        for(String nextTargetName :target.getDependsOnOrNeededFor(dependency)){
-            visited.add(targetName);
-           count+= getTotalDependenciesRec(nextTargetName,visited,dependency,count);
-           // visited.remove(targetName);
+         if (curTarget.getDependsOnOrNeededFor(dependency).isEmpty())
+            DependencyRelated.add(curTarget);
+
+        for(String nextTargetName : curTarget.getDependsOnOrNeededFor(dependency)){
+            DependencyRelated.add(allTargets.get(targetName));
+            getTotalDependenciesRec(nextTargetName,dependency,DependencyRelated);
         }
-    return count;
-
     }
 
-
-
-    }
+}
 
 
 
