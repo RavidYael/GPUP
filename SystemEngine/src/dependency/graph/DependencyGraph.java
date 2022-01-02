@@ -261,7 +261,7 @@ public class DependencyGraph implements Serializable {
         getTotalDependenciesRec(targetName, dependency,DependencyRelated);
         return DependencyRelated.size();
     }
-
+//
     public void getTotalDependenciesRec(String targetName, Target.Dependency dependency, Set<Target> DependencyRelated) {
         Target curTarget = allTargets.get(targetName);
         if (DependencyRelated.contains(targetName)) return;
