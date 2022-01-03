@@ -4,23 +4,15 @@ package MainScreen;
 import FXData.BackEndMediator;
 import MainScreen.graphInfoScreen.GraphInfoScreenController;
 import MainScreen.taskscreen.TaskScreenController;
-import com.sun.tracing.dtrace.DependencyClass;
-import dependency.graph.DependencyGraph;
 import dependency.graph.GraphFactory;
-import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 
-import javax.xml.soap.Text;
 import java.io.File;
 import java.io.IOException;
 
@@ -69,7 +61,7 @@ public class MainController {
     @FXML
     void graphInfoButtonAction(ActionEvent event) throws IOException {
         FXMLLoader fxmlLoader1 = new FXMLLoader(getClass().getResource("graph info screen.fxml"));
-        graphInfoScreenController.myInitializer();
+        graphInfoScreenController.myInitialize();
         centerPane.setCenter(graphInfoScreen);
     }
 
@@ -94,14 +86,13 @@ public class MainController {
         if (loadSuccess)
             graphInfoButton.fire();
 
-
-
     }
 
     @FXML
     void taskButtonAction(ActionEvent event) throws IOException {
 
         centerPane.setCenter(tasksScreen);
+        taskScreenController.myInitialize();
     }
     @FXML
     void switchSkinToggleAction(ActionEvent event) {

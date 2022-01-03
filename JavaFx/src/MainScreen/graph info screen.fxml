@@ -193,7 +193,7 @@
                                                 <Insets />
                                              </GridPane.margin>
                                           </Label>
-                                          <Label fx:id="pathTargetSelected1" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                          <Label fx:id="pathTargetSelected1" text="..." GridPane.columnIndex="1" GridPane.rowIndex="1">
                                              <GridPane.margin>
                                                 <Insets left="10.0" />
                                              </GridPane.margin>
@@ -203,7 +203,7 @@
                                                 <Insets left="10.0" top="10.0" />
                                              </GridPane.margin>
                                           </Label>
-                                          <Label fx:id="pathTargetSelected2" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.valignment="TOP">
+                                          <Label fx:id="pathTargetSelected2" text="..." GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.valignment="TOP">
                                              <padding>
                                                 <Insets left="10.0" top="10.0" />
                                              </padding>

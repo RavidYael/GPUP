@@ -14,6 +14,11 @@ public class DependencyGraph implements Serializable {
     private Map<Target.DependencyLevel, Set<Target>> targetsByDependencyLevel;
     private String workingDir;
     private Map<String, Set<String>> name2SerialSet;
+
+    public int getMaxParallelism() {
+        return maxParallelism;
+    }
+
     private int maxParallelism;
 
 
@@ -208,9 +213,9 @@ public class DependencyGraph implements Serializable {
 
     }
 
-    public boolean isTargetInCycle(Target investigatedTarget)
+    public boolean isTargetInCycle(String investigatedTargetName)
     {
-
+        Target investigatedTarget = getTargetByName(investigatedTargetName);
         Map<String, Boolean> isVisited = new HashMap<>();
 
         for (Target target : allTargets.values()){

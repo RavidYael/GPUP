@@ -32,20 +32,22 @@ public class SimulationTaskController {
         chanceWarningSpinner.setValueFactory(warningValueFactory);
         MaxSecSimulateSpinner.setValueFactory(secValueFactory);
     }
-
-    public CheckBox getSimTimeRandCheckBox() {
-        return simTimeRandCheckBox;
+    public Double getChancesOfSuccess(){
+        return chanceSuceessSpinner.getValue();
+    }
+    public Double getChancesOfWarning(){
+        return chanceWarningSpinner.getValue();
+    }
+    public int getMaxSecToRun(){
+        return MaxSecSimulateSpinner.getValue();
     }
 
-    public Spinner<Double> getChanceSuceessSpinner() {
-        return chanceSuceessSpinner;
+    public boolean isTaskTimeRandom(){
+        return simTimeRandCheckBox.isSelected();
     }
 
-    public Spinner<Double> getChanceWarningSpinner() {
-        return chanceWarningSpinner;
-    }
-
-    public Spinner<Integer> getMaxSecSimulateSpinner() {
-        return MaxSecSimulateSpinner;
-    }
 }
+
+
+
+

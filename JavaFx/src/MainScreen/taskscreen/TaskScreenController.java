@@ -1,14 +1,15 @@
 package MainScreen.taskscreen;
 
 import FXData.BackEndMediator;
+import FXData.TargetInTable;
+import dependency.target.Target;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableArray;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 
 import java.io.IOException;
@@ -16,13 +17,28 @@ import java.io.IOException;
 public class TaskScreenController {
 
     @FXML
-    private ChoiceBox<String> taskChoiceBox;
+    private TableView<TargetInTable> targetsTable;
+
+    @FXML
+    private TableColumn<TargetInTable, CheckBox> checkedCulumn;
+
+    @FXML
+    private TableColumn<TargetInTable,String> targetNameColumn;
+
+    @FXML
+    private TableColumn<TargetInTable, Target.DependencyLevel> locationColumn;
+
+    @FXML
+    private TableColumn<TargetInTable, Target.TargetStatus> executionStatusColumn;
+
+    @FXML
+    private TableColumn<TargetInTable, Target.TaskResult> ProccessingResultColumn;
 
     @FXML
     private BorderPane taskSettingsPane;
 
     @FXML
-    private Button OKButton;
+    private ComboBox<String> taskComboBox;
 
     @FXML
     private Spinner<Integer> numOfThreads;
@@ -36,6 +52,28 @@ public class TaskScreenController {
     @FXML
     private Button runButton;
 
+    @FXML
+    private ProgressBar progressBar;
+
+    @FXML
+    private Label totalCounter;
+
+    @FXML
+    private Label inProccessCounter;
+
+    @FXML
+    private Label totalCounter1;
+
+    @FXML
+    private Label failedCounter;
+
+    @FXML
+    private Label skippedCounter;
+
+    @FXML
+    private DialogPane taskDialogPane;
+
+
     private Parent simulationTaskScreen;
     private BackEndMediator backEndMediator;
     private SimulationTaskController simulationTaskController;
@@ -45,19 +83,41 @@ public class TaskScreenController {
     }
 
     @FXML
-    void OKButtonAction(ActionEvent event) throws IOException {
-        if (taskChoiceBox.getValue().equals("Simulation Task")){
-            taskSettingsPane.setCenter(simulationTaskScreen);
-        }
-
+    public void initialize(){
+        taskComboBox.setPromptText("Task Type");
+        taskComboBox.setItems(FXCollections.observableArrayList("Simulation Task", "Compilation Task"));
+        ToggleGroup incrOrScratch = new ToggleGroup();
+        incrementalRbutton.setToggleGroup(incrOrScratch);
+        fromScratchRbutton.setToggleGroup(incrOrScratch);
 
     }
+    public void myInitialize(){
+        numOfThreads.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1,backEndMediator.getParallelism()));
+        checkedCulumn.setCellValueFactory(new PropertyValueFactory<TargetInTable, CheckBox>("checked"));
+        targetNameColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable, String>("name"));
+        locationColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable,Target.DependencyLevel>("location"));
+        executionStatusColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable, Target.TargetStatus>("targetStatus"));
+        ProccessingResultColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable,Target.TaskResult>("taskResult"));
+        targetsTable.setItems(backEndMediator.getTargets());
+
+    }
+
+
     @FXML
     void runButtonAction(ActionEvent event) {
-        if (taskChoiceBox.getValue().equals("Simulation Task")){
-        }
 
     }
 
+    @FXML
+    void taskComboBoxAction(ActionEvent event) throws IOException {
+        String screenName = taskComboBox.getValue()+" screen.fxml";
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(screenName));
+        taskSettingsPane.setCenter(fxmlLoader.load());
+        simulationTaskController = fxmlLoader.getController();
+
+    }
 
 }
+
+
+

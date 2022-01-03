@@ -1,20 +1,18 @@
 package MainScreen.graphInfoScreen;
 
 import FXData.BackEndMediator;
+import FXData.TableManager;
 import FXData.TargetInTable;
 import dependency.target.Target;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableArray;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.DialogPane;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+
+import java.util.Set;
 
 public class GraphInfoScreenController {
 
@@ -36,8 +34,8 @@ public class GraphInfoScreenController {
     @FXML
     private TableView<TargetInTable> targetsTable;
 
-//    @FXML
-//    private TableColumn<?, ?> checkedCulumn;
+   @FXML
+   private TableColumn<TargetInTable, CheckBox> checkedCulumn;
 
     @FXML
     private TableColumn<TargetInTable,String> targetNameColumn;
@@ -100,6 +98,7 @@ public class GraphInfoScreenController {
     private ComboBox<?> dependencyComboBox1;
 
     private BackEndMediator backEndMediator;
+    private TableManager tableManager;
 
     public void setBackEndMediator(BackEndMediator backEndMediator) {
         this.backEndMediator = backEndMediator;
@@ -114,15 +113,19 @@ public class GraphInfoScreenController {
         dependencyComboBox1.setPromptText("Dependency Type");
 
     }
-    public void myInitializer(){
+    public void myInitialize(){
 
         targetNameColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable,String>("name"));
         locationColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable,Target.DependencyLevel>("location"));
         totalDependsOnColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable,Integer>("totalDependsOn"));
         totalRequiredForColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable,Integer>("totalRequiredFor"));
         extraInfoColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable,String>("extraInfo"));
-        targetsTable.setItems(backEndMediator.getTargets());
-        //targetsTable.getColumns().add(targetNameColumn);
+        checkedCulumn.setCellValueFactory(new PropertyValueFactory<TargetInTable,CheckBox>("checked"));
+
+        ObservableList<TargetInTable> targetInTables = backEndMediator.getTargets();
+        tableManager = new TableManager(targetInTables);
+        targetsTable.setItems(targetInTables);
+
 
         System.out.println("tabel created");
         totalTargetsCounter.setText(String.valueOf(backEndMediator.getTotalNumOfTargets()));
@@ -150,6 +153,14 @@ public class GraphInfoScreenController {
 
     @FXML
     void locateCycleButtonAction(ActionEvent event) {
+        Set<TargetInTable> selectedTargets = tableManager.getSelectedTargets();
+        if (selectedTargets.size() >1){
+            String message = "Please select 1 target only";
+            Alert alert = new Alert(Alert.AlertType.ERROR,message);
+            alert.showAndWait();
+            return;
+        }
+            backEndMediator.getDependencyGraph().isTargetInCycle(selectedTargets.iterator().next().getName());
 
     }
 

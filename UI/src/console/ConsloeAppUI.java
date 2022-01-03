@@ -212,7 +212,7 @@ public class ConsloeAppUI implements Communicator, Serializable {
         if (target == null)
             return;
 
-        if (!dependencyGraph.isTargetInCycle(target)) {
+        if (!dependencyGraph.isTargetInCycle(target.getName())) {
             System.out.println("the target " + target.getName() + " isn't  in any cycle");
         }
     }
