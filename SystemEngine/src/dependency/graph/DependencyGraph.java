@@ -15,13 +15,16 @@ public class DependencyGraph implements Serializable {
     private Map<Target.DependencyLevel, Set<Target>> targetsByDependencyLevel;
     private String workingDir;
     private Map<String, Set<String>> name2SerialSet;
+    private int maxParallelism;
+
 
     public int getMaxParallelism() {
         return maxParallelism;
     }
 
-    private int maxParallelism;
-
+    public Map<String, Set<String>> getAllSerialSets() {
+        return name2SerialSet;
+    }
 
     public DependencyGraph() {
         allTargets = new HashMap<>();
@@ -95,14 +98,14 @@ public class DependencyGraph implements Serializable {
 
             Target t = getTargetByName(targetName);
 
-                if (isVisited.get(t) == false) {
+            if (isVisited.get(t) == false) {
 
-                    pathList.add(targetName);
+                pathList.add(targetName);
 
-                    getAllPathsUtils(t, dest, isVisited, pathList, requiredOrNeeded, flag,out);
+                getAllPathsUtils(t, dest, isVisited, pathList, requiredOrNeeded, flag,out);
 
-                    pathList.remove(targetName);
-                }
+                pathList.remove(targetName);
+            }
 
         }
 
@@ -217,7 +220,7 @@ public class DependencyGraph implements Serializable {
 
     }
 
-    public boolean isTargetInCycle(String investigatedTargetName)
+    public List<String> isTargetInCycle(String investigatedTargetName, Boolean[] inCycle)
     {
         Target investigatedTarget = getTargetByName(investigatedTargetName);
         Map<String, Boolean> isVisited = new HashMap<>();
@@ -231,9 +234,9 @@ public class DependencyGraph implements Serializable {
 
         for (String curTarget : investigatedTarget.getDependsOn())
             if (isCyclicUtil(investigatedTarget,curTarget, isVisited,traverse))
-                return true;
+                inCycle[0] = true;
 
-        return false;
+        return traverse;
     }
 
     private boolean isCyclicUtil(Target investigatedTarget,String curTarget,Map<String,Boolean> isVisited,List<String> theTraverse) {
@@ -264,32 +267,37 @@ public class DependencyGraph implements Serializable {
 
     }
 
-    public int getTotalDependencies(String targetName, Target.Dependency dependency) {
+    public Set<Target> getTotalDependencies(String targetName, Target.Dependency dependency) {
         // this method CANT help with cycle find !!
         Set<Target> DependencyRelated = new HashSet<>();
         Set<String> visited = new HashSet<>();
-        getTotalDependenciesRec(targetName, dependency,DependencyRelated);
+        getTotalDependenciesRec(targetName, dependency,DependencyRelated,visited);
         DependencyRelated.remove(getTargetByName(targetName));
         //due to this line btw
-        return DependencyRelated.size();
+        return DependencyRelated;
     }
-//
-    public void getTotalDependenciesRec(String targetName, Target.Dependency dependency, Set<Target> DependencyRelated) {
+    //
+    private void getTotalDependenciesRec(String targetName, Target.Dependency dependency, Set<Target> DependencyRelated, Set<String> visitedTargets) {
 
         Target curTarget = allTargets.get(targetName);
-        if (DependencyRelated.contains(targetName)) return;
+        if (visitedTargets.contains(targetName)) return;
 
-         if (curTarget.getDependsOnOrNeededFor(dependency).isEmpty())
-            DependencyRelated.add(curTarget);
+        visitedTargets.add(targetName);
 
-        for(String nextTargetName : curTarget.getDependsOnOrNeededFor(dependency)){
-            DependencyRelated.add(allTargets.get(targetName));
-            getTotalDependenciesRec(nextTargetName,dependency,DependencyRelated);
+        if (curTarget.getDependsOnOrNeededFor(dependency).isEmpty()){
+            return;
         }
+
+        for (String nextTargetName : curTarget.getDependsOnOrNeededFor(dependency)) {
+            if(!visitedTargets.contains(nextTargetName)) {
+                DependencyRelated.add(allTargets.get(nextTargetName));
+                getTotalDependenciesRec(nextTargetName, dependency, DependencyRelated, visitedTargets);
+            }
+        }
+
     }
 
 }
-
 
 
 

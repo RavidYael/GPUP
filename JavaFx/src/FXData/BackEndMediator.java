@@ -7,6 +7,11 @@ import execution.TaskExecution;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Control;
+
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class BackEndMediator {
     private DependencyGraph dependencyGraph;
@@ -28,17 +33,16 @@ public class BackEndMediator {
         this.lastTaskExecution = new TaskExecution(dependencyGraph,task);
     }
 
-    public ObservableList<TargetInTable> getTargets(){
+    public ObservableList<TargetInTable> getAllTargetsForTable(){
         ObservableList<TargetInTable> targetInTables = FXCollections.observableArrayList();
         for(Target target : dependencyGraph.getAllTargets().values()){
             TargetInTable tempTargetInTable = new TargetInTable();
-           // tempTargetInTable.setChecked(new CheckBox());
             tempTargetInTable.setChecked(new CheckBox());
             tempTargetInTable.setName(target.getName());
             tempTargetInTable.setLocation(target.getDependencyLevel());
             tempTargetInTable.setExtraInfo(target.getData());
-            tempTargetInTable.setTotalDependsOn(dependencyGraph.getTotalDependencies(target.getName(), Target.Dependency.DependsOn));
-            tempTargetInTable.setTotalRequiredFor(dependencyGraph.getTotalDependencies(target.getName(), Target.Dependency.RequiredFor));
+            tempTargetInTable.setTotalDependsOn(dependencyGraph.getTotalDependencies(target.getName(), Target.Dependency.DependsOn).size());
+            tempTargetInTable.setTotalRequiredFor(dependencyGraph.getTotalDependencies(target.getName(), Target.Dependency.RequiredFor).size());
             tempTargetInTable.setTargetStatus(target.getTargeStatus());
             tempTargetInTable.setTaskResult(target.getTaskResult());
             //TODO get number of serial sets per target
@@ -49,6 +53,35 @@ public class BackEndMediator {
 
     public int getTotalNumOfTargets(){
         return dependencyGraph.getAllTargets().size();
+
+    }
+
+    public ObservableList<TargetInTable> getTransitiveTargetData(String targetName, Target.Dependency dependency){
+        Set<Target> transitiveTargets = dependencyGraph.getTotalDependencies(targetName,dependency);
+        ObservableList<TargetInTable>  targetInTables = FXCollections.observableArrayList();
+        for (Target target: transitiveTargets){
+            TargetInTable tempTargetInTable = new TargetInTable();
+            tempTargetInTable.setName(target.getName());
+            tempTargetInTable.setLocation(target.getDependencyLevel());
+            targetInTables.add(tempTargetInTable);
+
+        }
+        return targetInTables;
+
+
+    }
+    public ObservableList<SerialSetInTable> getAllSerialSetsForTable(){
+        Map<String,Set<String>> allSets = dependencyGraph.getAllSerialSets();
+        ObservableList<SerialSetInTable> serialSetInTables = FXCollections.observableArrayList();
+        for (Map.Entry<String,Set<String>> entry :allSets.entrySet()){
+            SerialSetInTable tempSetInTabel = new SerialSetInTable();
+            tempSetInTabel.setSetName(entry.getKey());
+            String targetsInSetStr = entry.getValue().stream().collect(Collectors.joining(","));
+            tempSetInTabel.setTargetsInSet(targetsInSetStr);
+            serialSetInTables.add(tempSetInTabel);
+
+        }
+        return serialSetInTables;
 
     }
 

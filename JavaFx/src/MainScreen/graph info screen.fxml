@@ -264,7 +264,12 @@
                                                    </GridPane.margin>
                                                 </ComboBox>
                                                 <Label opacity="0.7" styleClass="instructionLabel" text="Choose a target from the target table" textFill="#797777" GridPane.columnSpan="2" />
-                                                <TextArea prefHeight="200.0" prefWidth="200.0" GridPane.columnSpan="2" GridPane.rowIndex="4" />
+                                                <TableView fx:id="whatIfTableView" prefHeight="200.0" prefWidth="200.0" GridPane.columnSpan="2" GridPane.rowIndex="4">
+                                                  <columns>
+                                                    <TableColumn fx:id="whatIfTargetNameColumn" prefWidth="127.0" text="Target Name" />
+                                                    <TableColumn fx:id="whatIfLocationColumn" prefWidth="127.0" text="Location" />
+                                                  </columns>
+                                                </TableView>
                                              </children>
                                           </GridPane>
                                        </content>

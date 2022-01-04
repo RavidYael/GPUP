@@ -1,11 +1,8 @@
 package MainScreen.graphInfoScreen;
 
-import FXData.BackEndMediator;
-import FXData.TableManager;
-import FXData.TargetInTable;
+import FXData.*;
 import dependency.target.Target;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableArray;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -13,7 +10,6 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.util.List;
-import java.util.Set;
 
 public class GraphInfoScreenController {
 
@@ -57,13 +53,13 @@ public class GraphInfoScreenController {
     private TableColumn<TargetInTable, Integer> numOfSerialColumn;
 
     @FXML
-    private TableView<?> serialSetTable;
+    private TableView<SerialSetInTable> serialSetTable;
 
     @FXML
-    private TableColumn<?, ?> serialSetName;
+    private TableColumn<SerialSetInTable, String> serialSetName;
 
     @FXML
-    private TableColumn<?, ?> targetsInSet;
+    private TableColumn<SerialSetInTable, String> targetsInSet;
 
     @FXML
     private Label cycleTargetSelected;
@@ -93,13 +89,22 @@ public class GraphInfoScreenController {
     private Label whatIfSelectedTarget;
 
     @FXML
+    private TableView<TargetInTable> whatIfTableView;
+
+    @FXML
+    private TableColumn<TargetInTable, String> whatIfTargetNameColumn;
+
+    @FXML
+    private TableColumn<TargetInTable, Target.DependencyLevel> whatIfLocationColumn;
+
+    @FXML
     private Button displayInfoButton;
 
     @FXML
-    private ComboBox<?> dependencyComboBox1;
+    private ComboBox<String> dependencyComboBox1;
 
     private BackEndMediator backEndMediator;
-    private TableManager tableManager;
+    private TableManager mainTableManager;
 
     public void setBackEndMediator(BackEndMediator backEndMediator) {
         this.backEndMediator = backEndMediator;
@@ -123,9 +128,12 @@ public class GraphInfoScreenController {
         totalRequiredForColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable,Integer>("totalRequiredFor"));
         extraInfoColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable,String>("extraInfo"));
         checkedCulumn.setCellValueFactory(new PropertyValueFactory<TargetInTable,CheckBox>("checked"));
-        ObservableList<TargetInTable> targetInTables = backEndMediator.getTargets();
-        tableManager = new TableManager(targetInTables);
+        ObservableList<TargetInTable> targetInTables = backEndMediator.getAllTargetsForTable();
+        mainTableManager = new TableManager(targetInTables);
         targetsTable.setItems(targetInTables);
+        serialSetTable.setItems(backEndMediator.getAllSerialSetsForTable());
+        serialSetName.setCellValueFactory(new PropertyValueFactory<SerialSetInTable,String>("setName"));
+        targetsInSet.setCellValueFactory(new PropertyValueFactory<SerialSetInTable,String>("targetsInSet"));
 
 
         System.out.println("tabel created");
@@ -144,6 +152,32 @@ public class GraphInfoScreenController {
 
     @FXML
     void displayInfoButtonAction(ActionEvent event) {
+        String message = "";
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        boolean userError = false;
+        List<TargetInTable> selectedTargets = mainTableManager.getSelectedTargets();
+        if (selectedTargets.size() != 1){
+            message = "Please select 1 targets";
+            userError = true;
+        }
+        else if(dependencyComboBox1.getValue() == null){
+            message = "Please select Dependency Type";
+            userError = true;
+        }
+        if (userError) {
+            alert.setContentText(message);
+            alert.showAndWait();
+            return;
+        }
+
+        else{
+            String targetName = selectedTargets.get(0).getName();
+            Target.Dependency dependency = stringToDependency(dependencyComboBox1.getValue());
+            ObservableList<TargetInTable> tableTargets = backEndMediator.getTransitiveTargetData(targetName,dependency);
+            whatIfTableView.setItems(tableTargets);
+            whatIfTargetNameColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable,String>("name"));
+            whatIfLocationColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable, Target.DependencyLevel>("location"));
+        }
 
     }
 
@@ -152,7 +186,7 @@ public class GraphInfoScreenController {
         String message = "";
         Alert alert = new Alert(Alert.AlertType.ERROR);
         boolean userError = false;
-        List<TargetInTable> selectedTargets = tableManager.getSelectedTargets();
+        List<TargetInTable> selectedTargets = mainTableManager.getSelectedTargets();
         if (selectedTargets.size() != 2){
             message = "Please select 2 targets";
             userError = true;
@@ -179,15 +213,13 @@ public class GraphInfoScreenController {
         if (!isPath){
             findPathTA.setText("No Existing Path from " + target1+ " To "+ target2 + " in Direction: " + dep);
         }
-
-
     }
 
     @FXML
     void locateCycleButtonAction(ActionEvent event) {
-        List<TargetInTable> selectedTargets = tableManager.getSelectedTargets();
-        if (selectedTargets.size() >1){
-            String message = "Please select 1 target only";
+        List<TargetInTable> selectedTargets = mainTableManager.getSelectedTargets();
+        if (selectedTargets.size() !=1){
+            String message = "Please select 1 target";
             Alert alert = new Alert(Alert.AlertType.ERROR,message);
             alert.showAndWait();
             return;
@@ -198,17 +230,16 @@ public class GraphInfoScreenController {
         String selectedTargetName = selectedTargets.get(0).getName();
         List<String> cycleStr =  backEndMediator.getDependencyGraph().isTargetInCycle(selectedTargets.get(0).getName(),cycleCheck);
 
-       if(cycleCheck[0]) {
-           loacteCycleTA.setText("Target " + selectedTargetName+ " is in the following cycle:\n");
-           loacteCycleTA.appendText(String.join("-->", cycleStr));
+        if(cycleCheck[0]) {
+            loacteCycleTA.setText("Target " + selectedTargetName+ " is in the following cycle:\n");
+            loacteCycleTA.appendText(String.join("-->", cycleStr));
 
-       }
-       else
-           loacteCycleTA.setText("target is not in cycle");
+        }
+        else
+            loacteCycleTA.setText("target is not in cycle");
 
     }
-
-    private Target.Dependency stringToDependency(String dep){
+    private Target.Dependency stringToDependency(String dep) {
         if (dep.equals("Depends On")) return Target.Dependency.DependsOn;
         else if (dep.equals("Required For")) return Target.Dependency.RequiredFor;
 

@@ -3,7 +3,6 @@ package MainScreen.taskscreen;
 import FXData.BackEndMediator;
 import FXData.TargetInTable;
 import dependency.target.Target;
-import execution.SimulationTask;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -99,7 +98,7 @@ public class TaskScreenController {
         locationColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable,Target.DependencyLevel>("location"));
         executionStatusColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable, Target.TargetStatus>("targetStatus"));
         ProccessingResultColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable,Target.TaskResult>("taskResult"));
-        targetsTable.setItems(backEndMediator.getTargets());
+        targetsTable.setItems(backEndMediator.getAllTargetsForTable());
 
     }
 
