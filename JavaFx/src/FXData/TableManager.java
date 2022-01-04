@@ -1,9 +1,8 @@
 package FXData;
 
-import dependency.target.Target;
 import javafx.collections.ObservableList;
-import javafx.scene.control.TableView;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -26,8 +25,8 @@ public class TableManager {
 //}
 
 
-    public Set<TargetInTable> getSelectedTargets(){
-        return targetsTable.stream().filter(t -> t.getChecked().isSelected()).collect(Collectors.toSet());
+    public List<TargetInTable> getSelectedTargets(){
+        return targetsTable.stream().filter(t -> t.getChecked().isSelected()).collect(Collectors.toList());
 
     }
 

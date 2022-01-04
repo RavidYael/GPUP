@@ -88,8 +88,6 @@ public class TaskExecution implements Serializable {
     }
 
 
-
-
     private String getTimeStamp(String format){
         LocalDateTime myDateObj = LocalDateTime.now();
         DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern(format);

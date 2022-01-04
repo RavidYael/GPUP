@@ -9,10 +9,10 @@ public class SimulationTask  extends Task implements Serializable {
     private String taskName = "Simulation";
     private int processTime;
     private boolean isRandomTime;
-    private float successProb;
-    private float successWithWarningProb;
+    private double successProb;
+    private double successWithWarningProb;
 
-    public SimulationTask(int processTime, boolean isRandomTime, float successProb, float successWithWarningProb) {
+    public SimulationTask(int processTime, boolean isRandomTime, Double successProb, Double successWithWarningProb) {
 
         this.isRandomTime = isRandomTime;
         if (isRandomTime)

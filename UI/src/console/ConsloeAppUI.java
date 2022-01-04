@@ -13,6 +13,7 @@ import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Scanner;
+import java.util.function.Consumer;
 
 public class ConsloeAppUI implements Communicator, Serializable {
 
@@ -163,10 +164,10 @@ public class ConsloeAppUI implements Communicator, Serializable {
         random = getInputFromUser().equals("y");
 
         System.out.println("what is the probability of success?");
-        float probSuccess = Float.parseFloat(getInputFromUser());
+        double probSuccess = Float.parseFloat(getInputFromUser());
 
         System.out.println("what is the probability of success with warning?");
-        float probWarning = Float.parseFloat(getInputFromUser());
+        double probWarning = Float.parseFloat(getInputFromUser());
         task = new SimulationTask(processTime, random, probSuccess, probWarning);
 
 
@@ -202,7 +203,12 @@ public class ConsloeAppUI implements Communicator, Serializable {
         String dependencyTypeStr = getInputFromUser();
         Target.Dependency dependencyType = getAndVerifyDependencyByString(dependencyTypeStr);
         if (dependencyType == null) return;
-        if (dependencyGraph.displayAllPathsBetweenTwoTargets(t1, t2, dependencyType) == false)
+        if (dependencyGraph.displayAllPathsBetweenTwoTargets(t1.getName(), t2.getName(), dependencyType, new Consumer<String>() {
+            @Override
+            public void accept(String s) {
+                System.out.println(s);
+            }
+        }) == false)
             System.out.println("No path Found");
     }
 

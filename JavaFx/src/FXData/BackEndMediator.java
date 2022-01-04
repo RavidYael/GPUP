@@ -2,6 +2,7 @@ package FXData;
 
 import dependency.graph.DependencyGraph;
 import dependency.target.Target;
+import execution.Task;
 import execution.TaskExecution;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -9,22 +10,22 @@ import javafx.scene.control.CheckBox;
 
 public class BackEndMediator {
     private DependencyGraph dependencyGraph;
-    private TaskExecution taskExecution;
+    private TaskExecution lastTaskExecution;
 
     public DependencyGraph getDependencyGraph() {
         return dependencyGraph;
     }
 
-    public TaskExecution getTaskExecution() {
-        return taskExecution;
+    public TaskExecution getLastTaskExecution() {
+        return lastTaskExecution;
     }
 
     public void setDependencyGraph(DependencyGraph dependencyGraph) {
         this.dependencyGraph = dependencyGraph;
     }
 
-    public void setTaskExecution(TaskExecution taskExecution) {
-        this.taskExecution = taskExecution;
+    public void setLastTaskExecution(Task task) {
+        this.lastTaskExecution = new TaskExecution(dependencyGraph,task);
     }
 
     public ObservableList<TargetInTable> getTargets(){
@@ -57,6 +58,10 @@ public class BackEndMediator {
 
     public int getParallelism(){
         return dependencyGraph.getMaxParallelism();
+    }
+
+    public void runTask(int proccessTime, boolean taskTimeRandom, Double chancesOfSuccess, Double chancesOfWarning, boolean isIncremental){
+
     }
 
 }

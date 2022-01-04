@@ -12,6 +12,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 
+import java.util.List;
 import java.util.Set;
 
 public class GraphInfoScreenController {
@@ -71,7 +72,7 @@ public class GraphInfoScreenController {
     private Button loacteCycleButton;
 
     @FXML
-    private DialogPane cycleDialog;
+    private TextArea loacteCycleTA;
 
     @FXML
     private Label pathTargetSelected1;
@@ -83,7 +84,7 @@ public class GraphInfoScreenController {
     private Button findPathButton;
 
     @FXML
-    private ListView<?> findPathList;
+    private TextArea findPathTA;
 
     @FXML
     private ComboBox<String> dependencyComboBox;
@@ -106,11 +107,12 @@ public class GraphInfoScreenController {
 
     @FXML
     public void initialize(){
-        ObservableList depList = FXCollections.observableArrayList("DependsOn", "RequiredFor");
+        ObservableList depList = FXCollections.observableArrayList("Depends On", "Required For");
         dependencyComboBox.setItems(depList);
         dependencyComboBox.setPromptText("Dependency Type");
         dependencyComboBox1.setItems(depList);
         dependencyComboBox1.setPromptText("Dependency Type");
+
 
     }
     public void myInitialize(){
@@ -121,7 +123,6 @@ public class GraphInfoScreenController {
         totalRequiredForColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable,Integer>("totalRequiredFor"));
         extraInfoColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable,String>("extraInfo"));
         checkedCulumn.setCellValueFactory(new PropertyValueFactory<TargetInTable,CheckBox>("checked"));
-
         ObservableList<TargetInTable> targetInTables = backEndMediator.getTargets();
         tableManager = new TableManager(targetInTables);
         targetsTable.setItems(targetInTables);
@@ -147,21 +148,71 @@ public class GraphInfoScreenController {
     }
 
     @FXML
-    void findPathButtonAction(ActionEvent event) {
+    void findPathButtonAction(ActionEvent event) { //TODO ERROR--- only showing depends on direction because targets are always picked in the same order.
+        String message = "";
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        boolean userError = false;
+        List<TargetInTable> selectedTargets = tableManager.getSelectedTargets();
+        if (selectedTargets.size() != 2){
+            message = "Please select 2 targets";
+            userError = true;
+        }
+        else if(dependencyComboBox.getValue() == null){
+            message = "Please select Dependency Type";
+            userError = true;
+        }
+        if (userError) {
+            alert.setContentText(message);
+            alert.showAndWait();
+            return;
+        }
+
+
+        String dep = dependencyComboBox.getValue();
+        String target1 = selectedTargets.get(0).getName();
+        String target2 = selectedTargets.get(1).getName();
+        String initMessage = "Path from " +target1 +" To " +target2+ " in direction:' "+ dep+ "' :";
+        TextAreaConsumer findPathTAConsumer = new TextAreaConsumer(findPathTA,initMessage);
+//        findPathTAConsumer.clear();
+        Target.Dependency dependency = stringToDependency(dep);
+        boolean isPath = backEndMediator.getDependencyGraph().displayAllPathsBetweenTwoTargets(target1,target2,dependency,findPathTAConsumer);
+        if (!isPath){
+            findPathTA.setText("No Existing Path from " + target1+ " To "+ target2 + " in Direction: " + dep);
+        }
+
 
     }
 
     @FXML
     void locateCycleButtonAction(ActionEvent event) {
-        Set<TargetInTable> selectedTargets = tableManager.getSelectedTargets();
+        List<TargetInTable> selectedTargets = tableManager.getSelectedTargets();
         if (selectedTargets.size() >1){
             String message = "Please select 1 target only";
             Alert alert = new Alert(Alert.AlertType.ERROR,message);
             alert.showAndWait();
             return;
         }
-            backEndMediator.getDependencyGraph().isTargetInCycle(selectedTargets.iterator().next().getName());
 
+        Boolean[] cycleCheck = new Boolean[1];
+        cycleCheck[0] = false;
+        String selectedTargetName = selectedTargets.get(0).getName();
+        List<String> cycleStr =  backEndMediator.getDependencyGraph().isTargetInCycle(selectedTargets.get(0).getName(),cycleCheck);
+
+       if(cycleCheck[0]) {
+           loacteCycleTA.setText("Target " + selectedTargetName+ " is in the following cycle:\n");
+           loacteCycleTA.appendText(String.join("-->", cycleStr));
+
+       }
+       else
+           loacteCycleTA.setText("target is not in cycle");
+
+    }
+
+    private Target.Dependency stringToDependency(String dep){
+        if (dep.equals("Depends On")) return Target.Dependency.DependsOn;
+        else if (dep.equals("Required For")) return Target.Dependency.RequiredFor;
+
+        return null;
     }
 
 }

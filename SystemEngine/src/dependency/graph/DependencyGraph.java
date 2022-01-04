@@ -6,6 +6,7 @@ import dependency.target.Target;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.function.Consumer;
 
 
 public class DependencyGraph implements Serializable {
@@ -58,8 +59,9 @@ public class DependencyGraph implements Serializable {
         this.workingDir = workingDir;
     }
 
-    public boolean displayAllPathsBetweenTwoTargets(Target src, Target dest, Target.Dependency dependedOnOrNeeded) {
-        //TODO function returns only one path, needs to return all paths יאח
+    public boolean displayAllPathsBetweenTwoTargets(String srcName, String destName, Target.Dependency dependedOnOrNeeded, Consumer<String> out) {
+        Target src = getTargetByName(srcName);
+        Target dest = getTargetByName(destName);
         Map<Target, Boolean> isVisited = new HashMap<>();
         for (Target target : allTargets.values()){
             isVisited.put(target,false);
@@ -71,15 +73,17 @@ public class DependencyGraph implements Serializable {
 
         Boolean[] flag = new Boolean[]{new Boolean(false)};
 
-        getAllPathsUtils(src, dest, isVisited, pathList, dependedOnOrNeeded, flag);
+        getAllPathsUtils(src, dest, isVisited, pathList, dependedOnOrNeeded, flag,out);
 
         return flag[0];
     }
 
-    private void getAllPathsUtils(Target src, Target dest, Map<Target, Boolean> isVisited, ArrayList<String> pathList, Target.Dependency requiredOrNeeded, Boolean[] flag) {
+    private void getAllPathsUtils(Target src, Target dest, Map<Target, Boolean> isVisited, ArrayList<String> pathList, Target.Dependency requiredOrNeeded, Boolean[] flag, Consumer<String> out) {
 
         if (src == dest) {
-            System.out.println(pathList.toString());
+            //System.out.println(pathList.toString());
+            out.accept(String.join("-->", pathList));
+
             flag[0] = true; // May Not Work
         }
 
@@ -95,7 +99,7 @@ public class DependencyGraph implements Serializable {
 
                     pathList.add(targetName);
 
-                    getAllPathsUtils(t, dest, isVisited, pathList, requiredOrNeeded, flag);
+                    getAllPathsUtils(t, dest, isVisited, pathList, requiredOrNeeded, flag,out);
 
                     pathList.remove(targetName);
                 }

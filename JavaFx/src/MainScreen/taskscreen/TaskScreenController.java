@@ -3,6 +3,7 @@ package MainScreen.taskscreen;
 import FXData.BackEndMediator;
 import FXData.TargetInTable;
 import dependency.target.Target;
+import execution.SimulationTask;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -105,6 +106,15 @@ public class TaskScreenController {
 
     @FXML
     void runButtonAction(ActionEvent event) {
+//        if (taskComboBox.getValue().equals("Simulation Task")){
+//            backEndMediator.runTask(
+//                    simulationTaskController.getMaxSecToRun() *1000,
+//                    simulationTaskController.isTaskTimeRandom(),
+//                    simulationTaskController.getChancesOfSuccess(),
+//                    simulationTaskController.getChancesOfWarning(),
+//                    //   simulationTaskController.
+//
+//        }
 
     }
 
