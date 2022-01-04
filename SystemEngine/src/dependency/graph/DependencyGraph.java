@@ -217,7 +217,7 @@ public class DependencyGraph implements Serializable {
 
     }
 
-    public boolean isTargetInCycle(String investigatedTargetName)
+    public List<String> isTargetInCycle(String investigatedTargetName, Boolean[] inCycle)
     {
         Target investigatedTarget = getTargetByName(investigatedTargetName);
         Map<String, Boolean> isVisited = new HashMap<>();
@@ -231,9 +231,9 @@ public class DependencyGraph implements Serializable {
 
         for (String curTarget : investigatedTarget.getDependsOn())
             if (isCyclicUtil(investigatedTarget,curTarget, isVisited,traverse))
-                return true;
+                inCycle[0] = true;
 
-        return false;
+        return traverse;
     }
 
     private boolean isCyclicUtil(Target investigatedTarget,String curTarget,Map<String,Boolean> isVisited,List<String> theTraverse) {
@@ -268,25 +268,31 @@ public class DependencyGraph implements Serializable {
         // this method CANT help with cycle find !!
         Set<Target> DependencyRelated = new HashSet<>();
         Set<String> visited = new HashSet<>();
-        getTotalDependenciesRec(targetName, dependency,DependencyRelated);
+        getTotalDependenciesRec(targetName, dependency,DependencyRelated,visited);
         DependencyRelated.remove(getTargetByName(targetName));
         //due to this line btw
         return DependencyRelated.size();
     }
 //
-    public void getTotalDependenciesRec(String targetName, Target.Dependency dependency, Set<Target> DependencyRelated) {
+public void getTotalDependenciesRec(String targetName, Target.Dependency dependency, Set<Target> DependencyRelated, Set<String> visitedTargets) {
 
-        Target curTarget = allTargets.get(targetName);
-        if (DependencyRelated.contains(targetName)) return;
+    Target curTarget = allTargets.get(targetName);
+    if (visitedTargets.contains(targetName)) return;
 
-         if (curTarget.getDependsOnOrNeededFor(dependency).isEmpty())
-            DependencyRelated.add(curTarget);
+    visitedTargets.add(targetName);
 
-        for(String nextTargetName : curTarget.getDependsOnOrNeededFor(dependency)){
-            DependencyRelated.add(allTargets.get(targetName));
-            getTotalDependenciesRec(nextTargetName,dependency,DependencyRelated);
+    if (curTarget.getDependsOnOrNeededFor(dependency).isEmpty()){
+        return;
+    }
+
+    for (String nextTargetName : curTarget.getDependsOnOrNeededFor(dependency)) {
+        if(!visitedTargets.contains(nextTargetName)) {
+            DependencyRelated.add(allTargets.get(nextTargetName));
+            getTotalDependenciesRec(nextTargetName, dependency, DependencyRelated, visitedTargets);
         }
     }
+
+}
 
 }
 

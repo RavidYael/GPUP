@@ -3,6 +3,7 @@ package MainScreen.graphInfoScreen;
 import FXData.BackEndMediator;
 import FXData.TableManager;
 import FXData.TargetInTable;
+import FXData.TextAreaConsumer;
 import dependency.target.Target;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableArray;
