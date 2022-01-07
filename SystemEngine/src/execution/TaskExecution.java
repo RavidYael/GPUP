@@ -140,6 +140,7 @@ public class TaskExecution implements Serializable {
                      }
             }
            // incrementTotalDuration(s); // maaazeeeee
+            //committtt
         }
 
         updateTarget2summary();
