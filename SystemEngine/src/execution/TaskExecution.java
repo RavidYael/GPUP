@@ -2,6 +2,8 @@ package execution;
 
 import dependency.graph.DependencyGraph;
 import dependency.target.Target;
+import dependency.target.TargetRunner;
+import sun.nio.ch.ThreadPool;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -15,10 +17,12 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 public class TaskExecution implements Serializable {
     private Task task;
+    private DependencyGraph originalGraph;
     private DependencyGraph graphInExecution;
     private Map<Target.TargetStatus,Set<Target>> status2Targets;
     private Map<Target,TargetExecutionSummary> target2summary;
@@ -26,8 +30,9 @@ public class TaskExecution implements Serializable {
     private Long totalDuration =0L;
 
 
-    public TaskExecution(DependencyGraph dependencyGraph, Task task) {
-        this.graphInExecution = dependencyGraph.createDeepCopy();
+    public TaskExecution(DependencyGraph graphInExecution, DependencyGraph originalGraph, Task task) {
+        this.originalGraph = originalGraph;
+        this.graphInExecution = graphInExecution.createDeepCopy();
         this.task = task;
         status2Targets = new HashMap<>();
         status2Targets.put(Target.TargetStatus.Frozen,new HashSet<>());
@@ -80,6 +85,7 @@ public class TaskExecution implements Serializable {
 
     private void updateStatus2Target()
     {
+        System.out.println("i am updating status2Targets");
       clearStatus2Targets();
         for (Target target: graphInExecution.getAllTargets().values())
         {
@@ -95,39 +101,46 @@ public class TaskExecution implements Serializable {
         return formattedDate;
     }
 
-    public void runTaskFromScratch()
+    public void runTaskFromScratch(int maxparrallel)
     {
+
+        ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(maxparrallel);
+        Set<Target> executedTargets = new HashSet<>();
         createTaskWorkingDirectory();
         Set<String> updatedTargets;
         Iterator<Target> iter = status2Targets.get(Target.TargetStatus.Waiting).iterator();
-        while(iter.hasNext())
-        {
-            Target target = iter.next();
-            Instant start = Instant.now();
-            Target.TaskResult result = task.runOnTarget(target);
-            Instant finish = Instant.now();
-            Duration duration = Duration.between(start,finish);
-            Long s = duration.getSeconds();
-            target2summary.get(target).setDuration(s);
-            target.setTaskResult(result);
-            incrementTotalDuration(s);
-            if(result == Target.TaskResult.Success || result == Target.TaskResult.Warning)
-            {
-                updatedTargets =  graphInExecution.setAndUpdateTargetSuccess(target);
-                if (!updatedTargets.isEmpty())
-                    System.out.println("The following targets are now ready to process: " + updatedTargets.toString());
-            }
-            else if (result == Target.TaskResult.Failure)
-            {
-                updatedTargets = graphInExecution.setAndUpdateTargetFailure(target);
-                if (!updatedTargets.isEmpty())
-                    System.out.println("The following targets now cannot be processed: " +updatedTargets.toString());
-            }
-            target.setTargetStatus(Target.TargetStatus.Finished);
-            updateStatus2Target();
-            iter = status2Targets.get(Target.TargetStatus.Waiting).iterator();
-        }
+        Boolean hasMoreToExecute = true;
+        List<Future> futureRes = new ArrayList<>();
 
+        //int WorkingThreads ???
+
+        while(hasMoreToExecute)
+        {
+            if (iter.hasNext()) {
+                Target target = iter.next();
+                TargetRunner targetRunner = new TargetRunner(target, task , originalGraph);
+                executedTargets.add(target);
+                futureRes.add(threadPoolExecutor.submit(targetRunner));
+            }
+            else {
+                for (Future taskResult :futureRes) {
+                    try {
+                        taskResult.get();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (ExecutionException e) {
+                        e.printStackTrace();
+                    }
+                }
+                    graphInExecution.updateEffectOfTargetsExecution(executedTargets);
+                     updateStatus2Target();
+                     iter = status2Targets.get(Target.TargetStatus.Waiting).iterator();
+                     if(!iter.hasNext()) {
+                         hasMoreToExecute = false;
+                     }
+            }
+           // incrementTotalDuration(s); // maaazeeeee
+        }
 
         updateTarget2summary();
         printExecutionSummary();
@@ -165,7 +178,7 @@ public class TaskExecution implements Serializable {
             return;
         }
 
-        runTaskFromScratch();
+     //   runTaskFromScratch();
 
     }
 

@@ -60,6 +60,7 @@ public class SimulationTask  extends Task implements Serializable {
 
         }
         System.out.println();
+
         return resStatus;
 
     }

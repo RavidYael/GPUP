@@ -176,15 +176,15 @@ public class ConsloeAppUI implements Communicator, Serializable {
         if (choice.equals("y")) {
             if (lastTaskExecution == null) {
                 System.out.println("No previos execution was found, running from scratch");
-                lastTaskExecution = new TaskExecution(dependencyGraph, task);
-                lastTaskExecution.runTaskFromScratch();
+                lastTaskExecution = new TaskExecution(dependencyGraph,dependencyGraph, task);
+                lastTaskExecution.runTaskFromScratch(1);
             } else {
                 lastTaskExecution.runTaskIncrementally();
 
             }
         } else {
-            lastTaskExecution = new TaskExecution(dependencyGraph, task);
-            lastTaskExecution.runTaskFromScratch();
+            lastTaskExecution = new TaskExecution(dependencyGraph, dependencyGraph, task);
+            lastTaskExecution.runTaskFromScratch(1);
         }
 
 

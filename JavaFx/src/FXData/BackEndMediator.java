@@ -9,6 +9,9 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Control;
 
+import javax.script.Bindings;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -29,8 +32,8 @@ public class BackEndMediator {
         this.dependencyGraph = dependencyGraph;
     }
 
-    public void setLastTaskExecution(Task task) {
-        this.lastTaskExecution = new TaskExecution(dependencyGraph,task);
+    public void setLastTaskExecution(TaskExecution taskExecution) {
+        this.lastTaskExecution = taskExecution;
     }
 
     public ObservableList<TargetInTable> getAllTargetsForTable(){
@@ -44,7 +47,9 @@ public class BackEndMediator {
             tempTargetInTable.setTotalDependsOn(dependencyGraph.getTotalDependencies(target.getName(), Target.Dependency.DependsOn).size());
             tempTargetInTable.setTotalRequiredFor(dependencyGraph.getTotalDependencies(target.getName(), Target.Dependency.RequiredFor).size());
             tempTargetInTable.setTargetStatus(target.getTargeStatus());
+            target.targetStatusProperty().addListener((observable, oldValue, newValue) -> tempTargetInTable.setTargetStatus(newValue));
             tempTargetInTable.setTaskResult(target.getTaskResult());
+            target.taskResultProperty().addListener((observable, oldValue, newValue) -> tempTargetInTable.setTaskResult(newValue));
             //TODO get number of serial sets per target
             targetInTables.add(tempTargetInTable);
         }
@@ -96,5 +101,29 @@ public class BackEndMediator {
     public void runTask(int proccessTime, boolean taskTimeRandom, Double chancesOfSuccess, Double chancesOfWarning, boolean isIncremental){
 
     }
+
+    public DependencyGraph getSubGraphFromTable(List<TargetInTable> selectedTargets){
+        DependencyGraph subGraph = new DependencyGraph();
+        for (TargetInTable curTargetInTabel : selectedTargets){
+            Target curTarget = dependencyGraph.getTargetByName(curTargetInTabel.getName());
+            Target curTargetCopy = curTarget.getDeepCopy();
+            subGraph.addTargetToGraph(curTargetInTabel.getName(),curTargetCopy);
+
+        }
+        subGraph.filterTargetDependendies();
+        subGraph.updateAllTargetDependencyLevel();
+        subGraph.setName2SerialSet(dependencyGraph.getName2SerialSet()); // not logically true
+        return subGraph;
+    }
+
+    public void updateGraphFromSubGraph(DependencyGraph subGraph){
+        for (Target subGraphTarget : subGraph.getAllTargets().values()){
+            dependencyGraph.getTargetByName(subGraphTarget.getName()).setTaskResult(subGraphTarget.getTaskResult());
+
+        }
+
+    }
+
+
 
 }

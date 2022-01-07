@@ -24,7 +24,9 @@ public class TableManager {
     }
 
     public List<TargetInTable> getSelectedTargets(){
+        System.out.println( targetsTable.stream().filter(t -> t.getChecked().isSelected()).collect(Collectors.toList()));;
         return targetsTable.stream().filter(t -> t.getChecked().isSelected()).collect(Collectors.toList());
+
 
     }
 

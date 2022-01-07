@@ -8,8 +8,11 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import sun.nio.ch.ThreadPool;
 
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 public class GraphInfoScreenController {
 
@@ -128,12 +131,15 @@ public class GraphInfoScreenController {
         totalRequiredForColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable,Integer>("totalRequiredFor"));
         extraInfoColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable,String>("extraInfo"));
         checkedCulumn.setCellValueFactory(new PropertyValueFactory<TargetInTable,CheckBox>("checked"));
+
         ObservableList<TargetInTable> targetInTables = backEndMediator.getAllTargetsForTable();
         mainTableManager = new TableManager(targetInTables);
         targetsTable.setItems(targetInTables);
+
         serialSetTable.setItems(backEndMediator.getAllSerialSetsForTable());
         serialSetName.setCellValueFactory(new PropertyValueFactory<SerialSetInTable,String>("setName"));
         targetsInSet.setCellValueFactory(new PropertyValueFactory<SerialSetInTable,String>("targetsInSet"));
+
 
 
         System.out.println("tabel created");

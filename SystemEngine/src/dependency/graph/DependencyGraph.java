@@ -123,6 +123,14 @@ public class DependencyGraph implements Serializable {
         allTargets.put(name, toAdd);
     }
 
+    public void setName2SerialSet(Map<String, Set<String>> name2SerialSet) {
+        this.name2SerialSet = name2SerialSet;
+    }
+
+    public Map<String, Set<String>> getName2SerialSet() {
+        return name2SerialSet;
+    }
+
     public void updateAllTargetDependencyLevel() {
         boolean noDepends, noRequired;
         for (Target target :
@@ -149,6 +157,43 @@ public class DependencyGraph implements Serializable {
 
         }
     }
+
+    public void filterTargetDependendies() {
+        for (Target curTarget : allTargets.values()) {
+            Iterator<String> relatedTargetIter = curTarget.getDependsOn().iterator();
+            while (relatedTargetIter.hasNext()) {
+                String relatedTargetName = relatedTargetIter.next();
+                if (!allTargets.containsKey(relatedTargetName))
+                  relatedTargetIter.remove();
+            }
+
+             relatedTargetIter = curTarget.getRequiredFor().iterator();
+            while(relatedTargetIter.hasNext())
+            {
+                String relatedTargetName = relatedTargetIter.next();
+
+                if (!allTargets.containsKey(relatedTargetName))
+                    relatedTargetIter.remove();
+            }
+        }
+        }
+
+        public void updateEffectOfTargetsExecution(Set<Target> executedTargets){
+            System.out.println("i am in updateEffectedTargets");
+        Iterator<Target> curTargetIter = executedTargets.iterator();
+            while(curTargetIter.hasNext()){
+                Target curTarget = curTargetIter.next();
+                if(curTarget.getTaskResult() == Target.TaskResult.Success || curTarget.getTaskResult() == Target.TaskResult.Warning){
+                    setAndUpdateTargetSuccess(curTarget);
+                }
+                else if (curTarget.getTaskResult() == Target.TaskResult.Failure){
+                    setAndUpdateTargetFailure(curTarget);
+                }
+                curTargetIter.remove();
+            }
+        }
+
+
     public Set<String> setAndUpdateTargetSuccess(Target target) {
         Set<String> waitingTargets = new HashSet<>();
         target.setTargetStatus(Target.TargetStatus.Finished);

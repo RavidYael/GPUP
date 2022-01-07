@@ -11,12 +11,21 @@ public class TargetInTable {
     private StringProperty dummyCheck = new SimpleStringProperty(this,"isChecked","notChecked");
     private String name;
     private Target.DependencyLevel location;
-    private Target.TargetStatus targetStatus;
-    private Target.TaskResult taskResult;
+
     private int totalDependsOn;
     private int totalRequiredFor;
     private String extraInfo;
     private int numOfSerialSets;
+
+    private Target.TargetStatus targetStatus;
+    private Target.TaskResult taskResult;
+
+    private StringProperty targetStatusProperty = new SimpleStringProperty();
+
+
+
+
+
 
     public void setName(String name) {
         this.name = name;
@@ -90,4 +99,18 @@ public class TargetInTable {
     public int getNumOfSerialSets() {
         return numOfSerialSets;
     }
+
+    public String getTargetStatusProperty() {
+        return targetStatusProperty.get();
+    }
+
+    public StringProperty targetStatusPropertyProperty() {
+        return targetStatusProperty;
+    }
+
+    public void setTargetStatusProperty(String targetStatusProperty) {
+        this.targetStatusProperty.set(targetStatusProperty);
+    }
+
+
 }
