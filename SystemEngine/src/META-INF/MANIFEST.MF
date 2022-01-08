@@ -1,0 +1,3 @@
+Manifest-Version: 1.0
+Class-Path: jgrapht-core-1.4.0.jar jheaps-0.11.jar
+

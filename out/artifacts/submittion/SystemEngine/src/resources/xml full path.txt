@@ -1,0 +1,8 @@
+C:\Users\oatar\IdeaProjects\G.P.U.P EX1\SystemEngine\src\resources\ex1-small.xml
+
+C:\Users\oatar\IdeaProjects\G.P.U.P EX1\SystemEngine\src\resources\ex1-big.xml
+
+C:\Users\oatar\IdeaProjects\G.P.U.P EX1\SystemEngine\src\resources\ex1-error-2.4.xml
+
+C:\Users\oatar\IdeaProjects\G.P.U.P EX1\SystemEngine\src\resources\ex1-error-2.2.xml
+

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+
+<BorderPane xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="home.Controller">
+   <top>
+            <HBox alignment="CENTER_LEFT" prefHeight="92.0" spacing="50.0" BorderPane.alignment="CENTER">
+                <children>
+                    <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                        <children>
+                            <Label text="22000" textFill="#2a73ff">
+                                <font>
+                                    <Font name="System Bold" size="26.0" />
+                                </font>
+                            </Label>
+                            <Label text="total targets" textFill="#b51f1f" />
+                        </children>
+                    </VBox>
+                    <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                        <children>
+                            <Label text="1500" textFill="#26bfbc">
+                                <font>
+                                    <Font name="System Bold" size="26.0" />
+                                </font>
+                            </Label>
+                            <Label text="Leafs" textFill="#b51f1f" />
+                        </children>
+                    </VBox>
+                    <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                        <children>
+                            <Label text="1000" textFill="#fa5f7e">
+                                <font>
+                                    <Font name="System Bold" size="26.0" />
+                                </font>
+                            </Label>
+                            <Label text="independent" textFill="#b51f1f" />
+                        </children>
+                    </VBox>
+                    <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                        <children>
+                            <Label text="780" textFill="#de0000">
+                                <font>
+                                    <Font name="System Bold" size="26.0" />
+                                </font>
+                            </Label>
+                            <Label text="middles" textFill="#b51f1f" />
+                        </children>
+                    </VBox>
+            <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+               <children>
+                  <Label text="780" textFill="#de0000">
+                     <font>
+                        <Font name="System Bold" size="26.0" />
+                     </font>
+                  </Label>
+                  <Label text="roots" textFill="#b51f1f" />
+               </children>
+            </VBox>
+                </children>
+            </HBox>
+   </top>
+   <center>
+      <TableView BorderPane.alignment="CENTER">
+        <columns>
+          <TableColumn prefWidth="137.0" text="target name" />
+          <TableColumn prefWidth="72.99996948242188" text="C2" />
+            <TableColumn prefWidth="72.99996948242188" text="C2" />
+            <TableColumn prefWidth="72.99996948242188" text="C2" />
+            <TableColumn prefWidth="72.99996948242188" text="C2" />
+            <TableColumn prefWidth="72.99996948242188" text="C2" />
+        </columns>
+      </TableView>
+   </center>
+   <right>
+      <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+         <children>
+            <GridPane>
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+            </GridPane>
+         </children>
+      </VBox>
+   </right>
+</BorderPane>
