@@ -112,13 +112,6 @@ public class DependencyGraph implements Serializable {
         isVisited.put(src, false);
     }
 
-    public void setAllTargets(Map<String, Target> allTargets) {
-        this.allTargets = allTargets;
-    }
-    public void updateAllTargetDependencyLevel(Map<Target.DependencyLevel, Set<Target>> targetsByDependencyLevel) {
-        this.targetsByDependencyLevel = targetsByDependencyLevel;
-    }
-
     public void addTargetToGraph(String name, Target toAdd) {
         allTargets.put(name, toAdd);
     }
@@ -154,6 +147,33 @@ public class DependencyGraph implements Serializable {
 
             }
 
+
+        }
+    }
+
+
+    public void updateAllTargetDependencyLevelAfterExecution() {
+        boolean noDepends, noRequired;
+        for (Target target :
+                allTargets.values()) {
+            noDepends = target.getDependsOn().isEmpty();
+            noRequired = target.getRequiredFor().isEmpty();
+            if (noDepends && noRequired) {
+                targetsByDependencyLevel.get(Target.DependencyLevel.Independed).add(target);
+                target.setDependencyLevel(Target.DependencyLevel.Independed);
+
+            } else if (noDepends && !noRequired) {
+                targetsByDependencyLevel.get(Target.DependencyLevel.Leaf).add(target);
+                target.setDependencyLevel(Target.DependencyLevel.Leaf);
+
+            } else if (!noDepends && noRequired) {
+                targetsByDependencyLevel.get(Target.DependencyLevel.Root).add(target);
+                target.setDependencyLevel(Target.DependencyLevel.Root);
+            } else if (!noDepends && !noRequired) {
+                targetsByDependencyLevel.get(Target.DependencyLevel.Middle).add(target);
+                target.setDependencyLevel(Target.DependencyLevel.Middle);
+
+            }
 
         }
     }
@@ -226,6 +246,20 @@ public class DependencyGraph implements Serializable {
     public void setMaxParallelism(int maxParallelism) {
         this.maxParallelism = maxParallelism;
     }
+
+    public void resetTraverseDataAfterChangedInSubGraph(Map<Target,Set<String>> Target2ItsOriginalDependOnTargets,Map<Target,Set<String>> Target2ItsOriginalRequiredForTargets)
+    {
+        for (Target curTarget : allTargets.values()) {
+            if(Target2ItsOriginalDependOnTargets.containsKey(curTarget)){
+                curTarget.setDependsOn(Target2ItsOriginalDependOnTargets.get(curTarget));
+            }
+            if(Target2ItsOriginalRequiredForTargets.containsKey(curTarget)){
+                curTarget.setRequiredFor(Target2ItsOriginalRequiredForTargets.get(curTarget));
+            }
+        }
+    }
+
+
     public void fixTargetsDependencies()
     {
         for (Target target : allTargets.values())

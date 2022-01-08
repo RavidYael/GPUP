@@ -14,6 +14,7 @@ public class TableManager {
     private String destTarget;
     private String cycleTarget;
 
+
     public TableManager(ObservableList<TargetInTable> targetsTable) {
         this.targetsTable = targetsTable;
     }

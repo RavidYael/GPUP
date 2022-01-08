@@ -19,7 +19,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.*;
 
 public class TaskScreenController {
 
@@ -117,10 +117,21 @@ public class TaskScreenController {
 
     @FXML
     void runButtonAction(ActionEvent event) {
-        DependencyGraph graphInExecution = backEndMediator.getSubGraphFromTable(tableManager.getSelectedTargets());
+
+        Map<Target,Set<String>> Target2ItsOriginalDependOnTargets = new HashMap<>();
+        Map<Target,Set<String>> Target2ItsOriginalRequiredForTargets = new HashMap<>();
+
+        DependencyGraph graphInExecution = backEndMediator.getSubGraphFromTable(tableManager.getSelectedTargets(),Target2ItsOriginalDependOnTargets,Target2ItsOriginalRequiredForTargets);
+
+        // seems classic to create a map of target to its original dependencies, send it to getSubGraph method
+        // before changing the traversing data of one target insert it to this map- by that you can prevent from
+        // create a deep copy, you can work directly on the target from the original graph and just in the end of this method(run)
+        // reset the traversing data to the origin using the map we had created first
+
         if (taskComboBox.getValue() == "Simulation Task") {
             TaskExecution taskExecution = new TaskExecution(graphInExecution,
-                    backEndMediator.getDependencyGraph(),
+                    /*
+                    backEndMediator.getDependencyGraph(),*/
                     new SimulationTask(
                     simulationTaskController.getMaxSecToRun()*1000,
                     simulationTaskController.isTaskTimeRandom(),
@@ -132,7 +143,9 @@ public class TaskScreenController {
             }
 
         }
-      //  backEndMediator.updateGraphFromSubGraph(graphInExecution);
+        backEndMediator.getDependencyGraph().updateAllTargetDependencyLevelAfterExecution();
+        backEndMediator.getDependencyGraph().resetTraverseDataAfterChangedInSubGraph(Target2ItsOriginalDependOnTargets,Target2ItsOriginalRequiredForTargets);
+
     }
 
 

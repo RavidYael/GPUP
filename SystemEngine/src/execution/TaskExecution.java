@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 
 public class TaskExecution implements Serializable {
     private Task task;
-    private DependencyGraph originalGraph;
     private DependencyGraph graphInExecution;
     private Map<Target.TargetStatus,Set<Target>> status2Targets;
     private Map<Target,TargetExecutionSummary> target2summary;
@@ -30,9 +29,9 @@ public class TaskExecution implements Serializable {
     private Long totalDuration =0L;
 
 
-    public TaskExecution(DependencyGraph graphInExecution, DependencyGraph originalGraph, Task task) {
-        this.originalGraph = originalGraph;
-        this.graphInExecution = graphInExecution.createDeepCopy();
+    public TaskExecution(DependencyGraph graphInExecution /*DependencyGraph originalGraph*/, Task task) {
+        // this.originalGraph = originalGraph;
+        this.graphInExecution = graphInExecution;
         this.task = task;
         status2Targets = new HashMap<>();
         status2Targets.put(Target.TargetStatus.Frozen,new HashSet<>());
@@ -118,7 +117,7 @@ public class TaskExecution implements Serializable {
         {
             if (iter.hasNext()) {
                 Target target = iter.next();
-                TargetRunner targetRunner = new TargetRunner(target, task , originalGraph);
+                TargetRunner targetRunner = new TargetRunner(target, task , graphInExecution);
                 executedTargets.add(target);
                 futureRes.add(threadPoolExecutor.submit(targetRunner));
             }

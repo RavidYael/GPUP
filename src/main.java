@@ -3,7 +3,7 @@
 
 
 import com.sun.xml.internal.ws.api.model.wsdl.WSDLOutput;
-import console.GpupMenu;
+//import console.GpupMenu;
 import org.w3c.dom.ranges.Range;
 
 import javax.xml.bind.SchemaOutputResolver;
@@ -22,8 +22,8 @@ public class main {
     public static void main(String[] args) {
 
 
-        GpupMenu menu = new GpupMenu();
-        menu.executeMenu();
+        //GpupMenu menu = new GpupMenu();
+        //menu.executeMenu();
 
 
     }
