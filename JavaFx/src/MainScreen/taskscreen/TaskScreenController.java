@@ -84,6 +84,7 @@ public class TaskScreenController {
     private Parent simulationTaskScreen;
     private BackEndMediator backEndMediator;
     private SimulationTaskController simulationTaskController;
+    private CompilationTaskController compilationTaskController;
     private TableManager tableManager;
 
     public void setBackEndMediator(BackEndMediator backEndMediator) {
@@ -154,7 +155,11 @@ public class TaskScreenController {
             String screenName = taskComboBox.getValue() + " screen.fxml";
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(screenName));
             taskSettingsPane.setCenter(fxmlLoader.load());
+            if (taskComboBox.getValue().equals("Simulation Task"))
             simulationTaskController = fxmlLoader.getController();
+            else
+                compilationTaskController = fxmlLoader.getController();
+
 
         }
 
