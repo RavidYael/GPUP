@@ -112,7 +112,7 @@ public class TaskScreenController {
         fromScratchRbutton.setToggleGroup(incrOrScratch);
         dependencyForSelection.setItems(FXCollections.observableArrayList(Target.Dependency.DependsOn, Target.Dependency.RequiredFor));
         //TODO binding checkboxes so that only one can be picked
-        bindCheckBoxes();
+        //bindCheckBoxes();
         //TODO dependency combo box shoikd only be ctivated when checkbox is slelcetdd
 
 
@@ -126,7 +126,7 @@ public class TaskScreenController {
         executionStatusColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable, Target.TargetStatus>("targetStatus"));
         ProccessingResultColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable,Target.TaskResult>("taskResult"));
 
-        ObservableList<TargetInTable>  targetInTables = backEndMediator.getAllTargetsForTable(selectAll);
+        ObservableList<TargetInTable>  targetInTables = backEndMediator.getAllTargetsForTable();
         targetsTable.setItems(targetInTables);
         tableManager = new TableManager(targetInTables,selectWithDependency,selectAll,dependencyForSelection,backEndMediator);
 
@@ -181,8 +181,8 @@ public class TaskScreenController {
         }
 
         private void bindCheckBoxes(){
-        selectAll.selectedProperty().bind(selectWithDependency.disableProperty());
-        selectWithDependency.selectedProperty().bind(selectAll.disableProperty());
+        //selectAll.selectedProperty().bind(selectWithDependency.disableProperty());
+        //selectWithDependency.selectedProperty().bind(selectAll.disableProperty());
 
         }
 

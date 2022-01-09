@@ -28,7 +28,7 @@ public class TableManager {
         this.backEndMediator = backEndMediator;
         this.selectAll = selectAll;
         this.selectWithDep = selectWithDep;
-        //bindCheckBoxes();
+        bindCheckBoxes();
     }
 
     public TableManager(ObservableList<TargetInTable> targetsTable) {
@@ -49,13 +49,14 @@ public class TableManager {
     public void bindCheckBoxes(){
 
         for (TargetInTable curTargetInTable : targetsTable){
-            if (selectAll.isDisable())
-                curTargetInTable.getChecked().selectedProperty().unbind();
-                curTargetInTable.getChecked().setOnAction(event -> {
-            if (selectWithDep.isSelected()){
-                selectWithDependency(curTargetInTable,dependencyTypeForSelection.getValue());
-            }
-            });
+            curTargetInTable.getChecked().selectedProperty().bind(selectAll.selectedProperty());
+//            if (selectAll.isDisable())
+//                curTargetInTable.getChecked().selectedProperty().unbind();
+//                curTargetInTable.getChecked().setOnAction(event -> {
+//            if (selectWithDep.isSelected()){
+//                selectWithDependency(curTargetInTable,dependencyTypeForSelection.getValue());
+//            }
+//            });
         }
     }
 

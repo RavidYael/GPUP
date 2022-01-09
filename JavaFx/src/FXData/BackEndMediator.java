@@ -38,12 +38,11 @@ public class BackEndMediator {
         this.lastTaskExecution = taskExecution;
     }
 
-    public ObservableList<TargetInTable> getAllTargetsForTable(CheckBox selectAll){
+    public ObservableList<TargetInTable> getAllTargetsForTable(){
         ObservableList<TargetInTable> targetInTables = FXCollections.observableArrayList();
         for(Target target : dependencyGraph.getAllTargets().values()){
             TargetInTable tempTargetInTable = new TargetInTable();
             tempTargetInTable.setChecked(new CheckBox());
-          //  tempTargetInTable.getChecked().selectedProperty().bind(selectAll.selectedProperty());
             tempTargetInTable.setName(target.getName());
             tempTargetInTable.setLocation(target.getDependencyLevel());
             tempTargetInTable.setExtraInfo(target.getData());
