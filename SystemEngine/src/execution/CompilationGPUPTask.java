@@ -2,13 +2,16 @@ package execution;
 
 import dependency.target.Target;
 
-public class CompilationTask extends Task {
+public class CompilationGPUPTask extends GPUPTask {
     private String taskName = "Compilation";
 
+    @Override
+    public Void call() throws Exception { // TOBEFILLED
+        return null;
+    }
 
     @Override
-    public Target.TaskResult runOnTarget(Target target)
-    {
+    public Void runOnTarget(Target target){
         return null;
     }
 

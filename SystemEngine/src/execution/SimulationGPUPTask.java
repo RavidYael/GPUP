@@ -3,16 +3,23 @@ package execution;
 import dependency.target.Target;
 
 import java.io.Serializable;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Random;
 
-public class SimulationTask  extends Task implements Serializable {
+public class SimulationGPUPTask extends GPUPTask implements Serializable {
     private String taskName = "Simulation";
     private int processTime;
     private boolean isRandomTime;
     private double successProb;
     private double successWithWarningProb;
+    private Target curTarget;
 
-    public SimulationTask(int processTime, boolean isRandomTime, Double successProb, Double successWithWarningProb) {
+    public void setCurTarget(Target target){
+        curTarget = target;
+    }
+
+    public SimulationGPUPTask(int processTime, boolean isRandomTime, Double successProb, Double successWithWarningProb) {
 
         this.isRandomTime = isRandomTime;
         if (isRandomTime)
@@ -26,8 +33,20 @@ public class SimulationTask  extends Task implements Serializable {
     }
 
     @Override
-    public Target.TaskResult runOnTarget(Target target) {
-        Target.TaskResult resStatus;
+    public Void call() throws Exception {
+        Target toRun;
+        synchronized (this){
+            toRun = curTarget;
+        }
+        return runOnTarget(toRun);
+    }
+
+    @Override
+    public Void runOnTarget(Target target) {
+
+        Instant start = Instant.now();
+
+        Target.TaskResult taskResult;
         target.setTargetStatus(Target.TargetStatus.InProcess);
         double rand = new Random().nextDouble();
         System.out.println("Target " + target.getName() + " is now processing ");
@@ -43,26 +62,35 @@ public class SimulationTask  extends Task implements Serializable {
         {
             double newRand = new Random().nextDouble();
             if (newRand < successWithWarningProb) {
-                resStatus = Target.TaskResult.Warning;
+                taskResult = Target.TaskResult.Warning;
                 System.out.println("Warning.");
 
             }
             else {
-                resStatus = Target.TaskResult.Success;
+                taskResult = Target.TaskResult.Success;
                 System.out.println("Success.");
 
             }
 
         }
         else {
-            resStatus = Target.TaskResult.Failure;
+            taskResult = Target.TaskResult.Failure;
             System.out.println("Failure.");
 
         }
         System.out.println();
 
-        return resStatus;
+        target.setTaskResult(taskResult);
+        target.setTargetStatus(Target.TargetStatus.Finished);
 
+
+        Instant finish = Instant.now();
+
+        Duration duration = Duration.between(start,finish); // חרא גדול
+
+        target.setExecutionTime(duration.getSeconds()); // if needed can be added to a (new) Duration member in GPUPTask
+
+        return null;
     }
 
     @Override

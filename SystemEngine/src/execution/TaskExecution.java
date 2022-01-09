@@ -3,36 +3,34 @@ package execution;
 import dependency.graph.DependencyGraph;
 import dependency.target.Target;
 import dependency.target.TargetRunner;
-import sun.nio.ch.ThreadPool;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.Format;
-import java.text.SimpleDateFormat;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
-public class TaskExecution implements Serializable {
-    private Task task;
+public class TaskExecution implements Serializable, Runnable{
+    private GPUPTask GPUPTask;
     private DependencyGraph graphInExecution;
     private Map<Target.TargetStatus,Set<Target>> status2Targets;
     private Map<Target,TargetExecutionSummary> target2summary;
     private String targetsSummaryDir;
     private Long totalDuration =0L;
+    private int maxThreads;
 
+    public void setMaxThreads(int maxPerl) {
+    maxThreads = maxPerl;
+    }
 
-    public TaskExecution(DependencyGraph graphInExecution /*DependencyGraph originalGraph*/, Task task) {
-        // this.originalGraph = originalGraph;
+    public TaskExecution(DependencyGraph graphInExecution ,int maxParallelism, GPUPTask GPUPTask) {
+        this.maxThreads = maxParallelism;
         this.graphInExecution = graphInExecution;
-        this.task = task;
+        this.GPUPTask = GPUPTask;
         status2Targets = new HashMap<>();
         status2Targets.put(Target.TargetStatus.Frozen,new HashSet<>());
         status2Targets.put(Target.TargetStatus.Skipped,new HashSet<>());
@@ -47,7 +45,7 @@ public class TaskExecution implements Serializable {
     private void createTaskWorkingDirectory(){
         String timeStamp = getTimeStamp("dd.MM.yyyy HH.mm.ss");
         String workingDirStr =  graphInExecution.getWorkingDir();
-        String taskDirStr = workingDirStr + "\\" + task.getTaskName() +" " + timeStamp;
+        String taskDirStr = workingDirStr + "\\" + GPUPTask.getTaskName() +" " + timeStamp;
         File taskDirectory = new File(taskDirStr);
         Path path = Paths.get(taskDirStr);
         this.targetsSummaryDir = path.toString();
@@ -100,10 +98,18 @@ public class TaskExecution implements Serializable {
         return formattedDate;
     }
 
-    public void runTaskFromScratch(int maxparrallel)
+    @Override
+    public void run(){
+        //if(GPUPTask.getTaskName() == GPUPTask.TaskNames.Simulation){
+            runTaskFromScratch();
+//כאן צריכה להיות לוגיקה שאומרת לו איזה סוג מסימה לבצע, אפשר להוסיף את זה כenum בGPUPTask
+       // }
+    }
+
+    public void runTaskFromScratch()
     {
 
-        ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(maxparrallel);
+        ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(maxThreads);
         Set<Target> executedTargets = new HashSet<>();
         createTaskWorkingDirectory();
         Set<String> updatedTargets;
@@ -117,7 +123,7 @@ public class TaskExecution implements Serializable {
         {
             if (iter.hasNext()) {
                 Target target = iter.next();
-                TargetRunner targetRunner = new TargetRunner(target, task , graphInExecution);
+                TargetRunner targetRunner = new TargetRunner(target, GPUPTask, graphInExecution);
                 executedTargets.add(target);
                 futureRes.add(threadPoolExecutor.submit(targetRunner));
             }

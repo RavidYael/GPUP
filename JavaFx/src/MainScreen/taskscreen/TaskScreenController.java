@@ -5,8 +5,7 @@ import FXData.TableManager;
 import FXData.TargetInTable;
 import dependency.graph.DependencyGraph;
 import dependency.target.Target;
-import execution.SimulationTask;
-import execution.Task;
+import execution.SimulationGPUPTask;
 import execution.TaskExecution;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -147,17 +146,16 @@ public class TaskScreenController {
         // reset the traversing data to the origin using the map we had created first
 
         if (taskComboBox.getValue() == "Simulation Task") {
-            TaskExecution taskExecution = new TaskExecution(graphInExecution,
-                    /*
-                    backEndMediator.getDependencyGraph(),*/
-                    new SimulationTask(
+            TaskExecution taskExecution = new TaskExecution(graphInExecution,numOfThreads.getValue(),
+                    new SimulationGPUPTask(
                     simulationTaskController.getMaxSecToRun()*1000,
                     simulationTaskController.isTaskTimeRandom(),
                     simulationTaskController.getChancesOfSuccess(),
                     simulationTaskController.getChancesOfWarning()));
 
+
             if (fromScratchRbutton.isSelected()) {
-                taskExecution.runTaskFromScratch(numOfThreads.getValue());
+                new Thread(taskExecution).start();
             }
 
         }

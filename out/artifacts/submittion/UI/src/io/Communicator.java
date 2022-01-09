@@ -1,14 +1,5 @@
 package io;
 
-import dependency.target.Target;
-import execution.Task;
-import validation.GraphExtractor;
-import validation.GraphValidator;
-
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Scanner;
-
 public interface Communicator {
 
        // void loadAndValidateGraphFromFile() throws Exception;

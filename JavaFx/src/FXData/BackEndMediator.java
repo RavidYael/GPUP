@@ -1,17 +1,12 @@
 package FXData;
 
-import MainScreen.taskscreen.TaskScreenController;
 import dependency.graph.DependencyGraph;
 import dependency.target.Target;
-import execution.Task;
 import execution.TaskExecution;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.Control;
 
-import javax.script.Bindings;
-import javax.swing.*;
 import java.util.*;
 import java.util.stream.Collectors;
 

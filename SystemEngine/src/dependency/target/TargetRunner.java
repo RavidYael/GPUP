@@ -1,31 +1,31 @@
 package dependency.target;
 
 import dependency.graph.DependencyGraph;
-import execution.Task;
+import execution.GPUPTask;
 
 import java.time.Duration;
 import java.time.Instant;
 
 public class TargetRunner implements Runnable {
     Target target;
-    Task task;
+    GPUPTask GPUPTask;
     Target.TaskResult result;
     Target.TargetStatus status;
     Duration duration;
     DependencyGraph dependencyGraph;
 
-    public TargetRunner(Target target, Task task,DependencyGraph dependencyGraph) {
+    public TargetRunner(Target target, GPUPTask GPUPTask, DependencyGraph dependencyGraph) {
         this.target = target;
-        this.task = task;
+        this.GPUPTask = GPUPTask;
         this.dependencyGraph = dependencyGraph;
     }
 
-    public void setTask(Task task) {
-        this.task = task;
+    public void setTask(GPUPTask GPUPTask) {
+        this.GPUPTask = GPUPTask;
     }
 
-    public Task getTask() {
-        return task;
+    public GPUPTask getTask() {
+        return GPUPTask;
     }
 
     public void setTarget(Target target) {
@@ -38,13 +38,15 @@ public class TargetRunner implements Runnable {
 
     @Override
     public void run() {
-        Instant start = Instant.now();
-        Target.TaskResult result = ( task.runOnTarget(target));
-        target.setTaskResult(result);
-        Instant finish = Instant.now();
-        duration = Duration.between(start,finish); // חרא גדול
-        Long s = duration.getSeconds();
-        dependencyGraph.getTargetByName(target.getName()).setTaskResult(result);
-       // dependencyGraph.getTargetByName(target.getName()).setTasks(result);
+
+
+            GPUPTask.setCurTarget(target);
+
+        try {
+                GPUPTask.call();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
     }
 }
