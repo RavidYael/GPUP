@@ -11,6 +11,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Control;
 
 import javax.script.Bindings;
+import javax.swing.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -37,11 +38,12 @@ public class BackEndMediator {
         this.lastTaskExecution = taskExecution;
     }
 
-    public ObservableList<TargetInTable> getAllTargetsForTable(){
+    public ObservableList<TargetInTable> getAllTargetsForTable(CheckBox selectAll){
         ObservableList<TargetInTable> targetInTables = FXCollections.observableArrayList();
         for(Target target : dependencyGraph.getAllTargets().values()){
             TargetInTable tempTargetInTable = new TargetInTable();
             tempTargetInTable.setChecked(new CheckBox());
+          //  tempTargetInTable.getChecked().selectedProperty().bind(selectAll.selectedProperty());
             tempTargetInTable.setName(target.getName());
             tempTargetInTable.setLocation(target.getDependencyLevel());
             tempTargetInTable.setExtraInfo(target.getData());

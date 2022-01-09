@@ -2,6 +2,9 @@
 
 package dependency.target;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -23,8 +26,8 @@ public class Target implements Serializable {
     // private TargetStatus targetStatus = TargetStatus.Frozen;
     // private TaskResult taskResult = TaskResult.Skipped;
 
-    private SimpleObjectProperty<TaskResult> taskResult =  new SimpleObjectProperty(TaskResult.Skipped); // what is the initial value???
-    private SimpleObjectProperty<TargetStatus> targetStatus = new SimpleObjectProperty<>(TargetStatus.Skipped); // what is the initial value??
+    private ObjectProperty<TaskResult> taskResult =  new SimpleObjectProperty(TaskResult.Skipped); // what is the initial value???
+    private ObjectProperty<TargetStatus> targetStatus = new SimpleObjectProperty<>(TargetStatus.Skipped); // what is the initial value??
 
 
     public Target(String name,String data) {
@@ -88,7 +91,7 @@ public class Target implements Serializable {
         return targetStatus.get();
     }
 
-    public SimpleObjectProperty<TargetStatus> targetStatusProperty() {
+    public ObjectProperty<TargetStatus> targetStatusProperty() {
         return targetStatus;
     }
 
@@ -98,7 +101,7 @@ public class Target implements Serializable {
     }
 
 
-    public SimpleObjectProperty<TaskResult> taskResultProperty() {
+    public ObjectProperty<TaskResult> taskResultProperty() {
         return taskResult;
     }
 

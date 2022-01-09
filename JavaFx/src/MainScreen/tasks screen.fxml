@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ProgressBar?>
@@ -29,15 +30,60 @@
                <content>
                   <ScrollPane fitToHeight="true" fitToWidth="true">
                      <content>
-                        <TableView fx:id="targetsTable" minWidth="1000.0" prefHeight="810.0" prefWidth="819.0">
-                           <columns>
-                              <TableColumn fx:id="checkedCulumn" minWidth="0.0" prefWidth="63.000030517578125" text="checked" />
-                              <TableColumn fx:id="targetNameColumn" prefWidth="133.0" text="Target Name" />
-                              <TableColumn fx:id="locationColumn" prefWidth="129.0" text="Location" />
-                              <TableColumn fx:id="executionStatusColumn" prefWidth="162.0" text="Execution Status" />
-                              <TableColumn fx:id="ProccessingResultColumn" prefWidth="144.0" text="Proccessing Result" />
-                           </columns>
-                        </TableView>
+                        <BorderPane>
+                           <center>
+                              <TableView fx:id="targetsTable" minWidth="1000.0" prefHeight="835.0" prefWidth="1000.0">
+                                 <columns>
+                                    <TableColumn fx:id="checkedCulumn" minWidth="0.0" prefWidth="63.000030517578125" text="checked" />
+                                    <TableColumn fx:id="targetNameColumn" prefWidth="133.0" text="Target Name" />
+                                    <TableColumn fx:id="locationColumn" prefWidth="129.0" text="Location" />
+                                    <TableColumn fx:id="executionStatusColumn" prefWidth="162.0" text="Execution Status" />
+                                    <TableColumn fx:id="ProccessingResultColumn" prefWidth="144.0" text="Proccessing Result" />
+                                 </columns>
+                              </TableView>
+                           </center>
+                           <top>
+                              <GridPane BorderPane.alignment="CENTER">
+                                <columnConstraints>
+                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="329.0" minWidth="10.0" prefWidth="209.0" />
+                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="630.0" minWidth="10.0" prefWidth="204.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="650.0" minWidth="10.0" prefWidth="587.0" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                  <RowConstraints maxHeight="25.0" minHeight="10.0" prefHeight="24.0" vgrow="SOMETIMES" />
+                                  <RowConstraints maxHeight="43.0" minHeight="10.0" prefHeight="38.0" vgrow="SOMETIMES" />
+                                  <RowConstraints maxHeight="38.0" minHeight="10.0" prefHeight="28.0" vgrow="SOMETIMES" />
+                                </rowConstraints>
+                                 <children>
+                                    <CheckBox fx:id="selectAll" mnemonicParsing="false" text="Select All">
+                                       <GridPane.margin>
+                                          <Insets left="10.0" />
+                                       </GridPane.margin>
+                                    </CheckBox>
+                                    <CheckBox fx:id="selectWithDependency" mnemonicParsing="false" text="Select with dependency" GridPane.rowIndex="2">
+                                       <GridPane.margin>
+                                          <Insets left="10.0" />
+                                       </GridPane.margin>
+                                    </CheckBox>
+                                    <ComboBox fx:id="dependencyForSelection" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                       <GridPane.margin>
+                                          <Insets left="10.0" />
+                                       </GridPane.margin>
+                                    </ComboBox>
+                                    <ComboBox prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                       <GridPane.margin>
+                                          <Insets left="10.0" />
+                                       </GridPane.margin>
+                                    </ComboBox>
+                                    <CheckBox mnemonicParsing="false" text="Select Specific" GridPane.rowIndex="1">
+                                       <GridPane.margin>
+                                          <Insets left="10.0" />
+                                       </GridPane.margin>
+                                    </CheckBox>
+                                 </children>
+                              </GridPane>
+                           </top>
+                        </BorderPane>
                      </content>
                   </ScrollPane>
                </content>

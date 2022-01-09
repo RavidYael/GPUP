@@ -80,6 +80,18 @@ public class TaskScreenController {
     @FXML
     private DialogPane taskDialogPane;
 
+    @FXML
+    private CheckBox selectAll;
+
+    @FXML
+    private CheckBox deselectAll;
+
+    @FXML
+    private CheckBox selectWithDependency;
+
+    @FXML
+    private ComboBox<Target.Dependency> dependencyForSelection;
+
 
     private Parent simulationTaskScreen;
     private BackEndMediator backEndMediator;
@@ -98,6 +110,11 @@ public class TaskScreenController {
         ToggleGroup incrOrScratch = new ToggleGroup();
         incrementalRbutton.setToggleGroup(incrOrScratch);
         fromScratchRbutton.setToggleGroup(incrOrScratch);
+        dependencyForSelection.setItems(FXCollections.observableArrayList(Target.Dependency.DependsOn, Target.Dependency.RequiredFor));
+        //TODO binding checkboxes so that only one can be picked
+        bindCheckBoxes();
+        //TODO dependency combo box shoikd only be ctivated when checkbox is slelcetdd
+
 
     }
     public void myInitialize(){
@@ -109,9 +126,9 @@ public class TaskScreenController {
         executionStatusColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable, Target.TargetStatus>("targetStatus"));
         ProccessingResultColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable,Target.TaskResult>("taskResult"));
 
-        ObservableList<TargetInTable>  targetInTables = backEndMediator.getAllTargetsForTable();
+        ObservableList<TargetInTable>  targetInTables = backEndMediator.getAllTargetsForTable(selectAll);
         targetsTable.setItems(targetInTables);
-        tableManager = new TableManager(targetInTables);
+        tableManager = new TableManager(targetInTables,selectWithDependency,selectAll,dependencyForSelection,backEndMediator);
 
     }
 
@@ -160,6 +177,12 @@ public class TaskScreenController {
             else
                 compilationTaskController = fxmlLoader.getController();
 
+
+        }
+
+        private void bindCheckBoxes(){
+        selectAll.selectedProperty().bind(selectWithDependency.disableProperty());
+        selectWithDependency.selectedProperty().bind(selectAll.disableProperty());
 
         }
 

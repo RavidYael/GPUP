@@ -132,7 +132,7 @@ public class GraphInfoScreenController {
         extraInfoColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable,String>("extraInfo"));
         checkedCulumn.setCellValueFactory(new PropertyValueFactory<TargetInTable,CheckBox>("checked"));
 
-        ObservableList<TargetInTable> targetInTables = backEndMediator.getAllTargetsForTable();
+        ObservableList<TargetInTable> targetInTables = backEndMediator.getAllTargetsForTable(new CheckBox());
         mainTableManager = new TableManager(targetInTables);
         targetsTable.setItems(targetInTables);
 
