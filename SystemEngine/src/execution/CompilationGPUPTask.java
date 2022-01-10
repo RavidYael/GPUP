@@ -1,6 +1,7 @@
 package execution;
 
 import dependency.target.Target;
+import javafx.application.Platform;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -20,6 +21,12 @@ public class CompilationGPUPTask extends GPUPTask {
         this.outPutPath = outPutPath;
 
     }
+
+    @Override
+    public void setCurTarget(Target target) {
+        this.curTarget = target;
+    }
+
     @Override
     public Void call() throws Exception {
         Target toRun;
@@ -36,6 +43,7 @@ public class CompilationGPUPTask extends GPUPTask {
         String toComplileJavaFile = calculateJavaFileLoaction(target.getData());
         ProcessBuilder processBuilder = new ProcessBuilder("javac","-d",outPutPath.getPath(),"-cp", outPutPath.getPath(),toComplileJavaFile);
         Process process;
+        target.setTargetStatus(Target.TargetStatus.InProcess);
 
         try {
             process = processBuilder.start();
@@ -43,12 +51,13 @@ public class CompilationGPUPTask extends GPUPTask {
             if (code == 0){
                 target.setTaskResult(Target.TaskResult.Success);
                 //prints out sucess message
-                System.out.println(target.getName()+ " sucess");
+                Platform.runLater(()->updateMessage("Target: " + target.getName() +" Processed successfully"));
             }
             else{
                 target.setTaskResult(Target.TaskResult.Failure);
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-                bufferedReader.lines().forEach(l -> System.out.println(l));
+                Platform.runLater(()->updateMessage("Target: " + target.getName() +" Failed:"));
+                Platform.runLater(()-> bufferedReader.lines().forEach(l -> updateMessage(l)));
             }
             target.setTargetStatus(Target.TargetStatus.Finished);
 
@@ -60,13 +69,14 @@ public class CompilationGPUPTask extends GPUPTask {
         return null;
     }
 
+
     @Override
     public String getTaskName() {
         return taskName;
     }
 
     private String calculateJavaFileLoaction(String fqn){
-        String[] seperatedFqn = fqn.split(".");
+        String[] seperatedFqn = fqn.split("\\.");
         String res = String.join("\\", seperatedFqn);
         return toCompilePath+ "\\" +res + ".java";
     }

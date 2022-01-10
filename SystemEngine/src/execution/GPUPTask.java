@@ -7,9 +7,7 @@ public abstract class GPUPTask extends Task<Void> {
     private String taskName;
     private Target curTarget;
 
-    public void setCurTarget(Target target){
-        curTarget = target;
-    }
+    public abstract void setCurTarget(Target target);
 
 
     @Override

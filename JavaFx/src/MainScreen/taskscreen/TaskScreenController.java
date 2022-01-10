@@ -18,7 +18,9 @@ import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
+import sun.reflect.misc.FieldUtil;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
@@ -170,8 +172,12 @@ public class TaskScreenController {
                     simulationTaskController.getChancesOfWarning());
         }
         else if (taskComboBox.getValue().equals("Compilation Task")) {
-            task = new CompilationGPUPTask(compilationTaskController.getToCompilePath(),
-                    compilationTaskController.getOutputPath());
+//            task = new CompilationGPUPTask(compilationTaskController.getToCompilePath(),
+//                    compilationTaskController.getOutputPath());
+            File outPutPathTEST =  new File("C:\\Users\\oatar\\IdeaProjects\\GPUP-Advanced\\SystemEngine\\src\\resources\\ex2\\out");
+            File toCompilePathTEST = new File("\"C:\\Users\\oatar\\IdeaProjects\\GPUP-Advanced\\SystemEngine\\src\\resources\\ex2\\XOO\\src");
+            clearDirectory(outPutPathTEST);
+            task = new CompilationGPUPTask(toCompilePathTEST,outPutPathTEST);
 
         }
 
@@ -180,8 +186,11 @@ public class TaskScreenController {
         if (fromScratchRbutton.isSelected()) {
             new Thread(taskExecution).start();
         }
-       // backEndMediator.getDependencyGraph().updateAllTargetDependencyLevelAfterExecution();
-        //backEndMediator.getDependencyGraph().resetTraverseDataAfterChangedInSubGraph(Target2ItsOriginalDependOnTargets,Target2ItsOriginalRequiredForTargets);
+
+        //TODO the next few lines should be executed only when thread is finished
+//        backEndMediator.getDependencyGraph().updateAllTargetDependencyLevelAfterExecution();
+//        backEndMediator.getDependencyGraph().resetTraverseDataAfterChangedInSubGraph(Target2ItsOriginalDependOnTargets,Target2ItsOriginalRequiredForTargets);
+//
     }
 
     @FXML
@@ -221,9 +230,11 @@ public class TaskScreenController {
         progressBar.progressProperty().bind(task.progressProperty());
 
 
+    }
 
-
-
+    private void clearDirectory(File directoryToBeDeleted) {
+        final File[] files = directoryToBeDeleted.listFiles();
+        Arrays.stream(files).forEach(f-> f.delete());
     }
 
 

@@ -36,17 +36,12 @@
                         <Insets left="10.0" top="10.0" />
                      </GridPane.margin>
                   </Label>
-                  <Label text="Path to possibly needed resources:" GridPane.rowIndex="2" GridPane.valignment="TOP">
-                     <GridPane.margin>
-                        <Insets left="10.0" top="10.0" />
-                     </GridPane.margin>
-                  </Label>
                   <Label GridPane.rowIndex="3" GridPane.valignment="TOP">
                      <GridPane.margin>
                         <Insets left="10.0" top="10.0" />
                      </GridPane.margin>
                   </Label>
-                  <Label text="Path to compiled artifacts:" GridPane.rowIndex="3">
+                  <Label text="Path to compiled artifacts:" GridPane.rowIndex="2">
                      <GridPane.margin>
                         <Insets left="10.0" />
                      </GridPane.margin>
@@ -56,12 +51,7 @@
                         <Insets bottom="10.0" left="10.0" top="10.0" />
                      </GridPane.margin>
                   </Button>
-                  <Button fx:id="neededResourcesFileChooser" mnemonicParsing="false" onAction="#neededResourcesFileChooserAction" text="Browse" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                     <GridPane.margin>
-                        <Insets bottom="10.0" left="10.0" top="10.0" />
-                     </GridPane.margin>
-                  </Button>
-                  <Button fx:id="outputPathFileChooser" mnemonicParsing="false" onAction="#outputPathFileChooserAction" text="Browse" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                  <Button fx:id="outputPathFileChooser" mnemonicParsing="false" onAction="#outputPathFileChooserAction" text="Browse" GridPane.columnIndex="1" GridPane.rowIndex="2">
                      <GridPane.margin>
                         <Insets bottom="10.0" left="10.0" top="10.0" />
                      </GridPane.margin>
