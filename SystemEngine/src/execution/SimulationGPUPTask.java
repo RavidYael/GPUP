@@ -51,7 +51,7 @@ public class SimulationGPUPTask extends GPUPTask implements Serializable {
         Instant start = Instant.now();
 
         Target.TaskResult taskResult;
-        Platform.runLater(()->target.setTargetStatus(Target.TargetStatus.InProcess));
+        target.setTargetStatus(Target.TargetStatus.InProcess);
         double rand = new Random().nextDouble();
          Platform.runLater(()->updateMessage("Target " + target.getName() + " is now processing "));
          Platform.runLater(()->updateMessage("Target information: " + target.getData()));
@@ -85,8 +85,8 @@ public class SimulationGPUPTask extends GPUPTask implements Serializable {
         String finalStatus = status;
         Platform.runLater(()->updateMessage("Target " +target.getName()+ " completed with status: "+ finalStatus));
         Platform.runLater(()->updateMessage(""));
-        Platform.runLater(()->target.setTaskResult(taskResult));
-        Platform.runLater(()->target.setTargetStatus(Target.TargetStatus.Finished));
+        target.setTaskResult(taskResult);
+        target.setTargetStatus(Target.TargetStatus.Finished);
 
 
         Instant finish = Instant.now();

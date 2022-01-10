@@ -26,7 +26,7 @@ public class TargetInTable {
     private ObjectProperty<Target.TaskResult> taskResult = new SimpleObjectProperty<>();
 
 
-    public ObjectProperty<Target.TargetStatus> getTargetStatusProperty() {
+    public ObjectProperty<Target.TargetStatus> targetStatusProperty() {
         return targetStatus;
     }
 
@@ -38,7 +38,7 @@ public class TargetInTable {
         this.targetStatus.set(targetStatus);
     }
 
-    public ObjectProperty<Target.TaskResult> getTaskResultProperty() {
+    public ObjectProperty<Target.TaskResult> taskResultProperty() {
         return taskResult;
     }
 

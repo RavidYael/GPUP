@@ -11,25 +11,18 @@ import java.io.File;
 public class CompilationTaskController {
 
     private File toCompilePath;
-    private File neededResourcesPath;
     private File outputPath;
 
     @FXML
     private Button toCompileFileChooser;
 
-    @FXML
-    private Button neededResourcesFileChooser;
+
 
     @FXML
     private Button outputPathFileChooser;
 
 
-    @FXML
-    void neededResourcesFileChooserAction(ActionEvent event) {
-        DirectoryChooser directoryChooser = new DirectoryChooser();
-        neededResourcesPath = directoryChooser.showDialog(null);
 
-    }
 
     @FXML
     void outputPathFileChooserAction(ActionEvent event) {
@@ -47,10 +40,6 @@ public class CompilationTaskController {
 
     public File getToCompilePath() {
         return toCompilePath;
-    }
-
-    public File getNeededResourcesPath() {
-        return neededResourcesPath;
     }
 
     public File getOutputPath() {

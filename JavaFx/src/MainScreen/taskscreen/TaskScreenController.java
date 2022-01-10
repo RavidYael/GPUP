@@ -130,8 +130,6 @@ public class TaskScreenController {
         selectSpecificComboBox.setDisable(true);
         selectSpecificCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> selectSpecificComboBox.setDisable(!newValue));
 
-
-
     }
     public void myInitialize(){
 
@@ -173,8 +171,7 @@ public class TaskScreenController {
         }
         else if (taskComboBox.getValue().equals("Compilation Task")) {
             task = new CompilationGPUPTask(compilationTaskController.getToCompilePath(),
-                    compilationTaskController.getOutputPath(),
-                    compilationTaskController.getNeededResourcesPath());
+                    compilationTaskController.getOutputPath());
 
         }
 
@@ -183,6 +180,8 @@ public class TaskScreenController {
         if (fromScratchRbutton.isSelected()) {
             new Thread(taskExecution).start();
         }
+       // backEndMediator.getDependencyGraph().updateAllTargetDependencyLevelAfterExecution();
+        //backEndMediator.getDependencyGraph().resetTraverseDataAfterChangedInSubGraph(Target2ItsOriginalDependOnTargets,Target2ItsOriginalRequiredForTargets);
     }
 
     @FXML
@@ -195,8 +194,7 @@ public class TaskScreenController {
     void stopButtonAction(ActionEvent event) {
 
     }
-//          backEndMediator.getDependencyGraph().updateAllTargetDependencyLevelAfterExecution();
-//        backEndMediator.getDependencyGraph().resetTraverseDataAfterChangedInSubGraph(Target2ItsOriginalDependOnTargets,Target2ItsOriginalRequiredForTargets);
+
 
         @FXML
         void taskComboBoxAction (ActionEvent event) throws IOException {

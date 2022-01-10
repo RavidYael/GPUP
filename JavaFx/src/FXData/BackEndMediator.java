@@ -44,14 +44,11 @@ public class BackEndMediator {
             tempTargetInTable.setTotalDependsOn(dependencyGraph.getTotalDependencies(target.getName(), Target.Dependency.DependsOn).size());
             tempTargetInTable.setTotalRequiredFor(dependencyGraph.getTotalDependencies(target.getName(), Target.Dependency.RequiredFor).size());
 
-           // tempTargetInTable.setTargetStatus(target.getTargeStatus());
             tempTargetInTable.setTargetStatus(target.getTargetStatus());
-
-            //target.targetStatusProperty().addListener((observable, oldValue, newValue)-> tempTargetInTable.setTargetStatus(newValue));
+            tempTargetInTable.targetStatusProperty().bind(target.targetStatusProperty());
 
             tempTargetInTable.setTaskResult(target.getTaskResult());
-
-         //   target.taskResultProperty().addListener((observable, oldValue, newValue) -> tempTargetInTable.setTaskResult(newValue));
+            tempTargetInTable.taskResultProperty().bind(target.taskResultProperty());
 
             //TODO get number of serial sets per target
             targetInTables.add(tempTargetInTable);

@@ -15,10 +15,9 @@ public class CompilationGPUPTask extends GPUPTask {
     private File needeResourcesPath;
     private Target curTarget;
 
-    public CompilationGPUPTask(File toCompilePath, File outPutPath, File needeResourcesPath) {
+    public CompilationGPUPTask(File toCompilePath, File outPutPath) {
         this.toCompilePath = toCompilePath;
         this.outPutPath = outPutPath;
-        this.needeResourcesPath = needeResourcesPath;
 
     }
     @Override
@@ -51,6 +50,7 @@ public class CompilationGPUPTask extends GPUPTask {
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
                 bufferedReader.lines().forEach(l -> System.out.println(l));
             }
+            target.setTargetStatus(Target.TargetStatus.Finished);
 
         } catch (IOException e) {
             e.printStackTrace();
