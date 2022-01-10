@@ -1,6 +1,8 @@
 package FXData;
 
 import dependency.target.Target;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.control.CheckBox;
@@ -17,15 +19,36 @@ public class TargetInTable {
     private String extraInfo;
     private int numOfSerialSets;
 
-    private Target.TargetStatus targetStatus;
-    private Target.TaskResult taskResult;
+   // private Target.TargetStatus targetStatus;
+  //  private Target.TaskResult taskResult;
 
-    private StringProperty targetStatusProperty = new SimpleStringProperty();
-
-
-
+    private ObjectProperty<Target.TargetStatus> targetStatus = new SimpleObjectProperty<>();
+    private ObjectProperty<Target.TaskResult> taskResult = new SimpleObjectProperty<>();
 
 
+    public ObjectProperty<Target.TargetStatus> getTargetStatusProperty() {
+        return targetStatus;
+    }
+
+    public Target.TargetStatus getTargetStatus() {
+        return targetStatus.get();
+    }
+
+    public void setTargetStatus(Target.TargetStatus targetStatus) {
+        this.targetStatus.set(targetStatus);
+    }
+
+    public ObjectProperty<Target.TaskResult> getTaskResultProperty() {
+        return taskResult;
+    }
+
+    public Target.TaskResult getTaskResult() {
+        return taskResult.get();
+    }
+
+    public void setTaskResult(Target.TaskResult taskResult) {
+        this.taskResult.set(taskResult);
+    }
 
     public void setName(String name) {
         this.name = name;
@@ -64,21 +87,21 @@ public class TargetInTable {
         return name;
     }
 
-    public Target.TargetStatus getTargetStatus() {
-        return targetStatus;
-    }
+//    public Target.TargetStatus getTargetStatus() {
+//        return targetStatus;
+//    }
 
-    public Target.TaskResult getTaskResult() {
-        return taskResult;
-    }
+//    public Target.TaskResult getTaskResult() {
+//        return taskResult;
+//    }
 
-    public void setTargetStatus(Target.TargetStatus targetStatus) {
-        this.targetStatus = targetStatus;
-    }
+//    public void setTargetStatus(Target.TargetStatus targetStatus) {
+//        this.targetStatus = targetStatus;
+//    }
 
-    public void setTaskResult(Target.TaskResult taskResult) {
-        this.taskResult = taskResult;
-    }
+//    public void setTaskResult(Target.TaskResult taskResult) {
+//        this.taskResult = taskResult;
+//    }
 
     public Target.DependencyLevel getLocation() {
         return location;
@@ -100,17 +123,9 @@ public class TargetInTable {
         return numOfSerialSets;
     }
 
-    public String getTargetStatusProperty() {
-        return targetStatusProperty.get();
-    }
 
-    public StringProperty targetStatusPropertyProperty() {
-        return targetStatusProperty;
-    }
 
-    public void setTargetStatusProperty(String targetStatusProperty) {
-        this.targetStatusProperty.set(targetStatusProperty);
-    }
+
 
 
 }

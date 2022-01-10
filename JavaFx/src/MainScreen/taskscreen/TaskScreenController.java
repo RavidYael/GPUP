@@ -5,8 +5,10 @@ import FXData.TableManager;
 import FXData.TargetInTable;
 import dependency.graph.DependencyGraph;
 import dependency.target.Target;
-import execution.SimulationGPUPTask;
-import execution.TaskExecution;
+import execution.*;
+//
+//import execution.SimulationGPUPTask;
+import javafx.beans.property.ObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -35,10 +37,10 @@ public class TaskScreenController {
     private TableColumn<TargetInTable, Target.DependencyLevel> locationColumn;
 
     @FXML
-    private TableColumn<TargetInTable, Target.TargetStatus> executionStatusColumn;
+    private TableColumn<TargetInTable, ObjectProperty<Target.TargetStatus>> executionStatusColumn;
 
     @FXML
-    private TableColumn<TargetInTable, Target.TaskResult> ProccessingResultColumn;
+    private TableColumn<TargetInTable, ObjectProperty<Target.TaskResult>> ProccessingResultColumn;
 
     @FXML
     private BorderPane taskSettingsPane;
@@ -83,13 +85,19 @@ public class TaskScreenController {
     private CheckBox selectAll;
 
     @FXML
-    private CheckBox deselectAll;
-
-    @FXML
     private CheckBox selectWithDependency;
 
     @FXML
+    private TextArea taskProccessTA;
+
+    @FXML
     private ComboBox<Target.Dependency> dependencyForSelection;
+
+    @FXML
+    private ComboBox<Target.DependencyLevel> selectSpecificComboBox;
+
+    @FXML
+    private CheckBox selectSpecificCheckBox;
 
 
     private Parent simulationTaskScreen;
@@ -109,10 +117,13 @@ public class TaskScreenController {
         ToggleGroup incrOrScratch = new ToggleGroup();
         incrementalRbutton.setToggleGroup(incrOrScratch);
         fromScratchRbutton.setToggleGroup(incrOrScratch);
+        dependencyForSelection.setDisable(true);
+        selectWithDependency.selectedProperty().addListener((observable, oldValue, newValue) -> dependencyForSelection.setDisable(!newValue));
         dependencyForSelection.setItems(FXCollections.observableArrayList(Target.Dependency.DependsOn, Target.Dependency.RequiredFor));
-        //TODO binding checkboxes so that only one can be picked
-        //bindCheckBoxes();
-        //TODO dependency combo box shoikd only be ctivated when checkbox is slelcetdd
+        selectSpecificComboBox.setItems(FXCollections.observableArrayList(Target.DependencyLevel.Root, Target.DependencyLevel.Middle, Target.DependencyLevel.Leaf, Target.DependencyLevel.Independed));
+        selectSpecificComboBox.setDisable(true);
+        selectSpecificCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> selectSpecificComboBox.setDisable(!newValue));
+
 
 
     }
@@ -122,8 +133,11 @@ public class TaskScreenController {
         checkedCulumn.setCellValueFactory(new PropertyValueFactory<TargetInTable, CheckBox>("checked"));
         targetNameColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable, String>("name"));
         locationColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable,Target.DependencyLevel>("location"));
-        executionStatusColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable, Target.TargetStatus>("targetStatus"));
-        ProccessingResultColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable,Target.TaskResult>("taskResult"));
+        //executionStatusColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable, Target.TargetStatus>("targetStatus"));
+       // ProccessingResultColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable,Target.TaskResult>("taskResult"));
+
+        ProccessingResultColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable,ObjectProperty<Target.TaskResult>>("taskResult"));
+        executionStatusColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable,ObjectProperty<Target.TargetStatus>>("targetStatus"));
 
         ObservableList<TargetInTable>  targetInTables = backEndMediator.getAllTargetsForTable();
         targetsTable.setItems(targetInTables);
@@ -135,10 +149,10 @@ public class TaskScreenController {
     @FXML
     void runButtonAction(ActionEvent event) {
 
-        Map<Target,Set<String>> Target2ItsOriginalDependOnTargets = new HashMap<>();
-        Map<Target,Set<String>> Target2ItsOriginalRequiredForTargets = new HashMap<>();
-
-        DependencyGraph graphInExecution = backEndMediator.getSubGraphFromTable(tableManager.getSelectedTargets(),Target2ItsOriginalDependOnTargets,Target2ItsOriginalRequiredForTargets);
+        Map<Target, Set<String>> Target2ItsOriginalDependOnTargets = new HashMap<>();
+        Map<Target, Set<String>> Target2ItsOriginalRequiredForTargets = new HashMap<>();
+        GPUPTask task =null;
+        DependencyGraph graphInExecution = backEndMediator.getSubGraphFromTable(tableManager.getSelectedTargets(), Target2ItsOriginalDependOnTargets, Target2ItsOriginalRequiredForTargets);
 
         // seems classic to create a map of target to its original dependencies, send it to getSubGraph method
         // before changing the traversing data of one target insert it to this map- by that you can prevent from
@@ -146,24 +160,26 @@ public class TaskScreenController {
         // reset the traversing data to the origin using the map we had created first
 
         if (taskComboBox.getValue() == "Simulation Task") {
-            TaskExecution taskExecution = new TaskExecution(graphInExecution,numOfThreads.getValue(),
-                    new SimulationGPUPTask(
-                    simulationTaskController.getMaxSecToRun()*1000,
+            task = new SimulationGPUPTask(simulationTaskController.getMaxSecToRun()*1000,
                     simulationTaskController.isTaskTimeRandom(),
                     simulationTaskController.getChancesOfSuccess(),
-                    simulationTaskController.getChancesOfWarning()));
-
-
-            if (fromScratchRbutton.isSelected()) {
-                new Thread(taskExecution).start();
-            }
+                    simulationTaskController.getChancesOfWarning());
+        }
+        else if (taskComboBox.getValue().equals("Compilation Task")) {
+            task = new CompilationGPUPTask(compilationTaskController.getToCompilePath(),
+                    compilationTaskController.getOutputPath(),
+                    compilationTaskController.getNeededResourcesPath());
 
         }
-        backEndMediator.getDependencyGraph().updateAllTargetDependencyLevelAfterExecution();
-        backEndMediator.getDependencyGraph().resetTraverseDataAfterChangedInSubGraph(Target2ItsOriginalDependOnTargets,Target2ItsOriginalRequiredForTargets);
 
+        TaskExecution taskExecution = new TaskExecution(graphInExecution, numOfThreads.getValue(), task);
+        bindUIComponents(task);
+        if (fromScratchRbutton.isSelected()) {
+            new Thread(taskExecution).start();
+        }
     }
-
+//          backEndMediator.getDependencyGraph().updateAllTargetDependencyLevelAfterExecution();
+//        backEndMediator.getDependencyGraph().resetTraverseDataAfterChangedInSubGraph(Target2ItsOriginalDependOnTargets,Target2ItsOriginalRequiredForTargets);
 
         @FXML
         void taskComboBoxAction (ActionEvent event) throws IOException {
@@ -178,11 +194,22 @@ public class TaskScreenController {
 
         }
 
-        private void bindCheckBoxes(){
-        //selectAll.selectedProperty().bind(selectWithDependency.disableProperty());
-        //selectWithDependency.selectedProperty().bind(selectAll.disableProperty());
+    @FXML
+    void selectSpecificOnAction(ActionEvent event) {
+        tableManager.deselectAll();
+        tableManager.selectByDependecyLevel(selectSpecificComboBox.getValue());
 
-        }
+    }
+    private void bindUIComponents(GPUPTask task){
+        taskProccessTA.clear();
+        task.messageProperty().addListener((observable, oldValue, newValue) -> taskProccessTA.appendText(newValue+ "\n"));
+        progressBar.progressProperty().bind(task.progressProperty());
+
+
+
+
+
+    }
 
 
     }

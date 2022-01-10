@@ -70,12 +70,12 @@
                                           <Insets left="10.0" />
                                        </GridPane.margin>
                                     </ComboBox>
-                                    <ComboBox prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                    <ComboBox fx:id="selectSpecificComboBox" onAction="#selectSpecificOnAction" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                                        <GridPane.margin>
                                           <Insets left="10.0" />
                                        </GridPane.margin>
                                     </ComboBox>
-                                    <CheckBox mnemonicParsing="false" text="Select Specific" GridPane.rowIndex="1">
+                                    <CheckBox fx:id="selectSpecificCheckBox" mnemonicParsing="false" text="Select Specific" GridPane.rowIndex="1">
                                        <GridPane.margin>
                                           <Insets left="10.0" />
                                        </GridPane.margin>

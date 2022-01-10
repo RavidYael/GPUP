@@ -86,7 +86,7 @@ public class TaskExecution implements Serializable, Runnable{
       clearStatus2Targets();
         for (Target target: graphInExecution.getAllTargets().values())
         {
-            status2Targets.get(target.getTargeStatus()).add(target);
+            status2Targets.get(target.getTargetStatus()).add(target);
         }
     }
 

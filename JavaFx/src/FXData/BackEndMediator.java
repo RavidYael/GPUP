@@ -44,13 +44,14 @@ public class BackEndMediator {
             tempTargetInTable.setTotalDependsOn(dependencyGraph.getTotalDependencies(target.getName(), Target.Dependency.DependsOn).size());
             tempTargetInTable.setTotalRequiredFor(dependencyGraph.getTotalDependencies(target.getName(), Target.Dependency.RequiredFor).size());
 
-            tempTargetInTable.setTargetStatus(target.getTargeStatus());
+           // tempTargetInTable.setTargetStatus(target.getTargeStatus());
+            tempTargetInTable.setTargetStatus(target.getTargetStatus());
 
-            target.targetStatusProperty().addListener((observable, oldValue, newValue)-> tempTargetInTable.setTargetStatus(newValue));
+            //target.targetStatusProperty().addListener((observable, oldValue, newValue)-> tempTargetInTable.setTargetStatus(newValue));
 
             tempTargetInTable.setTaskResult(target.getTaskResult());
 
-            target.taskResultProperty().addListener((observable, oldValue, newValue) -> tempTargetInTable.setTaskResult(newValue));
+         //   target.taskResultProperty().addListener((observable, oldValue, newValue) -> tempTargetInTable.setTaskResult(newValue));
 
             //TODO get number of serial sets per target
             targetInTables.add(tempTargetInTable);
@@ -100,9 +101,7 @@ public class BackEndMediator {
         return dependencyGraph.getMaxParallelism();
     }
 
-    public void runTask(int proccessTime, boolean taskTimeRandom, Double chancesOfSuccess, Double chancesOfWarning, boolean isIncremental){
 
-    }
 
     public DependencyGraph getSubGraphFromTable(List<TargetInTable> selectedTargets,Map<Target,Set<String>> MapOFTargetNDependOnTargets,Map<Target,Set<String>> MapOFTargetNRequiredForTargets){
         DependencyGraph subGraph = new DependencyGraph();

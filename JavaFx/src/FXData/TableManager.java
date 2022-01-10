@@ -1,10 +1,12 @@
 package FXData;
 
 import dependency.target.Target;
+import javafx.beans.property.ObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.TableColumn;
 
 import javax.swing.*;
 import java.util.List;
@@ -28,7 +30,36 @@ public class TableManager {
         this.backEndMediator = backEndMediator;
         this.selectAll = selectAll;
         this.selectWithDep = selectWithDep;
-        bindCheckBoxes();
+        selectAllcheckBoxAction();
+        selectWithDepCheckBoxAction();
+    }
+
+    private void selectWithDepCheckBoxAction() {
+        selectWithDep.setOnAction(event -> {
+            if (selectWithDep.isSelected()){
+                for (TargetInTable curTargetInTable : targetsTable){
+                    curTargetInTable.getChecked().setOnAction(e -> {
+                        selectWithDependency(curTargetInTable,dependencyTypeForSelection.getValue());
+                    });
+                }
+            }
+        });
+    }
+
+    private void selectAllcheckBoxAction() {
+        selectAll.setOnAction(e->{
+            if (selectAll.isSelected()){
+                for (TargetInTable curTargetInTable : targetsTable){
+                    curTargetInTable.getChecked().setSelected(true);
+                }
+            }
+            else {
+                for (TargetInTable curTargetInTable : targetsTable){
+                    curTargetInTable.getChecked().setSelected(false);
+                }
+
+            }
+        });
     }
 
     public TableManager(ObservableList<TargetInTable> targetsTable) {
@@ -46,17 +77,11 @@ public class TableManager {
 
     }
 
-    public void bindCheckBoxes(){
+    public void checkBoxesAction(){
 
         for (TargetInTable curTargetInTable : targetsTable){
             curTargetInTable.getChecked().selectedProperty().bind(selectAll.selectedProperty());
-//            if (selectAll.isDisable())
-//                curTargetInTable.getChecked().selectedProperty().unbind();
-//                curTargetInTable.getChecked().setOnAction(event -> {
-//            if (selectWithDep.isSelected()){
-//                selectWithDependency(curTargetInTable,dependencyTypeForSelection.getValue());
-//            }
-//            });
+
         }
     }
 
@@ -72,4 +97,20 @@ public class TableManager {
     }
 
 
+    public void selectByDependecyLevel(Target.DependencyLevel location) {
+        targetsTable.stream().filter(t -> t.getLocation().equals(location)).forEach(t-> t.getChecked().setSelected(true));
+
+    }
+
+    public void deselectAll() {
+        targetsTable.stream().forEach(t-> t.getChecked().setSelected(false));
+    }
+
+//    public void bindColumns(TableColumn<TargetInTable, ObjectProperty<Target.TaskResult>> proccessingResultColumn, TableColumn<TargetInTable, ObjectProperty<Target.TargetStatus>> executionStatusColumn) {
+//        for (TargetInTable curTargetInTable : targetsTable){
+//            curTargetInTable.
+//
+//        }
+//
+//    }
 }

@@ -1,8 +1,10 @@
 package execution;
 
 import dependency.target.Target;
+import javafx.application.Platform;
 
 import java.io.Serializable;
+import java.lang.management.PlatformLoggingMXBean;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Random;
@@ -43,53 +45,53 @@ public class SimulationGPUPTask extends GPUPTask implements Serializable {
 
     @Override
     public Void runOnTarget(Target target) {
+        String status = "";
+
 
         Instant start = Instant.now();
 
         Target.TaskResult taskResult;
-        target.setTargetStatus(Target.TargetStatus.InProcess);
+        Platform.runLater(()->target.setTargetStatus(Target.TargetStatus.InProcess));
         double rand = new Random().nextDouble();
-        System.out.println("Target " + target.getName() + " is now processing ");
-        System.out.println("Target information: " + target.getData());
+         Platform.runLater(()->updateMessage("Target " + target.getName() + " is now processing "));
+         Platform.runLater(()->updateMessage("Target information: " + target.getData()));
 
         try {
             Thread.sleep(processTime);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        System.out.print("Target " +target.getName()+ " completed with status: ");
         if (rand < successProb)
         {
             double newRand = new Random().nextDouble();
             if (newRand < successWithWarningProb) {
                 taskResult = Target.TaskResult.Warning;
-                System.out.println("Warning.");
+                status = "Warning.";
 
             }
             else {
                 taskResult = Target.TaskResult.Success;
-                System.out.println("Success.");
+                status = "Success.";
 
             }
 
         }
         else {
             taskResult = Target.TaskResult.Failure;
-            System.out.println("Failure.");
+            status = "Failure.";
 
         }
-        System.out.println();
 
-        target.setTaskResult(taskResult);
-        target.setTargetStatus(Target.TargetStatus.Finished);
+        String finalStatus = status;
+        Platform.runLater(()->updateMessage("Target " +target.getName()+ " completed with status: "+ finalStatus));
+        Platform.runLater(()->updateMessage(""));
+        Platform.runLater(()->target.setTaskResult(taskResult));
+        Platform.runLater(()->target.setTargetStatus(Target.TargetStatus.Finished));
 
 
         Instant finish = Instant.now();
-
         Duration duration = Duration.between(start,finish); // חרא גדול
-
         target.setExecutionTime(duration.getSeconds()); // if needed can be added to a (new) Duration member in GPUPTask
-
         return null;
     }
 

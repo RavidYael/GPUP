@@ -278,7 +278,7 @@ public class DependencyGraph implements Serializable {
         for (Target target : allTargets.values()){
             if (target.getTaskResult() == Target.TaskResult.Failure)
                 target.setTargetStatus(Target.TargetStatus.Waiting);
-            else if(target.getTargeStatus() == Target.TargetStatus.Skipped){
+            else if(target.getTargetStatus() == Target.TargetStatus.Skipped){
                 target.setTargetStatus(Target.TargetStatus.Frozen);
             }
             else if(target.getTaskResult() == Target.TaskResult.Success){

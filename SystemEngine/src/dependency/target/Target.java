@@ -14,6 +14,7 @@ import java.util.Set;
 
 public class Target implements Serializable {
 
+
     public static enum DependencyLevel {Root,Middle,Leaf, Independed}
     public static enum Dependency {DependsOn , RequiredFor}
     public static enum TargetStatus { Frozen, Skipped, Waiting ,InProcess, Finished, Done}
@@ -25,11 +26,12 @@ public class Target implements Serializable {
     private String data;
     private DependencyLevel dependencyLevel;
     private Long executionTime = 0l;
-    // private TargetStatus targetStatus = TargetStatus.Frozen;
-    // private TaskResult taskResult = TaskResult.Skipped;
 
-    private ObjectProperty<TaskResult> taskResult =  new SimpleObjectProperty(TaskResult.Skipped); // what is the initial value???
-    private ObjectProperty<TargetStatus> targetStatus = new SimpleObjectProperty<>(TargetStatus.Skipped); // what is the initial value??
+     private TargetStatus targetStatus = TargetStatus.Frozen;
+     private TaskResult taskResult = TaskResult.Skipped;
+
+    //private ObjectProperty<TaskResult> taskResult =  new SimpleObjectProperty(TaskResult.Skipped); // what is the initial value???
+    //private ObjectProperty<TargetStatus> targetStatus = new SimpleObjectProperty<>(TargetStatus.Skipped); // what is the initial value??
 
 
     public void setExecutionTime(Long Time){
@@ -61,10 +63,14 @@ public class Target implements Serializable {
             dependsOn.add(dep);
         }
 
-        this.setTargetStatus(other.targetStatus.get());
+
 
         this.setDependencyLevel(other.dependencyLevel);
 
+    }
+
+    public void setTaskResult(TaskResult taskResult) {
+        this.taskResult = taskResult;
     }
 
     public String getName() {
@@ -89,26 +95,32 @@ public class Target implements Serializable {
     public void addToDependsOn(String name) {dependsOn.add(name);}
     public void setDependencyLevel(DependencyLevel dependencyLevel) {this.dependencyLevel = dependencyLevel;}
 
-    public TargetStatus getTargeStatus() {
-        return targetStatus.get();
-    }
+//    public TargetStatus getTargetStatus() {
+//        return targetStatus.get();
+//    }
 
-    public TargetStatus getTargetStatus() {
-        return targetStatus.get();
-    }
 
-    public ObjectProperty<TargetStatus> targetStatusProperty() {
-        return targetStatus;
-    }
+//    public ObjectProperty<TargetStatus> targetStatusProperty() {
+//        return targetStatus;
+//    }
+
+
+//    public TaskResult getTaskResult() {
+//        return taskResult.get();
+//    }
+
+
+//    public ObjectProperty<TaskResult> taskResultProperty() {
+//        return taskResult;
+//    }
 
 
     public TaskResult getTaskResult() {
-        return taskResult.get();
+        return taskResult;
     }
 
-
-    public ObjectProperty<TaskResult> taskResultProperty() {
-        return taskResult;
+    public TargetStatus getTargetStatus() {
+        return targetStatus;
     }
 
     public void setName(String name) {
@@ -127,19 +139,18 @@ public class Target implements Serializable {
         this.data = data;
     }
 
+    public void setTargetStatus(TargetStatus targetStatus) {
+        this.targetStatus = targetStatus;
+    }
+
+
 //    public void setTargetStatus(TargetStatus targetStatus) {
-//        this.targetStatus = targetStatus;
+//        this.targetStatus.set(targetStatus);
 //    }
 
-
-    public void setTargetStatus(TargetStatus targetStatus) {
-        this.targetStatus.set(targetStatus);
-    }
-
-
-    public void setTaskResult(TaskResult taskResult) {
-        this.taskResult.set(taskResult);
-    }
+//    public void setTaskResult(TaskResult taskResult) {
+//        this.taskResult.set(taskResult);
+//    }
 
 
 
