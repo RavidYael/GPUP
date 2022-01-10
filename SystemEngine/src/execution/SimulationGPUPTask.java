@@ -16,9 +16,15 @@ public class SimulationGPUPTask extends GPUPTask implements Serializable {
     private double successProb;
     private double successWithWarningProb;
     private Target curTarget;
+    private Long totalWork;
+    private Long workDone = 0L;
 
     public void setCurTarget(Target target){
         curTarget = target;
+    }
+
+    public void setTotalWork(Long totalWork) {
+        this.totalWork = totalWork;
     }
 
     public SimulationGPUPTask(int processTime, boolean isRandomTime, Double successProb, Double successWithWarningProb) {
@@ -46,15 +52,16 @@ public class SimulationGPUPTask extends GPUPTask implements Serializable {
     @Override
     public Void runOnTarget(Target target) {
         String status = "";
+        String additionalInfo = "";
 
 
-
+        Instant start = Instant.now();
 
         Target.TaskResult taskResult;
         target.setTargetStatus(Target.TargetStatus.InProcess);
         double rand = new Random().nextDouble();
-         Platform.runLater(()->updateMessage("Target " + target.getName() + " is now processing "));
-         Platform.runLater(()->updateMessage("Target information: " + target.getData()));
+         Platform.runLater(()->updateMessage("Target " + target.getName() + " is now processing\n" +
+         "Target information: " + target.getData()));
 
         try {
             Thread.sleep(processTime);
@@ -79,16 +86,21 @@ public class SimulationGPUPTask extends GPUPTask implements Serializable {
         else {
             taskResult = Target.TaskResult.Failure;
             status = "Failure.";
+            additionalInfo = "\nThe following targets cannot be procceseed:\n" + target.getRequiredFor().toString();
 
         }
 
         String finalStatus = status;
-        Platform.runLater(()->updateMessage("Target " +target.getName()+ " completed with status: "+ finalStatus));
-        Platform.runLater(()->updateMessage(""));
         target.setTaskResult(taskResult);
         target.setTargetStatus(Target.TargetStatus.Finished);
-
-
+        Platform.runLater(()->updateProgress(workDone++, totalWork));
+        Instant finish = Instant.now();
+        Duration duration = Duration.between(start,finish);
+        String finalAdditionalInfo = additionalInfo;
+        Platform.runLater(()->updateMessage("Target " +target.getName()+ " completed with status: "+ finalStatus+"\n" +
+                "Process time: " + duration.getSeconds() +" sec" + finalAdditionalInfo));
+        target.setExecutionTime(duration.getSeconds()); // if needed can be added to a (new) Duration member in GPUPTask
+        Platform.runLater(()->updateMessage(""));
         return null;
     }
 

@@ -38,7 +38,11 @@ public class Target implements Serializable {
         executionTime = Time;
     }
 
-    public Target(String name,String data) {
+    public Long getExecutionTime() {
+        return executionTime;
+    }
+
+    public Target(String name, String data) {
 
         this.name = name;
         this.data = data;
@@ -190,9 +194,7 @@ public class Target implements Serializable {
 
     @Override
     public String toString() {
-        return "Target{" +
-                "name='" + name + '\'' +
-                '}';
+        return name;
     }
 
 }
