@@ -3,6 +3,7 @@ package execution;
 import dependency.graph.DependencyGraph;
 import dependency.target.Target;
 import dependency.target.TargetRunner;
+import javafx.application.Platform;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -12,9 +13,10 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-public class TaskExecution implements Serializable, Runnable{
+public class TaskExecution  implements Serializable, Runnable {
     private GPUPTask GPUPTask;
     private DependencyGraph graphInExecution;
     private Map<Target.TargetStatus,Set<Target>> status2Targets;
@@ -22,15 +24,17 @@ public class TaskExecution implements Serializable, Runnable{
     private String targetsSummaryDir;
     private Long totalDuration =0L;
     private int maxThreads;
+    private Consumer taskInfoConsumer;
 
     public void setMaxThreads(int maxPerl) {
     maxThreads = maxPerl;
     }
 
-    public TaskExecution(DependencyGraph graphInExecution ,int maxParallelism, GPUPTask GPUPTask) {
+    public TaskExecution(DependencyGraph graphInExecution ,int maxParallelism, GPUPTask GPUPTask,Consumer consumer) {
         this.maxThreads = maxParallelism;
         this.graphInExecution = graphInExecution;
         this.GPUPTask = GPUPTask;
+        this.taskInfoConsumer = consumer;
         status2Targets = new HashMap<>();
         status2Targets.put(Target.TargetStatus.Frozen,new HashSet<>());
         status2Targets.put(Target.TargetStatus.Skipped,new HashSet<>());
@@ -189,7 +193,7 @@ public class TaskExecution implements Serializable, Runnable{
     }
 
     private void printExecutionSummary(){
-        System.out.println("Task completed");
+        Platform.runLater(()->taskInfoConsumer.accept("Task completed"));
         String runTime = String.format("%02d:%02d:%02d", totalDuration / 3600, (totalDuration % 3600) / 60, (totalDuration % 60));
         System.out.println("Task ran for: " +runTime);
         System.out.println(status2Targets.get(Target.TargetStatus.Finished).stream().filter(t -> t.getTaskResult() == Target.TaskResult.Success).count() + " Targets succeeded");

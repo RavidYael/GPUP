@@ -3,6 +3,7 @@ package MainScreen.taskscreen;
 import FXData.BackEndMediator;
 import FXData.TableManager;
 import FXData.TargetInTable;
+import FXData.TextAreaConsumer;
 import dependency.graph.DependencyGraph;
 import dependency.target.Target;
 import execution.*;
@@ -107,12 +108,17 @@ public class TaskScreenController {
     @FXML
     private Button stopButton;
 
+    @FXML
+    private Button resumeButton;
+
 
     private Parent simulationTaskScreen;
     private BackEndMediator backEndMediator;
     private SimulationTaskController simulationTaskController;
     private CompilationTaskController compilationTaskController;
     private TableManager tableManager;
+    private TextAreaConsumer textAreaConsumer;
+
 
     public void setBackEndMediator(BackEndMediator backEndMediator) {
         this.backEndMediator = backEndMediator;
@@ -126,6 +132,7 @@ public class TaskScreenController {
         incrementalRbutton.setToggleGroup(incrOrScratch);
         fromScratchRbutton.setToggleGroup(incrOrScratch);
         dependencyForSelection.setDisable(true);
+        textAreaConsumer = new TextAreaConsumer(taskProccessTA);
         selectWithDependency.selectedProperty().addListener((observable, oldValue, newValue) -> dependencyForSelection.setDisable(!newValue));
         dependencyForSelection.setItems(FXCollections.observableArrayList(Target.Dependency.DependsOn, Target.Dependency.RequiredFor));
         selectSpecificComboBox.setItems(FXCollections.observableArrayList(Target.DependencyLevel.Root, Target.DependencyLevel.Middle, Target.DependencyLevel.Leaf, Target.DependencyLevel.Independed));
@@ -181,7 +188,7 @@ public class TaskScreenController {
 
         }
 
-        TaskExecution taskExecution = new TaskExecution(graphInExecution, numOfThreads.getValue(), task);
+        TaskExecution taskExecution = new TaskExecution(graphInExecution, numOfThreads.getValue(), task,textAreaConsumer);
         bindUIComponents(task);
         if (fromScratchRbutton.isSelected()) {
             new Thread(taskExecution).start();
@@ -204,8 +211,14 @@ public class TaskScreenController {
 
     }
 
+    @FXML
+    void resumeButtonAction(ActionEvent event) {
 
-        @FXML
+    }
+
+
+
+    @FXML
         void taskComboBoxAction (ActionEvent event) throws IOException {
             String screenName = taskComboBox.getValue() + " screen.fxml";
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(screenName));

@@ -48,7 +48,7 @@ public class SimulationGPUPTask extends GPUPTask implements Serializable {
         String status = "";
 
 
-        Instant start = Instant.now();
+
 
         Target.TaskResult taskResult;
         target.setTargetStatus(Target.TargetStatus.InProcess);
@@ -89,9 +89,6 @@ public class SimulationGPUPTask extends GPUPTask implements Serializable {
         target.setTargetStatus(Target.TargetStatus.Finished);
 
 
-        Instant finish = Instant.now();
-        Duration duration = Duration.between(start,finish); // חרא גדול
-        target.setExecutionTime(duration.getSeconds()); // if needed can be added to a (new) Duration member in GPUPTask
         return null;
     }
 

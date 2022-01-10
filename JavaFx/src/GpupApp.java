@@ -17,7 +17,7 @@ public class GpupApp extends Application {
     public void start(Stage primaryStage) throws Exception {
         FXMLLoader fxmlLoader = new FXMLLoader();
         Parent root = FXMLLoader.load(getClass().getResource("MainScreen.fxml"));
-        Scene mainScene = new Scene(root,1000,1000);
+        Scene mainScene = new Scene(root,1200,950);
         primaryStage.setScene(mainScene);
         primaryStage.show();
 
