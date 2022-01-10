@@ -99,6 +99,12 @@ public class TaskScreenController {
     @FXML
     private CheckBox selectSpecificCheckBox;
 
+    @FXML
+    private Button pauseButton;
+
+    @FXML
+    private Button stopButton;
+
 
     private Parent simulationTaskScreen;
     private BackEndMediator backEndMediator;
@@ -177,6 +183,17 @@ public class TaskScreenController {
         if (fromScratchRbutton.isSelected()) {
             new Thread(taskExecution).start();
         }
+    }
+
+    @FXML
+    void pauseButtonAction(ActionEvent event) {
+
+    }
+
+
+    @FXML
+    void stopButtonAction(ActionEvent event) {
+
     }
 //          backEndMediator.getDependencyGraph().updateAllTargetDependencyLevelAfterExecution();
 //        backEndMediator.getDependencyGraph().resetTraverseDataAfterChangedInSubGraph(Target2ItsOriginalDependOnTargets,Target2ItsOriginalRequiredForTargets);
