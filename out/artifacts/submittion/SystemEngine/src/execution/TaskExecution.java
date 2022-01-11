@@ -26,6 +26,7 @@ public class TaskExecution implements Serializable {
     private Long totalDuration =0L;
 
 
+
     public TaskExecution(DependencyGraph dependencyGraph, Task task) {
         this.graphInExecution = dependencyGraph.createDeepCopy();
         this.task = task;

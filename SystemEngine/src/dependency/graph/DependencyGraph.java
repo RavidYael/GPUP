@@ -203,11 +203,12 @@ public class DependencyGraph implements Serializable {
         Iterator<Target> curTargetIter = executedTargets.iterator();
             while(curTargetIter.hasNext()){
                 Target curTarget = curTargetIter.next();
-                if(curTarget.getTaskResult() == Target.TaskResult.Success || curTarget.getTaskResult() == Target.TaskResult.Warning){
-                    setAndUpdateTargetSuccess(curTarget);
-                }
-                else if (curTarget.getTaskResult() == Target.TaskResult.Failure){
-                    setAndUpdateTargetFailure(curTarget);
+                if(curTarget.getTargetStatus() == Target.TargetStatus.Finished) {
+                    if (curTarget.getTaskResult() == Target.TaskResult.Success || curTarget.getTaskResult() == Target.TaskResult.Warning) {
+                        setAndUpdateTargetSuccess(curTarget);
+                    } else if (curTarget.getTaskResult() == Target.TaskResult.Failure) {
+                        setAndUpdateTargetFailure(curTarget);
+                    }
                 }
                 curTargetIter.remove();
             }

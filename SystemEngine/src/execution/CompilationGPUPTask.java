@@ -15,8 +15,6 @@ public class CompilationGPUPTask extends GPUPTask {
     private File outPutPath;
     private File needeResourcesPath;
     private Target curTarget;
-    private Long totalWork;
-    private Long workDone = 0L;
 
     public CompilationGPUPTask(File toCompilePath, File outPutPath) {
         this.toCompilePath = toCompilePath;
@@ -27,11 +25,6 @@ public class CompilationGPUPTask extends GPUPTask {
     @Override
     public void setCurTarget(Target target) {
         this.curTarget = target;
-    }
-
-    @Override
-    public void setTotalWork(Long totalWork) {
-        this.totalWork = totalWork;
     }
 
     @Override

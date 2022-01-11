@@ -118,7 +118,7 @@ public class TaskScreenController {
     private CompilationTaskController compilationTaskController;
     private TableManager tableManager;
     private TextAreaConsumer textAreaConsumer;
-
+    private TaskExecution curTask;
 
     public void setBackEndMediator(BackEndMediator backEndMediator) {
         this.backEndMediator = backEndMediator;
@@ -190,6 +190,9 @@ public class TaskScreenController {
 
         TaskExecution taskExecution = new TaskExecution(graphInExecution, numOfThreads.getValue(), task,textAreaConsumer);
         bindUIComponents(task);
+
+        curTask = taskExecution;
+
         if (fromScratchRbutton.isSelected()) {
             new Thread(taskExecution).start();
         }
@@ -202,18 +205,22 @@ public class TaskScreenController {
 
     @FXML
     void pauseButtonAction(ActionEvent event) {
+        //disable לכפתור של ה Pause
+        curTask.setBeenPaused();
 
     }
 
 
     @FXML
     void stopButtonAction(ActionEvent event) {
+        //disable לכפתור של ה Stop
+        curTask.setBeenPaused();
 
     }
 
     @FXML
     void resumeButtonAction(ActionEvent event) {
-
+        new Thread(curTask).start();
     }
 
 

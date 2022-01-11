@@ -83,10 +83,8 @@ public class MainController {
         }
         alert.setContentText(message);
         alert.showAndWait();
-        if (loadSuccess) {
+        if (loadSuccess)
             graphInfoButton.fire();
-           // taskScreenController.initialize();
-        }
 
     }
 

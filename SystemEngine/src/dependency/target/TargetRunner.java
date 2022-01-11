@@ -39,14 +39,12 @@ public class TargetRunner implements Runnable {
     @Override
     public void run() {
 
-
-            GPUPTask.setCurTarget(target);
-
         try {
-                GPUPTask.call();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            GPUPTask.setCurTarget(target);
+            GPUPTask.call();
+        } catch (Exception e) {
+            e.printStackTrace();
 
+        }
     }
 }

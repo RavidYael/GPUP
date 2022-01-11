@@ -16,6 +16,8 @@ import java.util.concurrent.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 public class TaskExecution  implements Serializable, Runnable {
     private GPUPTask GPUPTask;
     private DependencyGraph graphInExecution;
@@ -24,6 +26,8 @@ public class TaskExecution  implements Serializable, Runnable {
     private String targetsSummaryDir;
     private Long totalDuration =0L;
     private int maxThreads;
+    private Boolean beenPauesd = false;
+    private Boolean donePausing = false;
     private Consumer taskInfoConsumer;
 
     public void setMaxThreads(int maxPerl) {
@@ -110,21 +114,18 @@ public class TaskExecution  implements Serializable, Runnable {
        // }
     }
 
-    public void runTaskFromScratch()
-    {
-        GPUPTask.setTotalWork(Long.valueOf(graphInExecution.getAllTargets().size()));
+    public void runTaskFromScratch() {
+        this.beenPauesd = false;
+        this.donePausing = false;
+
         ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(maxThreads);
         Set<Target> executedTargets = new HashSet<>();
         createTaskWorkingDirectory();
-        Set<String> updatedTargets;
         Iterator<Target> iter = status2Targets.get(Target.TargetStatus.Waiting).iterator();
         Boolean hasMoreToExecute = true;
         List<Future> futureRes = new ArrayList<>();
 
-        //int WorkingThreads ???
-
-
-        while(hasMoreToExecute)
+        while(hasMoreToExecute && !beenPauesd)
         {
             if (iter.hasNext()) {
                 Target target = iter.next();
@@ -133,7 +134,14 @@ public class TaskExecution  implements Serializable, Runnable {
                 futureRes.add(threadPoolExecutor.submit(targetRunner));
             }
             else {
+
                 for (Future taskResult :futureRes) {
+
+                    if(beenPauesd) {
+                        pausingTask(futureRes,executedTargets,threadPoolExecutor);
+                        break;
+                    }
+
                     try {
                         taskResult.get();
                     } catch (InterruptedException e) {
@@ -142,13 +150,20 @@ public class TaskExecution  implements Serializable, Runnable {
                         e.printStackTrace();
                     }
                 }
+
+                if( !beenPauesd ) {
                     graphInExecution.updateEffectOfTargetsExecution(executedTargets);
-                     updateStatus2Target();
-                     iter = status2Targets.get(Target.TargetStatus.Waiting).iterator();
-                     if(!iter.hasNext()) {
-                         hasMoreToExecute = false;
-                     }
+                    updateStatus2Target();
+                    iter = status2Targets.get(Target.TargetStatus.Waiting).iterator();
+                    if (!iter.hasNext()) {
+                        hasMoreToExecute = false;
+                    }
+                }
             }
+        }
+
+        if(beenPauesd && !donePausing){
+            pausingTask(futureRes,executedTargets,threadPoolExecutor);
         }
 
         updateTarget2summary();
@@ -190,20 +205,16 @@ public class TaskExecution  implements Serializable, Runnable {
      //   runTaskFromScratch();
 
     }
-    private void calculateTotalDuration(){
-        status2Targets.get(Target.TargetStatus.Done).stream().forEach(t-> totalDuration+= t.getExecutionTime());
-    }
 
     private void printExecutionSummary(){
-        calculateTotalDuration();
-        Platform.runLater(()->taskInfoConsumer.accept("Task completed\n" +
-                "Task ran for: " +
-                String.format("%02d:%02d:%02d", totalDuration / 3600, (totalDuration % 3600) / 60, (totalDuration % 60)) + "sec\n" +
-        status2Targets.get(Target.TargetStatus.Finished).stream().filter(t -> t.getTaskResult() == Target.TaskResult.Success).count() + " Targets succeeded\n" +
-        status2Targets.get(Target.TargetStatus.Finished).stream().filter(t-> t.getTaskResult() == Target.TaskResult.Failure).count() + " Targets Failed:\n" +
-        status2Targets.get(Target.TargetStatus.Finished).stream().filter(t-> t.getTaskResult() == Target.TaskResult.Failure).collect(Collectors.toSet()).toString() +"\n"+
-        status2Targets.get(Target.TargetStatus.Finished).stream().filter(t-> t.getTaskResult() == Target.TaskResult.Warning).count() + " Targets succeeded with warning\n" +
-        status2Targets.get(Target.TargetStatus.Skipped).size() + " Targets skipped"));
+        Platform.runLater(()->taskInfoConsumer.accept("Task completed"));
+        String runTime = String.format("%02d:%02d:%02d", totalDuration / 3600, (totalDuration % 3600) / 60, (totalDuration % 60));
+        System.out.println("Task ran for: " +runTime);
+        System.out.println(status2Targets.get(Target.TargetStatus.Finished).stream().filter(t -> t.getTaskResult() == Target.TaskResult.Success).count() + " Targets succeeded");
+        System.out.println(status2Targets.get(Target.TargetStatus.Finished).stream().filter(t-> t.getTaskResult() == Target.TaskResult.Failure).count()+ " Targets Failed");
+        System.out.println(status2Targets.get(Target.TargetStatus.Finished).stream().filter(t-> t.getTaskResult() == Target.TaskResult.Failure).collect(Collectors.toSet()).toString());
+        System.out.println(status2Targets.get(Target.TargetStatus.Finished).stream().filter(t-> t.getTaskResult() == Target.TaskResult.Warning).count() + " Targets succeeded with warning");
+        System.out.println(status2Targets.get(Target.TargetStatus.Skipped).size() + " Targets skipped");
 
     }
 
@@ -212,6 +223,26 @@ public class TaskExecution  implements Serializable, Runnable {
 
     }
 
+    private void incrementTotalDuration(Long targetDuration) {
+        totalDuration += targetDuration;
+    }
+
+    public void setBeenPaused() {
+        beenPauesd = true;
+    }
+
+    private void pausingTask(List<Future> futureTasks, Set<Target> executedTargets,ThreadPoolExecutor threadPoolExecutor) {
+
+        threadPoolExecutor.shutdownNow();
+        try {
+            threadPoolExecutor.awaitTermination(  status2Targets.get(Target.TargetStatus.Waiting).size() * 10  ,SECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        graphInExecution.updateEffectOfTargetsExecution(executedTargets);
+        updateStatus2Target();
+        donePausing = true;
+    }
 
 }
 
