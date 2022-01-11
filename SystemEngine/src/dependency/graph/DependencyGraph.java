@@ -281,7 +281,7 @@ public class DependencyGraph implements Serializable {
             else if(target.getTargetStatus() == Target.TargetStatus.Skipped){
                 target.setTargetStatus(Target.TargetStatus.Frozen);
             }
-            else if(target.getTaskResult() == Target.TaskResult.Success){
+            else if(target.getTaskResult() == Target.TaskResult.Success || target.getTaskResult() == Target.TaskResult.Warning){
                 target.setTargetStatus(Target.TargetStatus.Done);
             }
         }
@@ -376,6 +376,18 @@ public class DependencyGraph implements Serializable {
 
     }
 
+    public boolean isTargetBlocked(Target target) {
+        for (Set<String> curSerialSet : name2SerialSet.values()){
+            if (curSerialSet.contains(target.getName())){
+                for (String targetNameInSet : curSerialSet){
+                    if (getTargetByName(targetNameInSet).getTargetStatus().equals(Target.TargetStatus.InProcess))
+                        return true;
+
+                }
+            }
+        }
+        return false;
+    }
 }
 
 

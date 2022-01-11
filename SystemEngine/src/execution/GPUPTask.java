@@ -19,4 +19,5 @@ public abstract class GPUPTask extends Task<Void> {
 
     public abstract Void runOnTarget(Target target);
     public abstract String getTaskName();
+    public void finishWork(){};
 }

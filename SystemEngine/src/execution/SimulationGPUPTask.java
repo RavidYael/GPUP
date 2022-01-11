@@ -54,7 +54,6 @@ public class SimulationGPUPTask extends GPUPTask implements Serializable {
         String status = "";
         String additionalInfo = "";
 
-
         Instant start = Instant.now();
 
         Target.TaskResult taskResult;
@@ -107,6 +106,11 @@ public class SimulationGPUPTask extends GPUPTask implements Serializable {
     @Override
     public String getTaskName() {
         return taskName;
+    }
+
+    @Override
+    public void finishWork(){
+        Platform.runLater(()-> updateProgress(totalWork, totalWork));
     }
 
 }

@@ -112,6 +112,7 @@ public class TaskExecution  implements Serializable, Runnable {
 
     public void runTaskFromScratch()
     {
+
         GPUPTask.setTotalWork(Long.valueOf(graphInExecution.getAllTargets().size()));
         ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(maxThreads);
         Set<Target> executedTargets = new HashSet<>();
@@ -126,10 +127,16 @@ public class TaskExecution  implements Serializable, Runnable {
 
         while(hasMoreToExecute)
         {
+
             if (iter.hasNext()) {
                 Target target = iter.next();
+//                if (graphInExecution.isTargetBlocked(target)) {// dealing with serial sets
+//                    Platform.runLater(()->taskInfoConsumer.accept("Target " + target.getName()+ "Is blocked by serial set, trying next available target"));
+//                    continue;
+//                }
                 TargetRunner targetRunner = new TargetRunner(target, GPUPTask, graphInExecution);
                 executedTargets.add(target);
+
                 futureRes.add(threadPoolExecutor.submit(targetRunner));
             }
             else {
@@ -151,6 +158,7 @@ public class TaskExecution  implements Serializable, Runnable {
             }
         }
 
+        GPUPTask.finishWork();
         updateTarget2summary();
         printExecutionSummary();
         printTargetExecutionSummary();
@@ -183,15 +191,15 @@ public class TaskExecution  implements Serializable, Runnable {
         updateStatus2Target();
 
         if (isExecutionComplete()) {
-            System.out.println("All targets were executed successfully! nothing left to run :)");
+            Platform.runLater(()-> taskInfoConsumer.accept("All targets were executed successfully! nothing left to run :)"));
             return;
         }
 
-     //   runTaskFromScratch();
+        runTaskFromScratch();
 
     }
     private void calculateTotalDuration(){
-        status2Targets.get(Target.TargetStatus.Done).stream().forEach(t-> totalDuration+= t.getExecutionTime());
+        status2Targets.get(Target.TargetStatus.Finished).stream().forEach(t-> totalDuration+= t.getExecutionTime());
     }
 
     private void printExecutionSummary(){

@@ -118,6 +118,7 @@ public class TaskScreenController {
     private CompilationTaskController compilationTaskController;
     private TableManager tableManager;
     private TextAreaConsumer textAreaConsumer;
+    private TaskExecution taskExecution;
 
 
     public void setBackEndMediator(BackEndMediator backEndMediator) {
@@ -188,10 +189,13 @@ public class TaskScreenController {
 
         }
 
-        TaskExecution taskExecution = new TaskExecution(graphInExecution, numOfThreads.getValue(), task,textAreaConsumer);
+         taskExecution = new TaskExecution(graphInExecution, numOfThreads.getValue(), task,textAreaConsumer);
         bindUIComponents(task);
         if (fromScratchRbutton.isSelected()) {
-            new Thread(taskExecution).start();
+            new Thread(()->taskExecution.runTaskFromScratch()).start();
+        }
+        else if (incrementalRbutton.isSelected()){
+            new Thread(()->taskExecution.runTaskIncrementally()).start();
         }
 
         //TODO the next few lines should be executed only when thread is finished
