@@ -22,7 +22,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
 
-<SplitPane dividerPositions="0.5811623246492986" prefHeight="1000.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="MainScreen.taskscreen.TaskScreenController">
+<SplitPane dividerPositions="0.3256513026052104" prefHeight="1000.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="MainScreen.taskscreen.TaskScreenController">
    <items>
       <TabPane prefHeight="849.0" prefWidth="1000.0" tabClosingPolicy="UNAVAILABLE">
          <tabs>
@@ -60,6 +60,11 @@
                                           <Insets left="10.0" />
                                        </GridPane.margin>
                                     </CheckBox>
+                                    <CheckBox fx:id="deselectAll" mnemonicParsing="false" text="Deselect All" GridPane.columnIndex="1">
+                                       <GridPane.margin>
+                                          <Insets left="10.0" />
+                                       </GridPane.margin>
+                                    </CheckBox>
                                     <CheckBox fx:id="selectWithDependency" mnemonicParsing="false" text="Select with dependency" GridPane.rowIndex="2">
                                        <GridPane.margin>
                                           <Insets left="10.0" />
@@ -88,7 +93,7 @@
                   </ScrollPane>
                </content>
             </Tab>
-            <Tab text="GPUPTask settings">
+            <Tab text="task settings">
                <content>
                   <ScrollPane fitToHeight="true" fitToWidth="true">
                      <content>
@@ -103,7 +108,7 @@
                               <RowConstraints maxHeight="871.0" minHeight="0.0" prefHeight="871.0" vgrow="NEVER" />
                            </rowConstraints>
                            <children>
-                              <Label styleClass="instructionLabel" text="choose GPUPTask" textFill="#9e9999" GridPane.valignment="TOP">
+                              <Label styleClass="instructionLabel" text="choose task" textFill="#9e9999" GridPane.valignment="TOP">
                                  <GridPane.margin>
                                     <Insets left="10.0" top="10.0" />
                                  </GridPane.margin>
@@ -152,7 +157,7 @@
                                           <Insets bottom="10.0" left="10.0" top="10.0" />
                                        </GridPane.margin>
                                     </Spinner>
-                                    <Label styleClass="instructionLabel" text="perform GPUPTask:" textFill="#9e9999" GridPane.columnSpan="2" GridPane.rowIndex="1" GridPane.valignment="TOP">
+                                    <Label styleClass="instructionLabel" text="perform task:" textFill="#9e9999" GridPane.columnSpan="2" GridPane.rowIndex="1" GridPane.valignment="TOP">
                                        <GridPane.margin>
                                           <Insets left="10.0" top="10.0" />
                                        </GridPane.margin>
@@ -188,12 +193,12 @@
                <bottom>
                   <GridPane BorderPane.alignment="CENTER">
                     <columnConstraints>
-                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="387.0" minWidth="10.0" prefWidth="144.33331298828125" />
-                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="529.0" minWidth="10.0" prefWidth="126.0" />
-                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="370.0" minWidth="0.0" prefWidth="64.3333740234375" />
-                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="370.0" minWidth="10.0" prefWidth="29.33331298828125" />
-                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="370.0" minWidth="10.0" prefWidth="30.0" />
-                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="370.0" minWidth="10.0" prefWidth="30.0" />
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="387.0" minWidth="10.0" prefWidth="209.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="529.0" minWidth="10.0" prefWidth="263.0" />
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="370.0" minWidth="10.0" prefWidth="314.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="370.0" minWidth="10.0" prefWidth="314.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="370.0" minWidth="10.0" prefWidth="314.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="370.0" minWidth="10.0" prefWidth="314.0" />
                     </columnConstraints>
                     <rowConstraints>
                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -279,7 +284,20 @@
                   </GridPane>
                </bottom>
                <center>
-                  <TextArea fx:id="taskProccessTA" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+                  <TabPane fx:id="TaskScreenTabPane" BorderPane.alignment="CENTER">
+                     <tabs>
+                        <Tab fx:id="taskProcessInfoTab" text="Task process info">
+                           <content>
+                              <TextArea fx:id="taskProccessTA" prefHeight="200.0" prefWidth="200.0" />
+                           </content>
+                        </Tab>
+                        <Tab fx:id="specificTargetTab" text="Specific Target info">
+                           <content>
+                              <TextArea fx:id="specificTargetTA" prefHeight="200.0" prefWidth="200.0" />
+                           </content>
+                        </Tab>
+                     </tabs>
+                  </TabPane>
                </center>
             </BorderPane>
          </content>

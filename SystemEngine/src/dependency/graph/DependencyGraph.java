@@ -389,6 +389,14 @@ public class DependencyGraph implements Serializable {
         }
         return false;
     }
+    public Set<String> getSerialSetsForTarget(String targetName){
+        Set<String> setsForTarget = new HashSet<>();
+        for (Map.Entry<String,Set<String>> entry : name2SerialSet.entrySet()){
+            if (entry.getValue().contains(targetName))
+                setsForTarget.add(entry.getKey());
+        }
+        return setsForTarget;
+    }
 }
 
 

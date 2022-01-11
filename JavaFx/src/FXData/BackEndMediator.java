@@ -120,4 +120,22 @@ public class BackEndMediator {
         return subGraph;
     }
 
+//    public ArrayList<String> getTargetLiveData(TargetInTable selectedItem) {
+//        ArrayList<String> res = new ArrayList<>();
+//
+//        res.add(selectedItem.getName()+ "\n");
+//        res.add(selectedItem.getLocation()+ "\n");
+//        Set<String> serialsetsForTarget = dependencyGraph.getSerialSetsForTarget(selectedItem.getName());
+//        if (!serialsetsForTarget.isEmpty()){
+//            res.add("Targets is in following sets: " +String.join(",",serialsetsForTarget)+ "\n");
+//        }
+//        if (selectedItem.getTargetStatus().equals(Target.TargetStatus.Frozen)){
+//            dependencyGraph.getTotalDependencies(selectedItem.getName(), Target.Dependency.DependsOn).stream().filter(t->{
+//                boolean b = t.getTargetStatus().equals(Target.TargetStatus.Waiting) || t.getTargetStatus().equals(Target.TargetStatus.Frozen) || t.getTargetStatus().equals(Target.TargetStatus.InProcess))
+//            }).forEach(res.add(""));
+//
+//        }
+//
+//
+//    }
 }

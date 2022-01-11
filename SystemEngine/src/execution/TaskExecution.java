@@ -168,12 +168,12 @@ public class TaskExecution  implements Serializable, Runnable {
                 pausingTask(futureRes, executedTargets, threadPoolExecutor);
             }
 
-            GPUPTask.finishWork();
-            updateTarget2summary();
-            printExecutionSummary();
-            printTargetExecutionSummary();
-
         }
+
+        GPUPTask.finishWork();
+        updateTarget2summary();
+        printExecutionSummary();
+        printTargetExecutionSummary();
     }
 
         private void printTargetExecutionSummary () {

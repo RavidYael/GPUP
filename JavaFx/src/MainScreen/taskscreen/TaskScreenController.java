@@ -111,6 +111,18 @@ public class TaskScreenController {
     @FXML
     private Button resumeButton;
 
+    @FXML
+    private Tab specificTargetTab;
+
+    @FXML
+    private TextArea specificTargetTA;
+
+    @FXML
+    private TabPane TaskScreenTabPane;
+
+    @FXML
+    private Tab taskProcessInfoTab;
+
 
     private Parent simulationTaskScreen;
     private BackEndMediator backEndMediator;
@@ -138,7 +150,7 @@ public class TaskScreenController {
         selectSpecificComboBox.setItems(FXCollections.observableArrayList(Target.DependencyLevel.Root, Target.DependencyLevel.Middle, Target.DependencyLevel.Leaf, Target.DependencyLevel.Independed));
         selectSpecificComboBox.setDisable(true);
         selectSpecificCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> selectSpecificComboBox.setDisable(!newValue));
-
+        initLiveDataAction();
     }
     public void myInitialize(){
 
@@ -208,7 +220,8 @@ public class TaskScreenController {
 
     @FXML
     void pauseButtonAction(ActionEvent event) {
-
+        curTask.setBeenPaused();
+        //somthing todo with disabling double click on this button
     }
 
 
@@ -254,6 +267,13 @@ public class TaskScreenController {
     private void clearDirectory(File directoryToBeDeleted) {
         final File[] files = directoryToBeDeleted.listFiles();
         Arrays.stream(files).forEach(f-> f.delete());
+    }
+    public void initLiveDataAction(){
+        targetsTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            TaskScreenTabPane.getSelectionModel().select(1);
+            //backEndMediator.getTargetLiveData(targetsTable.getSelectionModel().getSelectedItem());
+
+        });
     }
 
 
