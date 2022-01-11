@@ -39,6 +39,17 @@ public class CompilationGPUPTask extends GPUPTask {
         synchronized (this){
             toRun = curTarget;
         }
+
+        synchronized (getExecutionManager().getStopWorkSyncer()){
+
+            while(getExecutionManager().isPaused()){
+                try {
+                    getExecutionManager().getStopWorkSyncer().wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
         return runOnTarget(toRun);
     }
 
@@ -46,9 +57,15 @@ public class CompilationGPUPTask extends GPUPTask {
     @Override
     public Void runOnTarget(Target target)
     {
+        if(target.getTargetStatus() == Target.TargetStatus.Finished)
+            return null;
+
         String toComplileJavaFile = calculateJavaFileLoaction(target.getData());
         ProcessBuilder processBuilder = new ProcessBuilder("javac","-d",outPutPath.getPath(),"-cp", outPutPath.getPath(),toComplileJavaFile);
         Process process;
+        Boolean done = false;
+
+
         target.setTargetStatus(Target.TargetStatus.InProcess);
 
         try {
@@ -58,19 +75,27 @@ public class CompilationGPUPTask extends GPUPTask {
                 target.setTaskResult(Target.TaskResult.Success);
                 //prints out sucess message
                 Platform.runLater(()->updateMessage("Target: " + target.getName() +" Processed successfully"));
+                done = true;
             }
             else{
                 target.setTaskResult(Target.TaskResult.Failure);
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
                 Platform.runLater(()->updateMessage("Target: " + target.getName() +" Failed:"));
                 Platform.runLater(()-> bufferedReader.lines().forEach(l -> updateMessage(l)));
+                done = true;
             }
             target.setTargetStatus(Target.TargetStatus.Finished);
 
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
+            if(!done){
+                target.setTargetStatus(Target.TargetStatus.Waiting);
+                Platform.runLater(()->updateMessage("Target: " + target.getName() +" was interrupted"));
+            }
             e.printStackTrace();
+
+
         }
         return null;
     }

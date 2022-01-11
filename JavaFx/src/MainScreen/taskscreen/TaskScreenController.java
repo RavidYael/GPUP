@@ -200,6 +200,7 @@ public class TaskScreenController {
 
         }
 
+
         TaskExecution taskExecution = new TaskExecution(graphInExecution, numOfThreads.getValue(), task,textAreaConsumer);
         bindUIComponents(task);
 
@@ -220,8 +221,7 @@ public class TaskScreenController {
 
     @FXML
     void pauseButtonAction(ActionEvent event) {
-        curTask.setBeenPaused();
-        //somthing todo with disabling double click on this button
+        curTask.setPauseStatus(true);
     }
 
 
@@ -232,7 +232,7 @@ public class TaskScreenController {
 
     @FXML
     void resumeButtonAction(ActionEvent event) {
-        new Thread(curTask).start();
+        curTask.setPauseStatus(false);
     }
 
 

@@ -45,15 +45,32 @@ public class SimulationGPUPTask extends GPUPTask implements Serializable {
 
     @Override
     public Void call() throws Exception {
+
         Target toRun;
         synchronized (this){
             toRun = curTarget;
         }
+
+        synchronized (getExecutionManager().getStopWorkSyncer()){
+
+            while(getExecutionManager().isPaused()){
+                try {
+                    getExecutionManager().getStopWorkSyncer().wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
         return runOnTarget(toRun);
     }
 
     @Override
     public Void runOnTarget(Target target) {
+
+        if(target.getTargetStatus() == Target.TargetStatus.Finished)
+            return null;
+
         String status = "";
         String additionalInfo = "";
 
@@ -62,9 +79,6 @@ public class SimulationGPUPTask extends GPUPTask implements Serializable {
 
         Target.TaskResult taskResult;
 
-        if (Thread.interrupted()) {
-            return null;
-        }
 
         target.setTargetStatus(Target.TargetStatus.InProcess);
         double rand = new Random().nextDouble();

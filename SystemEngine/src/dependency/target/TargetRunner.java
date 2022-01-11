@@ -2,6 +2,7 @@ package dependency.target;
 
 import dependency.graph.DependencyGraph;
 import execution.GPUPTask;
+import execution.TaskExecution;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -13,11 +14,14 @@ public class TargetRunner implements Runnable {
     Target.TargetStatus status;
     Duration duration;
     DependencyGraph dependencyGraph;
+    TaskExecution taskManager;
 
-    public TargetRunner(Target target, GPUPTask GPUPTask, DependencyGraph dependencyGraph) {
+
+    public TargetRunner(Target target, GPUPTask GPUPTask, DependencyGraph dependencyGraph, TaskExecution manager) {
         this.target = target;
         this.GPUPTask = GPUPTask;
         this.dependencyGraph = dependencyGraph;
+        this.taskManager = manager;
     }
 
     public void setTask(GPUPTask GPUPTask) {
@@ -39,12 +43,14 @@ public class TargetRunner implements Runnable {
     @Override
     public void run() {
 
-        try {
-            GPUPTask.setCurTarget(target);
+    synchronized (this) {
+        GPUPTask.setCurTarget(target);
+    }
+            try {
             GPUPTask.call();
         } catch (Exception e) {
             e.printStackTrace();
-
         }
+
     }
 }

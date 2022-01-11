@@ -21,39 +21,43 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 public class TaskExecution  implements Serializable, Runnable {
     private GPUPTask GPUPTask;
     private DependencyGraph graphInExecution;
-    private Map<Target.TargetStatus,Set<Target>> status2Targets;
-    private Map<Target,TargetExecutionSummary> target2summary;
+    private Map<Target.TargetStatus, Set<Target>> status2Targets;
+    private Map<Target, TargetExecutionSummary> target2summary;
     private String targetsSummaryDir;
-    private Long totalDuration =0L;
+    private Long totalDuration = 0L;
     private int maxThreads;
-    private Boolean beenPauesd = false;
+    private Boolean pauseStatus = false;
     private Boolean donePausing = false;
     private Consumer taskInfoConsumer;
+    private Boolean stopWorkSyncer = false;
 
     public void setMaxThreads(int maxPerl) {
-    maxThreads = maxPerl;
+        maxThreads = maxPerl;
     }
 
-    public TaskExecution(DependencyGraph graphInExecution ,int maxParallelism, GPUPTask GPUPTask,Consumer consumer) {
+    public TaskExecution(DependencyGraph graphInExecution, int maxParallelism, GPUPTask GPUPTask, Consumer consumer) {
         this.maxThreads = maxParallelism;
         this.graphInExecution = graphInExecution;
         this.GPUPTask = GPUPTask;
         this.taskInfoConsumer = consumer;
+
+        GPUPTask.setExecutionManager(this);
+
         status2Targets = new HashMap<>();
-        status2Targets.put(Target.TargetStatus.Frozen,new HashSet<>());
-        status2Targets.put(Target.TargetStatus.Skipped,new HashSet<>());
-        status2Targets.put(Target.TargetStatus.Waiting,new HashSet<>());
-        status2Targets.put(Target.TargetStatus.InProcess,new HashSet<>());
-        status2Targets.put(Target.TargetStatus.Finished,new HashSet<>());
-        status2Targets.put(Target.TargetStatus.Done,new HashSet<>());
+        status2Targets.put(Target.TargetStatus.Frozen, new HashSet<>());
+        status2Targets.put(Target.TargetStatus.Skipped, new HashSet<>());
+        status2Targets.put(Target.TargetStatus.Waiting, new HashSet<>());
+        status2Targets.put(Target.TargetStatus.InProcess, new HashSet<>());
+        status2Targets.put(Target.TargetStatus.Finished, new HashSet<>());
+        status2Targets.put(Target.TargetStatus.Done, new HashSet<>());
         updateStatus2Target();
         initializeTarget2summary();
     }
 
-    private void createTaskWorkingDirectory(){
+    private void createTaskWorkingDirectory() {
         String timeStamp = getTimeStamp("dd.MM.yyyy HH.mm.ss");
-        String workingDirStr =  graphInExecution.getWorkingDir();
-        String taskDirStr = workingDirStr + "\\" + GPUPTask.getTaskName() +" " + timeStamp;
+        String workingDirStr = graphInExecution.getWorkingDir();
+        String taskDirStr = workingDirStr + "\\" + GPUPTask.getTaskName() + " " + timeStamp;
         File taskDirectory = new File(taskDirStr);
         Path path = Paths.get(taskDirStr);
         this.targetsSummaryDir = path.toString();
@@ -66,40 +70,38 @@ public class TaskExecution  implements Serializable, Runnable {
         }
     }
 
-    private void initializeTarget2summary(){
+    private void initializeTarget2summary() {
         target2summary = new HashMap<>();
-        for (Target target : graphInExecution.getAllTargets().values()){
-            TargetExecutionSummary defaultSummary = new TargetExecutionSummary(target.getName(),target.getTaskResult(),null);
-            target2summary.put(target,defaultSummary);
+        for (Target target : graphInExecution.getAllTargets().values()) {
+            TargetExecutionSummary defaultSummary = new TargetExecutionSummary(target.getName(), target.getTaskResult(), null);
+            target2summary.put(target, defaultSummary);
         }
     }
 
-    private void updateTarget2summary(){
-        for (Target target : graphInExecution.getAllTargets().values()){
+    private void updateTarget2summary() {
+        for (Target target : graphInExecution.getAllTargets().values()) {
             target2summary.get(target).setTaskResult(target.getTaskResult());
         }
     }
 
     private void clearStatus2Targets() {
-        for (Target.TargetStatus targetStatus : status2Targets.keySet()){
+        for (Target.TargetStatus targetStatus : status2Targets.keySet()) {
             if (targetStatus != Target.TargetStatus.Done) {
                 status2Targets.get(targetStatus).clear();
             }
         }
     }
 
-    private void updateStatus2Target()
-    {
+    private void updateStatus2Target() {
         System.out.println("i am updating status2Targets");
-      clearStatus2Targets();
-        for (Target target: graphInExecution.getAllTargets().values())
-        {
+        clearStatus2Targets();
+        for (Target target : graphInExecution.getAllTargets().values()) {
             status2Targets.get(target.getTargetStatus()).add(target);
         }
     }
 
 
-    private String getTimeStamp(String format){
+    private String getTimeStamp(String format) {
         LocalDateTime myDateObj = LocalDateTime.now();
         DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern(format);
         String formattedDate = myDateObj.format(myFormatObj);
@@ -107,16 +109,16 @@ public class TaskExecution  implements Serializable, Runnable {
     }
 
     @Override
-    public void run(){
+    public void run() {
         //if(GPUPTask.getTaskName() == GPUPTask.TaskNames.Simulation){
-            runTaskFromScratch();
+        runTaskFromScratch();
 //כאן צריכה להיות לוגיקה שאומרת לו איזה סוג מסימה לבצע, אפשר להוסיף את זה כenum בGPUPTask
-       // }
+        // }
     }
 
     public void runTaskFromScratch() {
 
-        this.beenPauesd = false;
+        this.pauseStatus = false;
         this.donePausing = false;
 
         GPUPTask.setTotalWork(Long.valueOf(graphInExecution.getAllTargets().size()));
@@ -130,45 +132,54 @@ public class TaskExecution  implements Serializable, Runnable {
         Boolean hasMoreToExecute = true;
         List<Future> futureRes = new ArrayList<>();
 
-        while (hasMoreToExecute && !beenPauesd) {
+        while (hasMoreToExecute) {
+            synchronized (stopWorkSyncer) {
+                while (pauseStatus) {
+                    try {
+                        stopWorkSyncer.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
             if (iter.hasNext()) {
                 Target target = iter.next();
-                TargetRunner targetRunner = new TargetRunner(target, GPUPTask, graphInExecution);
+                TargetRunner targetRunner = new TargetRunner(target, GPUPTask, graphInExecution, this);
                 executedTargets.add(target);
                 futureRes.add(threadPoolExecutor.submit(targetRunner));
             } else {
 
                 for (Future taskResult : futureRes) {
 
-                    if (beenPauesd) {
-                        pausingTask(futureRes, executedTargets, threadPoolExecutor);
+                    if (pauseStatus) {
                         break;
                     }
 
                     try {
-                        taskResult.get();
+                        taskResult.get(10l, SECONDS);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     } catch (ExecutionException e) {
                         e.printStackTrace();
+                    } catch (TimeoutException e) {
+                        e.printStackTrace();
                     }
                 }
-
-                if (!beenPauesd) {
-                    graphInExecution.updateEffectOfTargetsExecution(executedTargets);
-                    updateStatus2Target();
-                    iter = status2Targets.get(Target.TargetStatus.Waiting).iterator();
-                    if (!iter.hasNext()) {
-                        hasMoreToExecute = false;
-                    }
+//
+//                if (!pauseStatus) {
+                graphInExecution.updateEffectOfTargetsExecution(executedTargets);
+                updateStatus2Target();
+                iter = status2Targets.get(Target.TargetStatus.Waiting).iterator();
+                if (!iter.hasNext()) {
+                    hasMoreToExecute = false;
                 }
             }
-
-            if (beenPauesd && !donePausing) {
-                pausingTask(futureRes, executedTargets, threadPoolExecutor);
-            }
-
         }
+//
+//            if (pauseStatus && !donePausing) {
+//                graphInExecution.updateEffectOfTargetsExecution(executedTargets);
+//                updateStatus2Target();
+//            }
 
         GPUPTask.finishWork();
         updateTarget2summary();
@@ -235,8 +246,18 @@ public class TaskExecution  implements Serializable, Runnable {
             totalDuration += targetDuration;
         }
 
-        public void setBeenPaused () {
-            beenPauesd = true;
+        public void setPauseStatus (Boolean paused) {
+            synchronized (stopWorkSyncer){
+                pauseStatus = paused;
+                if(!paused){
+                    this.stopWorkSyncer.notifyAll();
+                }
+            }
+        }
+
+
+        public Boolean isPaused () {
+        return pauseStatus;
         }
 
 
@@ -253,5 +274,12 @@ public class TaskExecution  implements Serializable, Runnable {
         donePausing = true;
     }
 
+    public Boolean getStopWorkSyncer() {
+        return stopWorkSyncer;
+    }
+
+    public void setStopWorkSyncer(Boolean stopWorkSyncer) {
+        this.stopWorkSyncer = stopWorkSyncer;
+    }
 }
 
