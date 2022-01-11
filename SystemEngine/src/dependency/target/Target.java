@@ -33,6 +33,9 @@ public class Target implements Serializable {
     private ObjectProperty<TaskResult> taskResult =  new SimpleObjectProperty(TaskResult.Skipped); // what is the initial value???
     private ObjectProperty<TargetStatus> targetStatus = new SimpleObjectProperty<>(TargetStatus.Skipped); // what is the initial value??
 
+    public Long getExecutionTime(){
+    return executionTime;
+    }
 
     public void setExecutionTime(Long Time){
         executionTime = Time;
