@@ -119,23 +119,43 @@ public class BackEndMediator {
         subGraph.setName2SerialSet(dependencyGraph.getName2SerialSet()); // not logically true
         return subGraph;
     }
+    private boolean isTargetNeededForExecution(Target target){
+        return target.getTargetStatus().equals(Target.TargetStatus.Frozen) || target.getTargetStatus().equals(Target.TargetStatus.Waiting) || target.getTargetStatus().equals(Target.TargetStatus.InProcess);
+    }
 
-//    public ArrayList<String> getTargetLiveData(TargetInTable selectedItem) {
-//        ArrayList<String> res = new ArrayList<>();
-//
-//        res.add(selectedItem.getName()+ "\n");
-//        res.add(selectedItem.getLocation()+ "\n");
-//        Set<String> serialsetsForTarget = dependencyGraph.getSerialSetsForTarget(selectedItem.getName());
-//        if (!serialsetsForTarget.isEmpty()){
-//            res.add("Targets is in following sets: " +String.join(",",serialsetsForTarget)+ "\n");
-//        }
-//        if (selectedItem.getTargetStatus().equals(Target.TargetStatus.Frozen)){
-//            dependencyGraph.getTotalDependencies(selectedItem.getName(), Target.Dependency.DependsOn).stream().filter(t->{
-//                boolean b = t.getTargetStatus().equals(Target.TargetStatus.Waiting) || t.getTargetStatus().equals(Target.TargetStatus.Frozen) || t.getTargetStatus().equals(Target.TargetStatus.InProcess))
-//            }).forEach(res.add(""));
-//
-//        }
-//
-//
-//    }
+
+
+    public ArrayList<String> getTargetLiveData(TargetInTable selectedItem) {
+        ArrayList<String> res = new ArrayList<>();
+
+        res.add("Target name: " + selectedItem.getName());
+        res.add("Target location: "+selectedItem.getLocation());
+        Set<String> serialsetsForTarget = dependencyGraph.getSerialSetsForTarget(selectedItem.getName());
+        if (!serialsetsForTarget.isEmpty()){
+            res.add("Targets is in following sets: " +String.join(",",serialsetsForTarget));
+        }
+        if (selectedItem.getTargetStatus().equals(Target.TargetStatus.Frozen)){
+            res.add("Target waiting for following targets to finish: "+ dependencyGraph.getTotalDependencies(selectedItem.getName(), Target.Dependency.DependsOn)
+                    .stream().filter(t-> isTargetNeededForExecution(t))
+            .map(t-> t.getName()).collect(Collectors.joining(",")));
+        }
+        else if(selectedItem.getTargetStatus().equals(Target.TargetStatus.Skipped)){
+            res.add("Target is skipped due to the following failed Targets: " + dependencyGraph.getTotalDependencies(selectedItem.getName(),Target.Dependency.DependsOn)
+                    .stream().filter(t-> t.getTaskResult().equals(Target.TaskResult.Failure)).map(t-> t.getName()).collect(Collectors.joining(",")));
+        }
+        else if (selectedItem.getTargetStatus().equals(Target.TargetStatus.InProcess)){
+            Target selectedTarget = dependencyGraph.getTargetByName(selectedItem.getName());
+            res.add("Target has been processing for: " + (System.currentTimeMillis() - selectedTarget.getBeginProcessTime())/1000.0 + "seconds");
+        }
+        else if (selectedItem.getTargetStatus().equals(Target.TargetStatus.Waiting)){
+            Target selectedTarget = dependencyGraph.getTargetByName(selectedItem.getName());
+            res.add("Target has been waiting for: " + (System.currentTimeMillis() - selectedTarget.getStartWaitingTime())/1000.0 + "seconds" );
+        }
+        else if (selectedItem.getTargetStatus().equals(Target.TargetStatus.Finished)){
+            res.add("Target finished with with result: " + selectedItem.getTaskResult());
+        }
+
+
+return res;
+    }
 }

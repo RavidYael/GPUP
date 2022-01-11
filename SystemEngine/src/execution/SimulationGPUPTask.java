@@ -16,7 +16,13 @@ public class SimulationGPUPTask extends GPUPTask implements Serializable {
     private double successProb;
     private double successWithWarningProb;
     private Target curTarget;
-   private long totalWork;
+
+    @Override
+    public void setTotalWork(Long totalWork) {
+        this.totalWork = totalWork;
+    }
+
+    private long totalWork;
    private long workDone = 0l;
 
     public void setCurTarget(Target target){
@@ -52,6 +58,7 @@ public class SimulationGPUPTask extends GPUPTask implements Serializable {
         String additionalInfo = "";
 
         Instant start = Instant.now();
+        curTarget.setBeginProcessTime(System.currentTimeMillis());
 
         Target.TaskResult taskResult;
 
@@ -104,7 +111,7 @@ public class SimulationGPUPTask extends GPUPTask implements Serializable {
             String finalAdditionalInfo = additionalInfo;
             Platform.runLater(() -> updateMessage("Target " + target.getName() + " completed with status: " + finalStatus + "\n" +
                     "Process time: " + duration.getSeconds() + " sec" + finalAdditionalInfo));
-            target.setExecutionTime(duration.getSeconds()); // if needed can be added to a (new) Duration member in GPUPTask
+        //    target.setExecutionTime(duration.getSeconds()); // if needed can be added to a (new) Duration member in GPUPTask
             Platform.runLater(() -> updateMessage(""));
             return null;
         }

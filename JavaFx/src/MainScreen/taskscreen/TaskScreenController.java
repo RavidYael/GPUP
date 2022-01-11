@@ -271,7 +271,7 @@ public class TaskScreenController {
     public void initLiveDataAction(){
         targetsTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             TaskScreenTabPane.getSelectionModel().select(1);
-            //backEndMediator.getTargetLiveData(targetsTable.getSelectionModel().getSelectedItem());
+            specificTargetTA.setText(String.join("\n",backEndMediator.getTargetLiveData(targetsTable.getSelectionModel().getSelectedItem())));
 
         });
     }

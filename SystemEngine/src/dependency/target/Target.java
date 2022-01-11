@@ -25,21 +25,39 @@ public class Target implements Serializable {
     private Set<String> dependsOn;
     private String data;
     private DependencyLevel dependencyLevel;
-    private Long executionTime = 0l;
+    private Long beginProcessTime;
+    private Long startWaitingTime;
 
     // private TargetStatus targetStatus = TargetStatus.Frozen;
     // private TaskResult taskResult = TaskResult.Skipped;
 
     private ObjectProperty<TaskResult> taskResult =  new SimpleObjectProperty(TaskResult.Skipped); // what is the initial value???
-    private ObjectProperty<TargetStatus> targetStatus = new SimpleObjectProperty<>(TargetStatus.Skipped); // what is the initial value??
+    private ObjectProperty<TargetStatus> targetStatus = new SimpleObjectProperty<>(TargetStatus.Frozen); // what is the initial value??
 
-    public Long getExecutionTime(){
-    return executionTime;
+//    public Long getExecutionTime(){
+//    return executionTime;
+//    }
+
+
+    public void setBeginProcessTime(Long beginProcessTime) {
+        this.beginProcessTime = beginProcessTime;
     }
 
-    public void setExecutionTime(Long Time){
-        executionTime = Time;
+    public void setStartWaitingTime(Long startWaitingTime) {
+        this.startWaitingTime = startWaitingTime;
     }
+
+    public Long getBeginProcessTime() {
+        return beginProcessTime;
+    }
+
+    public Long getStartWaitingTime() {
+        return startWaitingTime;
+    }
+
+//    public void setExecutionTime(Long Time){
+//        executionTime = Time;
+//    }
 
     public Target(String name,String data) {
 
@@ -47,6 +65,12 @@ public class Target implements Serializable {
         this.data = data;
         requiredFor = new HashSet<>();
         dependsOn = new HashSet<>();
+
+        targetStatusProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue.equals(TargetStatus.Waiting)) {
+                this.startWaitingTime = System.currentTimeMillis();
+            }
+        });
 
 
     }
@@ -65,6 +89,7 @@ public class Target implements Serializable {
         for (String dep : other.dependsOn){
             dependsOn.add(dep);
         }
+
 
 
 

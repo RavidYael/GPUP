@@ -133,11 +133,11 @@ public class DependencyGraph implements Serializable {
             if (noDepends && noRequired) {
                 targetsByDependencyLevel.get(Target.DependencyLevel.Independed).add(target);
                 target.setDependencyLevel(Target.DependencyLevel.Independed);
-                target.setTargetStatus(Target.TargetStatus.Waiting);
+               // target.setTargetStatus(Target.TargetStatus.Waiting);
             } else if (noDepends && !noRequired) {
                 targetsByDependencyLevel.get(Target.DependencyLevel.Leaf).add(target);
                 target.setDependencyLevel(Target.DependencyLevel.Leaf);
-                target.setTargetStatus(Target.TargetStatus.Waiting);
+              //  target.setTargetStatus(Target.TargetStatus.Waiting);
             } else if (!noDepends && noRequired) {
                 targetsByDependencyLevel.get(Target.DependencyLevel.Root).add(target);
                 target.setDependencyLevel(Target.DependencyLevel.Root);
@@ -148,6 +148,14 @@ public class DependencyGraph implements Serializable {
             }
 
 
+        }
+    }
+
+    public void initializeWaitingTargets(){
+        for (Target curTarget : allTargets.values()){
+            if (curTarget.getDependencyLevel().equals(Target.DependencyLevel.Leaf)|| curTarget.getDependencyLevel().equals(Target.DependencyLevel.Independed)){
+                curTarget.setTargetStatus(Target.TargetStatus.Waiting);
+            }
         }
     }
 

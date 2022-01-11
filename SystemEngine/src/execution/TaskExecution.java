@@ -121,7 +121,7 @@ public class TaskExecution  implements Serializable, Runnable {
 
         GPUPTask.setTotalWork(Long.valueOf(graphInExecution.getAllTargets().size()));
 
-
+        graphInExecution.initializeWaitingTargets();
         ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(maxThreads);
         Set<Target> executedTargets = new HashSet<>();
         createTaskWorkingDirectory();
@@ -210,7 +210,7 @@ public class TaskExecution  implements Serializable, Runnable {
         }
 
         private void calculateTotalDuration () {
-            status2Targets.get(Target.TargetStatus.Finished).stream().forEach(t -> totalDuration += t.getExecutionTime());
+          //  status2Targets.get(Target.TargetStatus.Finished).stream().forEach(t -> totalDuration += t.getExecutionTime());
         }
 
         private void printExecutionSummary () {

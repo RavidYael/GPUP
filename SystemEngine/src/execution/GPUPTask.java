@@ -8,11 +8,11 @@ public abstract class GPUPTask extends Task<Void> {
     private Target curTarget;
     private Long totalWork;
 
+
     public abstract void setCurTarget(Target target);
 
-    public void setTotalWork(Long totalWork){
-    this.totalWork = totalWork;
-    }
+    public abstract void setTotalWork(Long totalWork);
+
 
     @Override
     public abstract Void call() throws Exception ;
