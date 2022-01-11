@@ -114,13 +114,19 @@ public class TaskExecution  implements Serializable, Runnable {
        // }
     }
 
-    public void runTaskFromScratch() {
+    public void runTaskFromScratch()
+    {
+
         this.beenPauesd = false;
         this.donePausing = false;
+
+        GPUPTask.setTotalWork(Long.valueOf(graphInExecution.getAllTargets().size()));
+
 
         ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(maxThreads);
         Set<Target> executedTargets = new HashSet<>();
         createTaskWorkingDirectory();
+        Set<String> updatedTargets;
         Iterator<Target> iter = status2Targets.get(Target.TargetStatus.Waiting).iterator();
         Boolean hasMoreToExecute = true;
         List<Future> futureRes = new ArrayList<>();
@@ -153,12 +159,11 @@ public class TaskExecution  implements Serializable, Runnable {
 
                 if( !beenPauesd ) {
                     graphInExecution.updateEffectOfTargetsExecution(executedTargets);
-                    updateStatus2Target();
-                    iter = status2Targets.get(Target.TargetStatus.Waiting).iterator();
-                    if (!iter.hasNext()) {
-                        hasMoreToExecute = false;
-                    }
-                }
+                     updateStatus2Target();
+                     iter = status2Targets.get(Target.TargetStatus.Waiting).iterator();
+                     if(!iter.hasNext()) {
+                         hasMoreToExecute = false;
+                     }
             }
         }
 
@@ -166,6 +171,7 @@ public class TaskExecution  implements Serializable, Runnable {
             pausingTask(futureRes,executedTargets,threadPoolExecutor);
         }
 
+        GPUPTask.finishWork();
         updateTarget2summary();
         printExecutionSummary();
         printTargetExecutionSummary();
@@ -198,23 +204,27 @@ public class TaskExecution  implements Serializable, Runnable {
         updateStatus2Target();
 
         if (isExecutionComplete()) {
-            System.out.println("All targets were executed successfully! nothing left to run :)");
+            Platform.runLater(()-> taskInfoConsumer.accept("All targets were executed successfully! nothing left to run :)"));
             return;
         }
 
-     //   runTaskFromScratch();
+        runTaskFromScratch();
 
+    }
+    private void calculateTotalDuration(){
+        status2Targets.get(Target.TargetStatus.Finished).stream().forEach(t-> totalDuration+= t.getExecutionTime());
     }
 
     private void printExecutionSummary(){
-        Platform.runLater(()->taskInfoConsumer.accept("Task completed"));
-        String runTime = String.format("%02d:%02d:%02d", totalDuration / 3600, (totalDuration % 3600) / 60, (totalDuration % 60));
-        System.out.println("Task ran for: " +runTime);
-        System.out.println(status2Targets.get(Target.TargetStatus.Finished).stream().filter(t -> t.getTaskResult() == Target.TaskResult.Success).count() + " Targets succeeded");
-        System.out.println(status2Targets.get(Target.TargetStatus.Finished).stream().filter(t-> t.getTaskResult() == Target.TaskResult.Failure).count()+ " Targets Failed");
-        System.out.println(status2Targets.get(Target.TargetStatus.Finished).stream().filter(t-> t.getTaskResult() == Target.TaskResult.Failure).collect(Collectors.toSet()).toString());
-        System.out.println(status2Targets.get(Target.TargetStatus.Finished).stream().filter(t-> t.getTaskResult() == Target.TaskResult.Warning).count() + " Targets succeeded with warning");
-        System.out.println(status2Targets.get(Target.TargetStatus.Skipped).size() + " Targets skipped");
+        calculateTotalDuration();
+        Platform.runLater(()->taskInfoConsumer.accept("Task completed\n" +
+                "Task ran for: " +
+                String.format("%02d:%02d:%02d", totalDuration / 3600, (totalDuration % 3600) / 60, (totalDuration % 60)) + "sec\n" +
+        status2Targets.get(Target.TargetStatus.Finished).stream().filter(t -> t.getTaskResult() == Target.TaskResult.Success).count() + " Targets succeeded\n" +
+        status2Targets.get(Target.TargetStatus.Finished).stream().filter(t-> t.getTaskResult() == Target.TaskResult.Failure).count() + " Targets Failed:\n" +
+        status2Targets.get(Target.TargetStatus.Finished).stream().filter(t-> t.getTaskResult() == Target.TaskResult.Failure).collect(Collectors.toSet()).toString() +"\n"+
+        status2Targets.get(Target.TargetStatus.Finished).stream().filter(t-> t.getTaskResult() == Target.TaskResult.Warning).count() + " Targets succeeded with warning\n" +
+        status2Targets.get(Target.TargetStatus.Skipped).size() + " Targets skipped"));
 
     }
 

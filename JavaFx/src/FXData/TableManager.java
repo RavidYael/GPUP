@@ -6,6 +6,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 
 import javax.swing.*;
@@ -113,4 +114,14 @@ public class TableManager {
 //        }
 //
 //    }
+
+    public void bindTable2Lables(Label src, Label dest){
+        targetsTable.stream().forEach(t-> t.getChecked().selectedProperty().addListener((observable, oldValue, newValue) -> {
+            if (getSelectedTargets().size() == 1)
+                src.setText(t.getName());
+            else if(getSelectedTargets().size()>1)
+                dest.setText(t.getName());
+        }));
+    }
+
 }

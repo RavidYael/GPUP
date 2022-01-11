@@ -194,7 +194,10 @@ public class TaskScreenController {
         curTask = taskExecution;
 
         if (fromScratchRbutton.isSelected()) {
-            new Thread(taskExecution).start();
+            new Thread(()->taskExecution.runTaskFromScratch()).start();
+        }
+        else if (incrementalRbutton.isSelected()){
+            new Thread(()->taskExecution.runTaskIncrementally()).start();
         }
 
         //TODO the next few lines should be executed only when thread is finished
@@ -205,16 +208,12 @@ public class TaskScreenController {
 
     @FXML
     void pauseButtonAction(ActionEvent event) {
-        //disable לכפתור של ה Pause
-        curTask.setBeenPaused();
 
     }
 
 
     @FXML
     void stopButtonAction(ActionEvent event) {
-        //disable לכפתור של ה Stop
-        curTask.setBeenPaused();
 
     }
 

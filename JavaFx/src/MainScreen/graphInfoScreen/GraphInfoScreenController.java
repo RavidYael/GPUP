@@ -134,7 +134,9 @@ public class GraphInfoScreenController {
 
         ObservableList<TargetInTable> targetInTables = backEndMediator.getAllTargetsForTable();
         mainTableManager = new TableManager(targetInTables);
+        mainTableManager.bindTable2Lables(pathTargetSelected1,pathTargetSelected2);
         targetsTable.setItems(targetInTables);
+
 
         serialSetTable.setItems(backEndMediator.getAllSerialSetsForTable());
         serialSetName.setCellValueFactory(new PropertyValueFactory<SerialSetInTable,String>("setName"));
@@ -251,5 +253,6 @@ public class GraphInfoScreenController {
 
         return null;
     }
+
 
 }
