@@ -4,8 +4,8 @@ import jaxb.generated.GPUPDescriptor;
 import jaxb.generated.GPUPTarget;
 import jaxb.generated.GPUPTargetDependencies;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GraphValidator {
 
@@ -40,6 +40,9 @@ public class GraphValidator {
         {
             containsDependencyConflict();
         }
+        if (valid){
+            isTargetInSerialSetExist();
+        }
 
         return valid;
 
@@ -67,6 +70,27 @@ public class GraphValidator {
             }
         }
     }
+
+    public void isTargetInSerialSetExist() throws Exception {
+        AtomicBoolean Avalid = new AtomicBoolean(true);
+        boolean resValid;
+        if (investigatedGraph.getGPUPSerialSets() != null) {
+            for (GPUPDescriptor.GPUPSerialSets.GPUPSerialSet serialSet : investigatedGraph.getGPUPSerialSets().getGPUPSerialSet()) {
+                String[] nameList = serialSet.getTargets().split(",");
+                Arrays.stream(nameList).forEach(name -> {
+                    if (!name2Target.keySet().contains(name)) {
+                        Avalid.set(false);
+                    }
+                });
+
+            }
+        }
+        if (!Avalid.get())
+            throw (new Exception("not all targets described in serial sets exist"));
+        valid = Avalid.get();
+        }
+
+
 
     public void containsDependencyConflict() throws Exception
     {

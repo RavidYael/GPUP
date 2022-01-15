@@ -82,8 +82,8 @@ public class SimulationGPUPTask extends GPUPTask implements Serializable {
 
         target.setTargetStatus(Target.TargetStatus.InProcess);
         double rand = new Random().nextDouble();
-        Platform.runLater(() -> updateMessage("Target " + target.getName() + " is now processing "));
-        Platform.runLater(() -> updateMessage("Target information: " + target.getData()));
+        Platform.runLater(() -> updateMessage("Target " + target.getName() + " is now processing " +
+                "\nTarget information: " + target.getData()));
 
         Instant startSleeping = Instant.now();
         try {
@@ -138,6 +138,11 @@ public class SimulationGPUPTask extends GPUPTask implements Serializable {
     @Override
     public void finishWork(){
         Platform.runLater(()-> updateProgress(totalWork, totalWork));
+    }
+
+    @Override
+    public void startWork(){
+        Platform.runLater(()->updateProgress(0,totalWork));
     }
 
 

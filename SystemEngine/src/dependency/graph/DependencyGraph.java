@@ -385,11 +385,11 @@ public class DependencyGraph implements Serializable {
 
     }
 
-    public boolean isTargetBlocked(Target target) {
+    public boolean isTargetBlocked(Target targetToEnterTheQueue, Set<Target> targetsInQueue) {
         for (Set<String> curSerialSet : name2SerialSet.values()){
-            if (curSerialSet.contains(target.getName())){
-                for (String targetNameInSet : curSerialSet){
-                    if (getTargetByName(targetNameInSet).getTargetStatus().equals(Target.TargetStatus.InProcess))
+            if (curSerialSet.contains(targetToEnterTheQueue.getName())){
+                for (Target targetNameInSet : targetsInQueue){
+                    if (curSerialSet.contains(targetNameInSet.getName()))
                         return true;
 
                 }
@@ -404,6 +404,11 @@ public class DependencyGraph implements Serializable {
                 setsForTarget.add(entry.getKey());
         }
         return setsForTarget;
+    }
+
+    public int getNumOfSerialSets(Target target){
+        int count = 0;
+        return (int) name2SerialSet.values().stream().filter(s-> s.contains(target.getName())).count();
     }
 }
 

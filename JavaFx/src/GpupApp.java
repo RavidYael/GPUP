@@ -1,4 +1,5 @@
 
+import MainScreen.MainController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -15,10 +16,14 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class GpupApp extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
-        FXMLLoader fxmlLoader = new FXMLLoader();
-        Parent root = FXMLLoader.load(getClass().getResource("MainScreen.fxml"));
-        Scene mainScene = new Scene(root,1200,950);
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("MainScreen.fxml"));
+        Parent root = fxmlLoader.load();
+        MainController  mainController = fxmlLoader.getController();
+
+
+        Scene mainScene = new Scene(root,1400,950);
         primaryStage.setScene(mainScene);
+        mainController.setScene(mainScene);
         primaryStage.show();
 
     }

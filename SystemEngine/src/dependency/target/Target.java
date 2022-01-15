@@ -218,9 +218,8 @@ public class Target implements Serializable {
 
     @Override
     public String toString() {
-        return "Target{" +
-                "name='" + name + '\'' +
-                '}';
+        return name;
+
     }
 
 }

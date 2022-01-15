@@ -21,7 +21,9 @@ public abstract class GPUPTask extends Task<Void> {
 
     public abstract Void runOnTarget(Target target);
     public abstract String getTaskName();
-    public void finishWork(){};
+    public abstract void finishWork();
+
+    ;
 
     public TaskExecution getExecutionManager() {
         return executionManager;
@@ -30,4 +32,6 @@ public abstract class GPUPTask extends Task<Void> {
     public void setExecutionManager(TaskExecution Manager) {
         this.executionManager = Manager;
     }
+
+    public abstract void startWork();
 }

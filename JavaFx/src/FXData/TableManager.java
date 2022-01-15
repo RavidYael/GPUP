@@ -44,7 +44,14 @@ public class TableManager {
                     });
                 }
             }
+            else{
+                targetsTable.forEach(ttb-> ttb.getChecked().setOnAction((e)->ttb.getChecked().setSelected(ttb.getChecked().isSelected())));
+            }
         });
+    }
+
+    public ObservableList<TargetInTable> getTargetsTable() {
+        return targetsTable;
     }
 
     private void selectAllcheckBoxAction() {
@@ -115,10 +122,13 @@ public class TableManager {
 //
 //    }
 
-    public void bindTable2Lables(Label src, Label dest){
+    public void bindTable2Lables(Label src, Label dest,Label cycle, Label whatif){
         targetsTable.stream().forEach(t-> t.getChecked().selectedProperty().addListener((observable, oldValue, newValue) -> {
-            if (getSelectedTargets().size() == 1)
+            if (getSelectedTargets().size() == 1) {
                 src.setText(t.getName());
+                cycle.setText(t.getName());
+                whatif.setText(t.getName());
+            }
             else if(getSelectedTargets().size()>1)
                 dest.setText(t.getName());
         }));

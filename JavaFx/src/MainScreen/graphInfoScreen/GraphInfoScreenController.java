@@ -8,8 +8,12 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.stage.DirectoryChooser;
 import sun.nio.ch.ThreadPool;
 
+import java.io.File;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -106,6 +110,23 @@ public class GraphInfoScreenController {
     @FXML
     private ComboBox<String> dependencyComboBox1;
 
+    @FXML
+    private Button chooseImageDirectory;
+    @FXML
+    private ImageView visualGraphImageView;
+
+    @FXML
+    private Button reverseButton;
+
+    @FXML
+    private TreeView<String> treeView;
+    @FXML
+    private ComboBox<Target.Dependency> treeDirectionComboBox;
+
+    private String srcTarget;
+    private String destTarget;
+    private boolean isReveresed = false;
+
     private BackEndMediator backEndMediator;
     private TableManager mainTableManager;
 
@@ -120,6 +141,7 @@ public class GraphInfoScreenController {
         dependencyComboBox.setPromptText("Dependency Type");
         dependencyComboBox1.setItems(depList);
         dependencyComboBox1.setPromptText("Dependency Type");
+        treeDirectionComboBox.setItems(FXCollections.observableArrayList(Target.Dependency.DependsOn, Target.Dependency.RequiredFor));
 
 
     }
@@ -131,10 +153,10 @@ public class GraphInfoScreenController {
         totalRequiredForColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable,Integer>("totalRequiredFor"));
         extraInfoColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable,String>("extraInfo"));
         checkedCulumn.setCellValueFactory(new PropertyValueFactory<TargetInTable,CheckBox>("checked"));
-
+        numOfSerialColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable,Integer>("numOfSerialSets"));
         ObservableList<TargetInTable> targetInTables = backEndMediator.getAllTargetsForTable();
         mainTableManager = new TableManager(targetInTables);
-        mainTableManager.bindTable2Lables(pathTargetSelected1,pathTargetSelected2);
+        mainTableManager.bindTable2Lables(pathTargetSelected1,pathTargetSelected2, cycleTargetSelected, whatIfSelectedTarget);
         targetsTable.setItems(targetInTables);
 
 
@@ -151,10 +173,13 @@ public class GraphInfoScreenController {
         MiddlesCounter.setText(String.valueOf(backEndMediator.getNumOfTargetsByDependencyLevel(Target.DependencyLevel.Middle)));
         leafsCounter.setText(String.valueOf(backEndMediator.getNumOfTargetsByDependencyLevel(Target.DependencyLevel.Leaf)));
 
+
+
     }
 
     @FXML
     void dependencyComboBoxAction(ActionEvent event) {
+
 
     }
 
@@ -190,7 +215,7 @@ public class GraphInfoScreenController {
     }
 
     @FXML
-    void findPathButtonAction(ActionEvent event) { //TODO ERROR--- only showing depends on direction because targets are always picked in the same order.
+    void findPathButtonAction(ActionEvent event) {
         String message = "";
         Alert alert = new Alert(Alert.AlertType.ERROR);
         boolean userError = false;
@@ -211,16 +236,32 @@ public class GraphInfoScreenController {
 
 
         String dep = dependencyComboBox.getValue();
-        String target1 = selectedTargets.get(0).getName();
-        String target2 = selectedTargets.get(1).getName();
-        String initMessage = "Path from " +target1 +" To " +target2+ " in direction:' "+ dep+ "' :";
+        if (!isReveresed) {
+            srcTarget = selectedTargets.get(0).getName();
+            destTarget = selectedTargets.get(1).getName();
+        }
+        else{
+            srcTarget = selectedTargets.get(1).getName();
+            destTarget = selectedTargets.get(0).getName();
+
+        }
+        isReveresed = false;
+        String initMessage = "Path from " +srcTarget +" To " +destTarget+ " in direction:' "+ dep+ "' :";
         TextAreaConsumer findPathTAConsumer = new TextAreaConsumer(findPathTA,initMessage);
 //        findPathTAConsumer.clear();
         Target.Dependency dependency = stringToDependency(dep);
-        boolean isPath = backEndMediator.getDependencyGraph().displayAllPathsBetweenTwoTargets(target1,target2,dependency,findPathTAConsumer);
+        boolean isPath = backEndMediator.getDependencyGraph().displayAllPathsBetweenTwoTargets(srcTarget,destTarget,dependency,findPathTAConsumer);
         if (!isPath){
-            findPathTA.setText("No Existing Path from " + target1+ " To "+ target2 + " in Direction: " + dep);
+            findPathTA.setText("No Existing Path from " + srcTarget+ " To "+ destTarget + " in Direction: " + dep);
         }
+    }
+    @FXML
+    void reverseButtonAction(ActionEvent event) {
+        isReveresed = true;
+        String temp = pathTargetSelected1.getText();
+        pathTargetSelected1.setText(pathTargetSelected2.getText());
+        pathTargetSelected2.setText(temp);
+
     }
 
     @FXML
@@ -253,6 +294,24 @@ public class GraphInfoScreenController {
 
         return null;
     }
+    @FXML
+    void chooseImageDirectoryAction(ActionEvent event) {
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        File graphImageFile = directoryChooser.showDialog(null);
 
+
+               // Image image = new Image(graphImageFile.getPath()+ "\\happy_dog.jpeg");
+                visualGraphImageView.setImage(backEndMediator.createVisualGraph(graphImageFile.getPath()));
+                visualGraphImageView.setFitHeight(700);
+                visualGraphImageView.setFitWidth(700);
+
+    }
+    @FXML
+    void treeDirectionComboBoxAction(ActionEvent event) {
+        Target.Dependency dependency = treeDirectionComboBox.getValue();
+        treeView.setRoot(backEndMediator.createTreeView(treeDirectionComboBox.getValue()));
+        treeView.setShowRoot(false);
+
+    }
 
 }

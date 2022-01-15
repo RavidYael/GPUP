@@ -15,11 +15,15 @@ public class CompilationGPUPTask extends GPUPTask {
     private File outPutPath;
     private File needeResourcesPath;
     private Target curTarget;
+    private Long workDone =0L;
     private Long totalWork;
+    private Integer processingTime;
 
-    public CompilationGPUPTask(File toCompilePath, File outPutPath) {
+    public CompilationGPUPTask(File toCompilePath, File outPutPath, Integer processTime) {
         this.toCompilePath = toCompilePath;
         this.outPutPath = outPutPath;
+        this.processingTime = processTime;
+
 
     }
 
@@ -65,15 +69,16 @@ public class CompilationGPUPTask extends GPUPTask {
         Process process;
         Boolean done = false;
 
-
         target.setTargetStatus(Target.TargetStatus.InProcess);
-
+        target.setBeginProcessTime(System.currentTimeMillis());
+        Platform.runLater(()->updateMessage("Target: "+ target.getName()+ " is now processing \n File: " + toComplileJavaFile));
         try {
             process = processBuilder.start();
+            if (this.processingTime !=0)
+            Thread.sleep(Long.valueOf(processingTime)*1000);
             int code = process.waitFor();
             if (code == 0){
                 target.setTaskResult(Target.TaskResult.Success);
-                //prints out sucess message
                 Platform.runLater(()->updateMessage("Target: " + target.getName() +" Processed successfully"));
                 done = true;
             }
@@ -84,7 +89,9 @@ public class CompilationGPUPTask extends GPUPTask {
                 Platform.runLater(()-> bufferedReader.lines().forEach(l -> updateMessage(l)));
                 done = true;
             }
+
             target.setTargetStatus(Target.TargetStatus.Finished);
+            Platform.runLater(()->updateProgress(workDone++, totalWork));
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -104,6 +111,16 @@ public class CompilationGPUPTask extends GPUPTask {
     @Override
     public String getTaskName() {
         return taskName;
+    }
+
+    @Override
+    public void finishWork() {
+        Platform.runLater(()-> updateProgress(totalWork,totalWork));
+    }
+
+    @Override
+    public void startWork() {
+        Platform.runLater(()->updateProgress(0,totalWork));
     }
 
     private String calculateJavaFileLoaction(String fqn){

@@ -19,7 +19,6 @@ import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
-import sun.reflect.misc.FieldUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -91,7 +90,7 @@ public class TaskScreenController {
     private CheckBox selectWithDependency;
 
     @FXML
-    private TextArea taskProccessTA;
+    private TextArea taskProcessTA;
 
     @FXML
     private ComboBox<Target.Dependency> dependencyForSelection;
@@ -130,7 +129,7 @@ public class TaskScreenController {
     private CompilationTaskController compilationTaskController;
     private TableManager tableManager;
     private TextAreaConsumer textAreaConsumer;
-    private TaskExecution curTask;
+    private TaskExecution curTaskExecution;
 
     public void setBackEndMediator(BackEndMediator backEndMediator) {
         this.backEndMediator = backEndMediator;
@@ -144,14 +143,29 @@ public class TaskScreenController {
         incrementalRbutton.setToggleGroup(incrOrScratch);
         fromScratchRbutton.setToggleGroup(incrOrScratch);
         dependencyForSelection.setDisable(true);
-        textAreaConsumer = new TextAreaConsumer(taskProccessTA);
+        textAreaConsumer = new TextAreaConsumer(taskProcessTA);
         selectWithDependency.selectedProperty().addListener((observable, oldValue, newValue) -> dependencyForSelection.setDisable(!newValue));
         dependencyForSelection.setItems(FXCollections.observableArrayList(Target.Dependency.DependsOn, Target.Dependency.RequiredFor));
         selectSpecificComboBox.setItems(FXCollections.observableArrayList(Target.DependencyLevel.Root, Target.DependencyLevel.Middle, Target.DependencyLevel.Leaf, Target.DependencyLevel.Independed));
         selectSpecificComboBox.setDisable(true);
         selectSpecificCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> selectSpecificComboBox.setDisable(!newValue));
         initLiveDataAction();
+        initPauseResumeStopButtons();
+
+
     }
+
+    private void initPauseResumeStopButtons() {
+        resumeButton.setDisable(true);
+        stopButton.setDisable(true);
+        pauseButton.setDisable(true);
+    }
+
+    private void activatePauseStop(){
+        pauseButton.setDisable(false);
+        stopButton.setDisable(false);
+    }
+
     public void myInitialize(){
 
         numOfThreads.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1,backEndMediator.getParallelism()));
@@ -163,26 +177,59 @@ public class TaskScreenController {
 
         ProccessingResultColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable,ObjectProperty<Target.TaskResult>>("taskResult"));
         executionStatusColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable,ObjectProperty<Target.TargetStatus>>("targetStatus"));
+        initTable();
 
+    }
+
+    public void initializeTaskExecution(){
+        curTaskExecution = null;
+    }
+
+    private void initTable() {
         ObservableList<TargetInTable>  targetInTables = backEndMediator.getAllTargetsForTable();
         targetsTable.setItems(targetInTables);
         tableManager = new TableManager(targetInTables,selectWithDependency,selectAll,dependencyForSelection,backEndMediator);
+    }
+    private void refreshTable(){
+        ObservableList<TargetInTable>  currentTable = tableManager.getTargetsTable();
+        ObservableList<TargetInTable> refreshedTargetsInTable = FXCollections.observableArrayList();
+        ArrayList<CheckBox> checkBoxes = new ArrayList<>();
+        for (TargetInTable curTargetInTable : currentTable){
+            checkBoxes.add(curTargetInTable.getChecked());
+        }
+        refreshedTargetsInTable = backEndMediator.getAllTargetsForTable();
+        Iterator<CheckBox> iter = checkBoxes.iterator();
+        for (TargetInTable curTargetInTable : refreshedTargetsInTable){
+            curTargetInTable.setChecked(iter.next());
+        }
+        targetsTable.setItems(refreshedTargetsInTable);
+        tableManager.setTargetsTable(refreshedTargetsInTable);
 
     }
 
 
     @FXML
     void runButtonAction(ActionEvent event) {
+        String message;
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+            if (notAllParametersSelected()){
+                message = "not all required parameters have been selected!";
+                alert.setContentText(message);
+                alert.showAndWait();
+                return;
+            }
+            if (tableManager.getSelectedTargets().isEmpty()){
+                message = "no targets selected";
+                alert.setContentText(message);
+                alert.showAndWait();
+            }
+            if (fromScratchRbutton.isSelected()) {
+                backEndMediator.restoreGraphToDefault();
+                refreshTable();
+            }
 
-        Map<Target, Set<String>> Target2ItsOriginalDependOnTargets = new HashMap<>();
-        Map<Target, Set<String>> Target2ItsOriginalRequiredForTargets = new HashMap<>();
-        GPUPTask task =null;
-        DependencyGraph graphInExecution = backEndMediator.getSubGraphFromTable(tableManager.getSelectedTargets(), Target2ItsOriginalDependOnTargets, Target2ItsOriginalRequiredForTargets);
-
-        // seems classic to create a map of target to its original dependencies, send it to getSubGraph method
-        // before changing the traversing data of one target insert it to this map- by that you can prevent from
-        // create a deep copy, you can work directly on the target from the original graph and just in the end of this method(run)
-        // reset the traversing data to the origin using the map we had created first
+        DependencyGraph graphInExecution = backEndMediator.getSubGraphFromTable(tableManager.getSelectedTargets());
+        GPUPTask task = null;
 
         if (taskComboBox.getValue() == "Simulation Task") {
             task = new SimulationGPUPTask(simulationTaskController.getMaxSecToRun()*1000,
@@ -191,37 +238,51 @@ public class TaskScreenController {
                     simulationTaskController.getChancesOfWarning());
         }
         else if (taskComboBox.getValue().equals("Compilation Task")) {
-//            task = new CompilationGPUPTask(compilationTaskController.getToCompilePath(),
-//                    compilationTaskController.getOutputPath());
-            File outPutPathTEST =  new File("C:\\Users\\oatar\\IdeaProjects\\GPUP-Advanced\\SystemEngine\\src\\resources\\ex2\\out");
-            File toCompilePathTEST = new File("\"C:\\Users\\oatar\\IdeaProjects\\GPUP-Advanced\\SystemEngine\\src\\resources\\ex2\\XOO\\src");
-            clearDirectory(outPutPathTEST);
-            task = new CompilationGPUPTask(toCompilePathTEST,outPutPathTEST);
+            task = new CompilationGPUPTask(compilationTaskController.getToCompilePath(),
+                    compilationTaskController.getOutputPath(),
+                    compilationTaskController.getProcessTime());
+
 
         }
 
-
-        TaskExecution taskExecution = new TaskExecution(graphInExecution, numOfThreads.getValue(), task,textAreaConsumer);
         bindUIComponents(task);
+        activatePauseStop();
 
-        curTask = taskExecution;
-
-        if (fromScratchRbutton.isSelected()) {
-            new Thread(()->taskExecution.runTaskFromScratch()).start();
+        if (fromScratchRbutton.isSelected() || curTaskExecution == null) {
+            curTaskExecution = new TaskExecution(graphInExecution, numOfThreads.getValue(), task, textAreaConsumer);
+            new Thread(()->curTaskExecution.runTaskFromScratch()).start();
         }
         else if (incrementalRbutton.isSelected()){
-            new Thread(()->taskExecution.runTaskIncrementally()).start();
+            curTaskExecution.setCurNumOfThreads(numOfThreads.getValue());
+            curTaskExecution.setGPUPTask(task);
+            new Thread(()->curTaskExecution.runTaskIncrementally()).start();
         }
 
-        //TODO the next few lines should be executed only when thread is finished
-//        backEndMediator.getDependencyGraph().updateAllTargetDependencyLevelAfterExecution();
-//        backEndMediator.getDependencyGraph().resetTraverseDataAfterChangedInSubGraph(Target2ItsOriginalDependOnTargets,Target2ItsOriginalRequiredForTargets);
-//
+
+    }
+
+    private boolean notAllParametersSelected() {
+        boolean scratchOrInc = !fromScratchRbutton.isSelected() && !incrementalRbutton.isSelected();
+        boolean taskNotSelected = taskComboBox.getValue() == null;
+        boolean directoryNotSelected = false;
+
+        if (taskComboBox.getValue() == "Compilation Task")
+            directoryNotSelected =  compilationTaskController.getToCompilePath() == null || compilationTaskController.getOutputPath() == null;
+
+        return scratchOrInc || taskNotSelected || directoryNotSelected;
+    }
+
+    private void resetCheckBoxes(){
+        selectAll.setSelected(false);
+        selectSpecificCheckBox.setSelected(false);
+        selectWithDependency.setSelected(false);
     }
 
     @FXML
     void pauseButtonAction(ActionEvent event) {
-        curTask.setPauseStatus(true);
+        curTaskExecution.setPauseStatus(true);
+        pauseButton.setDisable(true);
+        resumeButton.setDisable(false);
     }
 
 
@@ -232,7 +293,11 @@ public class TaskScreenController {
 
     @FXML
     void resumeButtonAction(ActionEvent event) {
-        curTask.setPauseStatus(false);
+        curTaskExecution.setCurNumOfThreads(numOfThreads.getValue());
+        curTaskExecution.setPauseStatus(false);
+        pauseButton.setDisable(false);
+        stopButton.setDisable(false);
+        resumeButton.setDisable(true);
     }
 
 
@@ -246,8 +311,6 @@ public class TaskScreenController {
             simulationTaskController = fxmlLoader.getController();
             else
                 compilationTaskController = fxmlLoader.getController();
-
-
         }
 
     @FXML
@@ -257,8 +320,8 @@ public class TaskScreenController {
 
     }
     private void bindUIComponents(GPUPTask task){
-        taskProccessTA.clear();
-        task.messageProperty().addListener((observable, oldValue, newValue) -> taskProccessTA.appendText(newValue+ "\n"));
+        taskProcessTA.clear();
+        task.messageProperty().addListener((observable, oldValue, newValue) -> taskProcessTA.appendText(newValue+ "\n"));
         progressBar.progressProperty().bind(task.progressProperty());
 
 

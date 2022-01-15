@@ -21,7 +21,7 @@ public class GraphFactory {
             generatedGraph = new GraphExtractor(directory).getGeneratedGraph();
 
 
-        GraphValidator graphValidator = new GraphValidator(generatedGraph); //TODO add new validation according to schema
+        GraphValidator graphValidator = new GraphValidator(generatedGraph);
         return graphValidator.startValidation();  // not sure where to catch the exceptions
 
     }

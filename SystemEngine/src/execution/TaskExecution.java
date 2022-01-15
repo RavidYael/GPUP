@@ -16,6 +16,7 @@ import java.util.concurrent.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class TaskExecution  implements Serializable, Runnable {
@@ -25,21 +26,25 @@ public class TaskExecution  implements Serializable, Runnable {
     private Map<Target, TargetExecutionSummary> target2summary;
     private String targetsSummaryDir;
     private Long totalDuration = 0L;
-    private int maxThreads;
+    private int curNumOfThreads;
+    private ThreadPoolExecutor threadPoolExecutor;
     private Boolean pauseStatus = false;
     private Boolean donePausing = false;
     private Consumer taskInfoConsumer;
     private Boolean stopWorkSyncer = false;
+    private Long executionStart;
 
-    public void setMaxThreads(int maxPerl) {
-        maxThreads = maxPerl;
+    public void setCurNumOfThreads(int maxPerl) {
+        this.threadPoolExecutor.setCorePoolSize(maxPerl);
+        this.threadPoolExecutor.setMaximumPoolSize(maxPerl);
     }
 
-    public TaskExecution(DependencyGraph graphInExecution, int maxParallelism, GPUPTask GPUPTask, Consumer consumer) {
-        this.maxThreads = maxParallelism;
+    public TaskExecution(DependencyGraph graphInExecution, int numOfTrheads, GPUPTask GPUPTask, Consumer consumer) {
+        this.curNumOfThreads = numOfTrheads;
         this.graphInExecution = graphInExecution;
         this.GPUPTask = GPUPTask;
         this.taskInfoConsumer = consumer;
+        this.threadPoolExecutor = new ThreadPoolExecutor(curNumOfThreads,graphInExecution.getMaxParallelism(),1000, MINUTES,new LinkedBlockingQueue<Runnable>());
 
         GPUPTask.setExecutionManager(this);
 
@@ -52,6 +57,12 @@ public class TaskExecution  implements Serializable, Runnable {
         status2Targets.put(Target.TargetStatus.Done, new HashSet<>());
         updateStatus2Target();
         initializeTarget2summary();
+        graphInExecution.initializeWaitingTargets();
+
+    }
+
+    public void setGPUPTask(execution.GPUPTask GPUPTask) {
+        this.GPUPTask = GPUPTask;
     }
 
     private void createTaskWorkingDirectory() {
@@ -117,14 +128,14 @@ public class TaskExecution  implements Serializable, Runnable {
     }
 
     public void runTaskFromScratch() {
-
+        executionStart = System.currentTimeMillis();
         this.pauseStatus = false;
         this.donePausing = false;
 
-        GPUPTask.setTotalWork(Long.valueOf(graphInExecution.getAllTargets().size()));
 
-        graphInExecution.initializeWaitingTargets();
-        ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(maxThreads);
+        GPUPTask.setTotalWork(Long.valueOf(graphInExecution.getAllTargets().size()));
+        GPUPTask.startWork();
+    //    ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(maxThreads);
         Set<Target> executedTargets = new HashSet<>();
         createTaskWorkingDirectory();
         Set<String> updatedTargets;
@@ -144,10 +155,21 @@ public class TaskExecution  implements Serializable, Runnable {
             }
             if (iter.hasNext()) {
                 Target target = iter.next();
+                if (!graphInExecution.isTargetBlocked(target, executedTargets)) {
                 TargetRunner targetRunner = new TargetRunner(target, GPUPTask, graphInExecution, this);
                 executedTargets.add(target);
                 futureRes.add(threadPoolExecutor.submit(targetRunner));
-            } else {
+            }
+
+            else
+            {
+                Platform.runLater(()->taskInfoConsumer.accept("Target: " + target.getName() +"is blocked, trying next available target"));
+                continue;
+            }
+
+                }
+
+            else {
 
                 for (Future taskResult : futureRes) {
 
@@ -225,15 +247,18 @@ public class TaskExecution  implements Serializable, Runnable {
         }
 
         private void printExecutionSummary () {
-            calculateTotalDuration();
+            totalDuration = System.currentTimeMillis() - executionStart;
             Platform.runLater(() -> taskInfoConsumer.accept("Task completed\n" +
                     "Task ran for: " +
-                    String.format("%02d:%02d:%02d", totalDuration / 3600, (totalDuration % 3600) / 60, (totalDuration % 60)) + "sec\n" +
+                    totalDuration/1000.0 + " sec\n" +
                     status2Targets.get(Target.TargetStatus.Finished).stream().filter(t -> t.getTaskResult() == Target.TaskResult.Success).count() + " Targets succeeded\n" +
+                    String.join(",",status2Targets.get(Target.TargetStatus.Finished).stream().filter(t-> t.getTaskResult().equals(Target.TaskResult.Success)).map(t-> t.getName()).collect(Collectors.toSet()))+"\n"+
                     status2Targets.get(Target.TargetStatus.Finished).stream().filter(t -> t.getTaskResult() == Target.TaskResult.Failure).count() + " Targets Failed:\n" +
-                    status2Targets.get(Target.TargetStatus.Finished).stream().filter(t -> t.getTaskResult() == Target.TaskResult.Failure).collect(Collectors.toSet()).toString() + "\n" +
+                    String.join(",",status2Targets.get(Target.TargetStatus.Finished).stream().filter(t -> t.getTaskResult() == Target.TaskResult.Failure).map(t->t.getName()).collect(Collectors.toSet())) + "\n" +
                     status2Targets.get(Target.TargetStatus.Finished).stream().filter(t -> t.getTaskResult() == Target.TaskResult.Warning).count() + " Targets succeeded with warning\n" +
-                    status2Targets.get(Target.TargetStatus.Skipped).size() + " Targets skipped"));
+                    String.join(",",status2Targets.get(Target.TargetStatus.Finished).stream().filter(t-> t.getTaskResult().equals(Target.TaskResult.Warning)).map(t->t.getName()).collect(Collectors.toSet()))+"\n"+
+                    status2Targets.get(Target.TargetStatus.Skipped).size() + " Targets skipped" + "\n"+
+                    String.join(",",status2Targets.get(Target.TargetStatus.Skipped).stream().map(t-> t.getName()).collect(Collectors.toSet()))));
 
         }
 
