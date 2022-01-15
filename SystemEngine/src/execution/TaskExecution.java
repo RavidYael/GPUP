@@ -61,6 +61,10 @@ public class TaskExecution  implements Serializable, Runnable {
 
     }
 
+    public ThreadPoolExecutor getThreadPoolExecutor() {
+        return threadPoolExecutor;
+    }
+
     public void setGPUPTask(execution.GPUPTask GPUPTask) {
         this.GPUPTask = GPUPTask;
     }
@@ -163,7 +167,7 @@ public class TaskExecution  implements Serializable, Runnable {
 
             else
             {
-                Platform.runLater(()->taskInfoConsumer.accept("Target: " + target.getName() +"is blocked, trying next available target"));
+               Platform.runLater(()->taskInfoConsumer.accept("Target: " + target.getName() +"is blocked, trying next available target"));
                 continue;
             }
 

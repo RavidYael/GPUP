@@ -130,6 +130,8 @@ public class TaskScreenController {
     private TableManager tableManager;
     private TextAreaConsumer textAreaConsumer;
     private TaskExecution curTaskExecution;
+    private GPUPTask task;
+    private boolean fromScratch = true;
 
     public void setBackEndMediator(BackEndMediator backEndMediator) {
         this.backEndMediator = backEndMediator;
@@ -210,6 +212,11 @@ public class TaskScreenController {
 
     @FXML
     void runButtonAction(ActionEvent event) {
+        if (incrementalRbutton.isSelected())
+            fromScratch = false;
+        else
+            fromScratch = true;
+
         String message;
         Alert alert = new Alert(Alert.AlertType.ERROR);
             if (notAllParametersSelected()){
@@ -223,27 +230,28 @@ public class TaskScreenController {
                 alert.setContentText(message);
                 alert.showAndWait();
             }
+
+
             if (fromScratchRbutton.isSelected()) {
                 backEndMediator.restoreGraphToDefault();
                 refreshTable();
             }
 
         DependencyGraph graphInExecution = backEndMediator.getSubGraphFromTable(tableManager.getSelectedTargets());
-        GPUPTask task = null;
 
+    if (fromScratch) {
         if (taskComboBox.getValue() == "Simulation Task") {
-            task = new SimulationGPUPTask(simulationTaskController.getMaxSecToRun()*1000,
+            task = new SimulationGPUPTask(simulationTaskController.getMaxSecToRun() * 1000,
                     simulationTaskController.isTaskTimeRandom(),
                     simulationTaskController.getChancesOfSuccess(),
                     simulationTaskController.getChancesOfWarning());
-        }
-        else if (taskComboBox.getValue().equals("Compilation Task")) {
+        } else if (taskComboBox.getValue().equals("Compilation Task")) {
             task = new CompilationGPUPTask(compilationTaskController.getToCompilePath(),
                     compilationTaskController.getOutputPath(),
                     compilationTaskController.getProcessTime());
 
-
         }
+    }
 
         bindUIComponents(task);
         activatePauseStop();
@@ -255,10 +263,9 @@ public class TaskScreenController {
         else if (incrementalRbutton.isSelected()){
             curTaskExecution.setCurNumOfThreads(numOfThreads.getValue());
             curTaskExecution.setGPUPTask(task);
+            curTaskExecution.getThreadPoolExecutor().getQueue().clear();
             new Thread(()->curTaskExecution.runTaskIncrementally()).start();
         }
-
-
     }
 
     private boolean notAllParametersSelected() {
@@ -323,8 +330,6 @@ public class TaskScreenController {
         taskProcessTA.clear();
         task.messageProperty().addListener((observable, oldValue, newValue) -> taskProcessTA.appendText(newValue+ "\n"));
         progressBar.progressProperty().bind(task.progressProperty());
-
-
     }
 
     private void clearDirectory(File directoryToBeDeleted) {
