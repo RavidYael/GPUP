@@ -207,7 +207,7 @@ public class DependencyGraph implements Serializable {
         }
 
         public void updateEffectOfTargetsExecution(Set<Target> executedTargets){
-            System.out.println("i am in updateEffectedTargets");
+           // System.out.println("i am in updateEffectedTargets");
         Iterator<Target> curTargetIter = executedTargets.iterator();
             while(curTargetIter.hasNext()){
                 Target curTarget = curTargetIter.next();

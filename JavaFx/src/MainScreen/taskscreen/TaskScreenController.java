@@ -33,7 +33,7 @@ public class TaskScreenController {
     private TableColumn<TargetInTable, CheckBox> checkedCulumn;
 
     @FXML
-    private TableColumn<TargetInTable,String> targetNameColumn;
+    private TableColumn<TargetInTable, String> targetNameColumn;
 
     @FXML
     private TableColumn<TargetInTable, Target.DependencyLevel> locationColumn;
@@ -138,7 +138,7 @@ public class TaskScreenController {
     }
 
     @FXML
-    public void initialize(){
+    public void initialize() {
         taskComboBox.setPromptText("Task Type");
         taskComboBox.setItems(FXCollections.observableArrayList("Simulation Task", "Compilation Task"));
         ToggleGroup incrOrScratch = new ToggleGroup();
@@ -163,45 +163,46 @@ public class TaskScreenController {
         pauseButton.setDisable(true);
     }
 
-    private void activatePauseStop(){
+    private void activatePauseStop() {
         pauseButton.setDisable(false);
         stopButton.setDisable(false);
     }
 
-    public void myInitialize(){
+    public void myInitialize() {
 
-        numOfThreads.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1,backEndMediator.getParallelism()));
+        numOfThreads.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, backEndMediator.getParallelism()));
         checkedCulumn.setCellValueFactory(new PropertyValueFactory<TargetInTable, CheckBox>("checked"));
         targetNameColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable, String>("name"));
-        locationColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable,Target.DependencyLevel>("location"));
+        locationColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable, Target.DependencyLevel>("location"));
         //executionStatusColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable, Target.TargetStatus>("targetStatus"));
-       // ProccessingResultColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable,Target.TaskResult>("taskResult"));
+        // ProccessingResultColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable,Target.TaskResult>("taskResult"));
 
-        ProccessingResultColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable,ObjectProperty<Target.TaskResult>>("taskResult"));
-        executionStatusColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable,ObjectProperty<Target.TargetStatus>>("targetStatus"));
+        ProccessingResultColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable, ObjectProperty<Target.TaskResult>>("taskResult"));
+        executionStatusColumn.setCellValueFactory(new PropertyValueFactory<TargetInTable, ObjectProperty<Target.TargetStatus>>("targetStatus"));
         initTable();
 
     }
 
-    public void initializeTaskExecution(){
+    public void initializeTaskExecution() {
         curTaskExecution = null;
     }
 
     private void initTable() {
-        ObservableList<TargetInTable>  targetInTables = backEndMediator.getAllTargetsForTable();
+        ObservableList<TargetInTable> targetInTables = backEndMediator.getAllTargetsForTable();
         targetsTable.setItems(targetInTables);
-        tableManager = new TableManager(targetInTables,selectWithDependency,selectAll,dependencyForSelection,backEndMediator);
+        tableManager = new TableManager(targetInTables, selectWithDependency, selectAll, dependencyForSelection, backEndMediator);
     }
-    private void refreshTable(){
-        ObservableList<TargetInTable>  currentTable = tableManager.getTargetsTable();
+
+    private void refreshTable() {
+        ObservableList<TargetInTable> currentTable = tableManager.getTargetsTable();
         ObservableList<TargetInTable> refreshedTargetsInTable = FXCollections.observableArrayList();
         ArrayList<CheckBox> checkBoxes = new ArrayList<>();
-        for (TargetInTable curTargetInTable : currentTable){
+        for (TargetInTable curTargetInTable : currentTable) {
             checkBoxes.add(curTargetInTable.getChecked());
         }
         refreshedTargetsInTable = backEndMediator.getAllTargetsForTable();
         Iterator<CheckBox> iter = checkBoxes.iterator();
-        for (TargetInTable curTargetInTable : refreshedTargetsInTable){
+        for (TargetInTable curTargetInTable : refreshedTargetsInTable) {
             curTargetInTable.setChecked(iter.next());
         }
         targetsTable.setItems(refreshedTargetsInTable);
@@ -219,42 +220,46 @@ public class TaskScreenController {
 
         String message;
         Alert alert = new Alert(Alert.AlertType.ERROR);
-            if (notAllParametersSelected()){
-                message = "not all required parameters have been selected!";
-                alert.setContentText(message);
-                alert.showAndWait();
-                return;
-            }
-            if (tableManager.getSelectedTargets().isEmpty()){
-                message = "no targets selected";
-                alert.setContentText(message);
-                alert.showAndWait();
-            }
+        if (notAllParametersSelected()) {
+            message = "not all required parameters have been selected!";
+            alert.setContentText(message);
+            alert.showAndWait();
+            return;
+        }
+        if (tableManager.getSelectedTargets().isEmpty()) {
+            message = "no targets selected";
+            alert.setContentText(message);
+            alert.showAndWait();
+        }
 
 
-            if (fromScratchRbutton.isSelected()) {
-                backEndMediator.restoreGraphToDefault();
-                refreshTable();
-            }
+        if (fromScratchRbutton.isSelected()) {
+            backEndMediator.restoreGraphToDefault();
+            refreshTable();
+        }
 
         DependencyGraph graphInExecution = backEndMediator.getSubGraphFromTable(tableManager.getSelectedTargets());
 
-    if (fromScratch) {
+
         if (taskComboBox.getValue() == "Simulation Task") {
-            task = new SimulationGPUPTask(simulationTaskController.getMaxSecToRun() * 1000,
-                    simulationTaskController.isTaskTimeRandom(),
-                    simulationTaskController.getChancesOfSuccess(),
-                    simulationTaskController.getChancesOfWarning());
-        } else if (taskComboBox.getValue().equals("Compilation Task")) {
+                task = new SimulationGPUPTask(simulationTaskController.getMaxSecToRun() * 1000,
+                        simulationTaskController.isTaskTimeRandom(),
+                        simulationTaskController.getChancesOfSuccess(),
+                        simulationTaskController.getChancesOfWarning());
+
+        }
+        else if (taskComboBox.getValue().equals("Compilation Task")) {
             task = new CompilationGPUPTask(compilationTaskController.getToCompilePath(),
                     compilationTaskController.getOutputPath(),
                     compilationTaskController.getProcessTime());
 
         }
-    }
 
+
+        task.setExecutionManager(curTaskExecution);
         bindUIComponents(task);
         activatePauseStop();
+
 
         if (fromScratchRbutton.isSelected() || curTaskExecution == null) {
             curTaskExecution = new TaskExecution(graphInExecution, numOfThreads.getValue(), task, textAreaConsumer);
