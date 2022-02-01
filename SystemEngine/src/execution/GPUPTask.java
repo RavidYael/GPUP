@@ -15,7 +15,6 @@ public abstract class GPUPTask extends Task<Void> {
     public abstract void setTotalWork(Long totalWork);
 
 
-
     @Override
     public abstract Void call() throws Exception ;
 

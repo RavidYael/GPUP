@@ -108,7 +108,7 @@ public class TaskExecution  implements Serializable, Runnable {
     }
 
     private void updateStatus2Target() {
-       // System.out.println("i am updating status2Targets");
+        System.out.println("i am updating status2Targets");
         clearStatus2Targets();
         for (Target target : graphInExecution.getAllTargets().values()) {
             status2Targets.get(target.getTargetStatus()).add(target);
@@ -201,12 +201,16 @@ public class TaskExecution  implements Serializable, Runnable {
                 }
             }
         }
-
+//
+//            if (pauseStatus && !donePausing) {
+//                graphInExecution.updateEffectOfTargetsExecution(executedTargets);
+//                updateStatus2Target();
+//            }
 
         GPUPTask.finishWork();
         updateTarget2summary();
         printExecutionSummary();
-     //   printTargetExecutionSummary();
+        printTargetExecutionSummary();
     }
 
         private void printTargetExecutionSummary () {

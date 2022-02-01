@@ -166,7 +166,7 @@ public class GraphInfoScreenController {
 
 
 
-      //  System.out.println("tabel created");
+        System.out.println("tabel created");
         totalTargetsCounter.setText(String.valueOf(backEndMediator.getTotalNumOfTargets()));
         rootsCounter.setText(String.valueOf(backEndMediator.getNumOfTargetsByDependencyLevel(Target.DependencyLevel.Root)));
         independentCounter.setText(String.valueOf(backEndMediator.getNumOfTargetsByDependencyLevel(Target.DependencyLevel.Independed)));
