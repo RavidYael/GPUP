@@ -1,4 +1,3 @@
-import com.google.gson.Gson;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -15,7 +14,7 @@ public class OurFirstServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.getWriter().println("hello mothafuckaaaaaaa");
         String check = "wasaaaapp";
-        Gson gson = new Gson();
+
 
 
 
