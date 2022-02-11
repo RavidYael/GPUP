@@ -1,3 +1,5 @@
+//the newUserManager with Class
+
 package UserManagement;
 
 import java.util.Collections;
