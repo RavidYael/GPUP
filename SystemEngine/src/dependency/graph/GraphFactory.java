@@ -1,6 +1,8 @@
 package dependency.graph;
 
 import dependency.target.Target;
+
+import jaxb.generated.GPUPConfiguration;
 import jaxb.generated.GPUPDescriptor;
 import jaxb.generated.GPUPTarget;
 import jaxb.generated.GPUPTargetDependencies;
@@ -17,12 +19,12 @@ public class GraphFactory {
 
 
 
-    private static boolean loadAndValidateGraphFromFile(String directory) throws Exception {
+    public static boolean loadAndValidateGraphFromFile(String directory) throws Exception {
             generatedGraph = new GraphExtractor(directory).getGeneratedGraph();
 
 
         GraphValidator graphValidator = new GraphValidator(generatedGraph);
-        return graphValidator.startValidation();  // not sure where to catch the exceptions
+        return graphValidator.startValidation();
 
     }
 
@@ -44,9 +46,9 @@ public class GraphFactory {
            return null;
 
         dependencyGraph = new DependencyGraph();
-        dependencyGraph.setWorkingDir(generatedGraph.getGPUPConfiguration().getGPUPWorkingDirectory());
-        dependencyGraph.setMaxParallelism(generatedGraph.getGPUPConfiguration().getGPUPMaxParallelism());
+
         Target toAdd;
+
         for(GPUPTarget curTarget : generatedGraph.getGPUPTargets().getGPUPTarget()) // adding targets to graph
         {
             toAdd = new Target(curTarget.getName(),curTarget.getGPUPUserData());
@@ -57,14 +59,28 @@ public class GraphFactory {
                         toAdd.addToRequiredFor(gpupDependency.getValue());
                     else
                         toAdd.addToDependsOn(gpupDependency.getValue());
-
                 }
             }
             dependencyGraph.addTargetToGraph(toAdd.getName(),toAdd);
         }
+
+        GPUPConfiguration gpupConfiguration = generatedGraph.getGPUPConfiguration();
+
+        for (GPUPConfiguration.GPUPPricing.GPUPTask task : gpupConfiguration.getGPUPPricing().getGPUPTask()) {
+            DependencyGraph.TaskType taskType;
+            if(task.getName().equalsIgnoreCase("simulation"))
+                taskType = DependencyGraph.TaskType.SIMULATION;
+            else
+                taskType = DependencyGraph.TaskType.COMPILATION;
+
+            dependencyGraph.addTaskPricingToMap(taskType,task.getPricePerTarget());
+        }
+
+        dependencyGraph.setGraphName(gpupConfiguration.getGPUPGraphName());
         dependencyGraph.fixTargetsDependencies();
-       dependencyGraph.updateAllTargetDependencyLevel();
-       generateSerialSets();
+        dependencyGraph.updateAllTargetDependencyLevel();
+        generateSerialSets();
+
         return dependencyGraph;
 
     }

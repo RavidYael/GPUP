@@ -11,11 +11,39 @@ import java.util.function.Consumer;
 
 public class DependencyGraph implements Serializable {
 
+    static public enum TaskType {SIMULATION, COMPILATION};
+
+    private String graphName;
+    private String uploaderName;
     private Map<String, Target> allTargets;
     private Map<Target.DependencyLevel, Set<Target>> targetsByDependencyLevel;
     private String workingDir;
     private Map<String, Set<String>> name2SerialSet;
     private int maxParallelism;
+
+    public void setUploaderName(String uploaderName) {
+        this.uploaderName = uploaderName;
+    }
+
+    public Map<TaskType, Integer> getTaskPricing() {
+        return taskPricing;
+    }
+
+    private Map<TaskType, Integer> taskPricing;
+
+    public void setTaskPricing(Map<TaskType,Integer> taskPricing) {
+        this.taskPricing = taskPricing;
+    }
+
+    public String getUploaderName() {
+    return uploaderName;
+    }
+
+
+    public void setGraphName(String graphName) {
+        this.graphName = graphName;
+    }
+
 
 
     public int getMaxParallelism() {
@@ -34,8 +62,13 @@ public class DependencyGraph implements Serializable {
         targetsByDependencyLevel.put(Target.DependencyLevel.Root, new HashSet<>());
         targetsByDependencyLevel.put(Target.DependencyLevel.Independed, new HashSet<>());
         name2SerialSet = new HashMap<>();
+        taskPricing = new HashMap<>();
 
 
+    }
+
+    public void addTaskPricingToMap(TaskType taskType, Integer taskPrice) {
+        taskPricing.put(taskType, taskPrice);
     }
 
     public String getWorkingDir() {
@@ -409,6 +442,10 @@ public class DependencyGraph implements Serializable {
     public int getNumOfSerialSets(Target target){
         int count = 0;
         return (int) name2SerialSet.values().stream().filter(s-> s.contains(target.getName())).count();
+    }
+
+    public String getGraphName() {
+        return graphName;
     }
 }
 

@@ -20,7 +20,7 @@ import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class TaskExecution  implements Serializable, Runnable {
-    private GPUPTask GPUPTask;
+    private GPUPTask GPUPTask; //TODO HAS TO BE UPDATE TO THE NEW DETAILS
     private DependencyGraph graphInExecution;
     private Map<Target.TargetStatus, Set<Target>> status2Targets;
     private Map<Target, TargetExecutionSummary> target2summary;

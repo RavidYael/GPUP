@@ -1,6 +1,6 @@
 package UserManagement.UsersManagementServer.servlets;
 
-import UserManagement.UsersManagementServer.utils.ServletUtils;
+import utils.ServletUtils;
 import UserManagement.userManager;
 
 import java.io.IOException;
@@ -8,7 +8,6 @@ import java.io.PrintWriter;
 import java.util.Set;
 
 import com.google.gson.Gson;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,11 +26,13 @@ public class UsersListServlet extends HttpServlet {
 
             userManager userManager = ServletUtils.getUserManager(getServletContext());
 
-            Set<String> usersList = userManager.getUsers();
+            //IS IT WORKS WITH THE <GENERICS>?; SEEMS TO BE WORK
+            Set<UserManagement.userManager.User> usersList = userManager.getUsers();
 
             String json = gson.toJson(usersList);
 
             out.println(json);
+
             out.flush();
 
         }

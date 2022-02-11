@@ -11,7 +11,7 @@ public class GraphValidator {
 
     private final GPUPDescriptor investigatedGraph;
     private boolean valid = true;
-    private Map<String,GPUPTarget> name2Target;
+    private Map<String, GPUPTarget> name2Target;
 
 
     public GraphValidator(GPUPDescriptor investigatedGraph) {

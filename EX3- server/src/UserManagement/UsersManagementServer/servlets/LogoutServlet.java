@@ -1,17 +1,18 @@
 package UserManagement.UsersManagementServer.servlets;
 
-import UserManagement.UsersManagementServer.utils.ServletUtils;
-import UserManagement.UsersManagementServer.utils.SessionUtils;
+import utils.ServletUtils;
+import utils.SessionUtils;
 
 import java.io.IOException;
 
 import UserManagement.userManager;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+
+//TODO TO BE HONEST I HAVE NO IDEA IF THAT NECESSARY
 @WebServlet(name = "LogoutServlet", urlPatterns = {"/logout"})
 public class LogoutServlet extends HttpServlet {
 

@@ -1,9 +1,9 @@
 package UserManagement.UsersManagementServer.servlets;
 
 import UserManagement.UsersManagementServer.constants.Constants;
-import UserManagement.UsersManagementServer.utils.ServletUtils;
+import utils.ServletUtils;
 import UserManagement.userManager;
-import UserManagement.UsersManagementServer.utils.SessionUtils;
+import utils.SessionUtils;
 
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -11,10 +11,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import static UserManagement.UsersManagementServer.constants.Constants.DEGREE;
 import static UserManagement.UsersManagementServer.constants.Constants.USERNAME;
 
 @WebServlet(name = "Login Servlet", urlPatterns = "/login")
-public class LightweightLoginServlet extends HttpServlet {
+public class LoginServlet extends HttpServlet {
+
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -26,6 +28,7 @@ public class LightweightLoginServlet extends HttpServlet {
         if (usernameFromSession == null) { //user is not logged in yet
 
             String usernameFromParameter = request.getParameter(USERNAME);
+            String userDegree = request.getParameter(DEGREE);
             if (usernameFromParameter == null || usernameFromParameter.isEmpty()) {
                 //no username in session and no username in parameter - not standard situation. it's a conflict
 
@@ -56,8 +59,19 @@ public class LightweightLoginServlet extends HttpServlet {
                         response.getOutputStream().print(errorMessage);
                     }
                     else {
-                        //add the new user to the users list
-                        userManager.addUser(usernameFromParameter);
+                        //add the new user to the users list according to his degree
+                        if(userDegree.equals("admin"))
+                        userManager.addUser(usernameFromParameter,"admin");
+                        else if(userDegree.equals("worker")){
+                            userManager.addUser(usernameFromParameter,"worker");
+                        }
+                        else{
+                            String errorMessage = "user-degree must be 'admin' or 'worker'";
+
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.getOutputStream().print(errorMessage);
+                            return;
+                        }
                         //set the username in a session so it will be available on each request
                         //the true parameter means that if a session object does not exists yet
                         //create a new one
@@ -65,13 +79,13 @@ public class LightweightLoginServlet extends HttpServlet {
 
                         //redirect the request to the chat room - in order to actually change the URL
                         System.out.println("On login, request URI is: " + request.getRequestURI());
-                        response.setStatus(HttpServletResponse.SC_OK);
-                        response.getWriter().println("hola muchachus");
+                        response.setStatus(HttpServletResponse.SC_ACCEPTED);
+                        response.getWriter().println("add successfully");
                     }
                 }
             }
         } else {
-            //user is already logged in
+            response.getWriter().println("you are trying to login from the same client twice");
             response.setStatus(HttpServletResponse.SC_OK);
         }
     }

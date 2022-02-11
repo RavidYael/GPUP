@@ -1,13 +1,13 @@
 package validation;
 
 import jaxb.generated.GPUPDescriptor;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.nio.file.Path;
 
 public class GraphExtractor {
 

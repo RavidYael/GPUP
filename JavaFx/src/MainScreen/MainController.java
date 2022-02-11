@@ -65,9 +65,6 @@ public class MainController {
         graphInfoScreenController = fxmlLoader1.getController();
         graphInfoScreenController.setBackEndMediator(backEndMediator);
 
-
-
-
     }
 
     @FXML

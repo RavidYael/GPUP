@@ -14,8 +14,6 @@ import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/// FirstCOnnectionWork
-
 
 public class BackEndMediator {
     private DependencyGraph dependencyGraph;

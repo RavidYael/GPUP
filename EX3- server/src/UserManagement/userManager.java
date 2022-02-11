@@ -11,25 +11,47 @@ of the user of this class to handle the synchronization of isUserExists with oth
  */
 public class userManager {
 
-    private final Set<String> usersSet;
+    public class User{
+
+        private String name;
+        private String degree;
+
+        public User(String Name,String Degree){
+            this.name = Name;
+            this.degree = Degree;
+        }
+    }
+
+    private final Set<User> usersSet;
 
     public userManager() {
         usersSet = new HashSet<>();
     }
 
-    public synchronized void addUser(String username) {
-        usersSet.add(username);
+    public synchronized void addUser(String username,String Degree) {
+        User newUser = new User(username,Degree);
+        usersSet.add(newUser);
     }
 
+    //IS IT WORKS? may be cause the bug of deleting while iterating
     public synchronized void removeUser(String username) {
-        usersSet.remove(username);
+        for (User user :usersSet) {
+            if (user.name==username)
+                usersSet.remove(user);
+            return;
+        }
     }
 
-    public synchronized Set<String> getUsers() {
+    public synchronized Set<User> getUsers() {
         return Collections.unmodifiableSet(usersSet);
     }
 
+
     public boolean isUserExists(String username) {
-        return usersSet.contains(username);
+        for (User user :usersSet) {
+            if (user.name==username)
+                return true;
+        }
+        return false;
     }
 }

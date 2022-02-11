@@ -14,10 +14,10 @@ public class CompilationGPUPTask extends GPUPTask {
     private File toCompilePath;
     private File outPutPath;
     private File needeResourcesPath;
-    private Target curTarget;
     private Long workDone =0L;
     private Long totalWork;
     private Integer processingTime;
+    private Target curTarget;
 
     public CompilationGPUPTask(File toCompilePath, File outPutPath, Integer processTime) {
         this.toCompilePath = toCompilePath;

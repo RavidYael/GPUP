@@ -1,4 +1,4 @@
-package UserManagement.UsersManagementServer.utils;
+package utils;
 
 import UserManagement.UsersManagementServer.constants.Constants;
 
