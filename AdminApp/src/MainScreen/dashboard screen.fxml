@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+
+<BorderPane xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="MainScreen.adminDashboardScreen.AdminDashboardScreenController">
+   <center>
+      <ScrollPane fitToHeight="true" fitToWidth="true" BorderPane.alignment="CENTER">
+         <content>
+            <TabPane prefHeight="798.0" prefWidth="848.0" tabClosingPolicy="UNAVAILABLE">
+              <tabs>
+                <Tab text="Graphs in proccess">
+                  <content>
+                        <TableView fx:id="graphsTable" prefHeight="200.0" prefWidth="200.0">
+                          <columns>
+                            <TableColumn fx:id="graphNameColumn" prefWidth="75.0" text="Name" />
+                            <TableColumn fx:id="graphUploadedByColumn" prefWidth="98.0" text="Uploaded by" />
+                              <TableColumn fx:id="totalTargetsColumn" prefWidth="106.0" text="Total targets" />
+                              <TableColumn fx:id="rootsColumn" prefWidth="66.0" text="Roots" />
+                              <TableColumn fx:id="leafsColumn" prefWidth="65.0" text="Leafs" />
+                              <TableColumn fx:id="middlesColumn" prefWidth="71.0" text="Middles" />
+                              <TableColumn fx:id="independentColumn" prefWidth="118.0" text="Independent" />
+                              <TableColumn fx:id="simulationPriceColumn" prefWidth="118.0" text="Simulation Price" />
+                              <TableColumn fx:id="compilationPriceColumn" prefWidth="118.0" text="Compilation Price" />
+                          </columns>
+                        </TableView>
+                  </content>
+                </Tab>
+                <Tab text="Users">
+                  <content>
+                        <TableView fx:id="usersTable" prefHeight="200.0" prefWidth="200.0">
+                          <columns>
+                            <TableColumn fx:id="userNameColumn" prefWidth="75.0" text="Name" />
+                              <TableColumn fx:id="userRoleColumn" prefWidth="75.0" text="Role" />
+                          </columns>
+                        </TableView>
+                  </content>
+                </Tab>
+                  <Tab text="Tasks in proccess">
+                     <content>
+                        <TableView fx:id="tasksTable" prefHeight="200.0" prefWidth="200.0">
+                           <columns>
+                              <TableColumn fx:id="taskNameColumn" prefWidth="75.0" text="Name" />
+                              <TableColumn fx:id="taskUploadedByColumn" prefWidth="108.0" text="Uploaded by" />
+                              <TableColumn fx:id="taskGraphNameColumn" prefWidth="99.0" text="Graph name" />
+                              <TableColumn fx:id="taskTotalTargetsColumn" prefWidth="103.0" text="Total targets" />
+                              <TableColumn fx:id="taskRootsColumn" prefWidth="57.0" text="Roots" />
+                              <TableColumn fx:id="taskMiddlesColumn" prefWidth="74.0" text="Middles" />
+                              <TableColumn fx:id="taskLeafsColumn" prefWidth="54.0" text="Leafs" />
+                              <TableColumn fx:id="taskIndependentColumn" prefWidth="104.0" text="Independents" />
+                              <TableColumn fx:id="taskTotalPaymentColumn" prefWidth="121.0" text="Total payment" />
+                              <TableColumn fx:id="workesrColumn" prefWidth="77.0" text="workers" />
+                           </columns>
+                        </TableView>
+                     </content>
+                  </Tab>
+              </tabs>
+            </TabPane>
+         </content>
+      </ScrollPane>
+   </center>
+</BorderPane>
