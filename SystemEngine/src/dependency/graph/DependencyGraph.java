@@ -447,6 +447,19 @@ public class DependencyGraph implements Serializable {
     public String getGraphName() {
         return graphName;
     }
+
+    public DependencyGraph getSubGraphFromTargets(Set<String> selectedTargets){
+        DependencyGraph subGraph = new DependencyGraph();
+
+        for (String curTargetName : selectedTargets){
+            Target curTarget = getTargetByName(curTargetName);
+            subGraph.addTargetToGraph(curTargetName,curTarget);
+        }
+        subGraph.filterTargetDependendies();
+        subGraph.updateAllTargetDependencyLevel();
+        return subGraph;
+
+    }
 }
 
 

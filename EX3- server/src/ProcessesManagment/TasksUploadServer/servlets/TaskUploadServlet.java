@@ -1,17 +1,17 @@
 package ProcessesManagment.TasksUploadServer.servlets;
 
 
-import DataManagment.GraphsManager;
+import GraphManagment.GraphsManager;
 import ProcessesManagment.ProcessesManager;
+import UserManagement.UsersManagementServer.constants.Constants;
 import com.google.gson.Gson;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import utils.GraphsDataDTOs.GraphInfoDTO;
 import utils.ServletUtils;
-import utils.ProccecesDTOs.CompilationTaskDTO;
-import utils.ProccecesDTOs.SimulationTaskDTO;
+import DTOs.CompilationTaskDTO;
+import DTOs.SimulationTaskDTO;
 
 import java.io.IOException;
 
@@ -28,9 +28,11 @@ public class TaskUploadServlet extends HttpServlet {
 
         ProcessesManager missionsManager = ServletUtils.getMissionsManager(getServletContext());
 
-        if(req.getHeader("simulation") != null) //Uploaded simulation task
+        if(req.getHeader("taskType").equals("simulation")) //Uploaded simulation task
         {
             SimulationTaskDTO newTaskInfo = gson.fromJson(req.getReader(), SimulationTaskDTO.class);
+            newTaskInfo.setTaskCreator((String)req.getSession(false).getAttribute(Constants.USERNAME));
+            //TODO adding here the name of the task uploader? will be easy becuase i have his session
             if(!missionsManager.isMissionExists(newTaskInfo.getTaskName())) //No task with the same name was found
             {
                 missionsManager.addSimulationTask(newTaskInfo);
@@ -46,9 +48,11 @@ public class TaskUploadServlet extends HttpServlet {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             }
         }
-        else if(req.getHeader("compilation") != null) //Uploaded compilation task
+        else if(req.getHeader("taskType").equals("compilation")) //Uploaded compilation task
         {
             CompilationTaskDTO newTaskInfo = gson.fromJson(req.getReader(), CompilationTaskDTO.class);
+            newTaskInfo.setTaskCreator((String)req.getSession(false).getAttribute(Constants.USERNAME));
+
             if(!missionsManager.isMissionExists(newTaskInfo.getTaskName())) //No task with the same name was found
             {
                 missionsManager.addCompilationTask(newTaskInfo);

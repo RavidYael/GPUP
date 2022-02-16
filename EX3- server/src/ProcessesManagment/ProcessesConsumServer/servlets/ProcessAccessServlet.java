@@ -7,14 +7,14 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import utils.ProccecesDTOs.MissionInfoDTO;
+import DTOs.MissionInfoDTO;
 import utils.ServletUtils;
-import utils.ProccecesDTOs.CompilationTaskDTO;
-import utils.ProccecesDTOs.SimulationTaskDTO;
+import DTOs.CompilationTaskDTO;
+import DTOs.SimulationTaskDTO;
 
 import java.io.IOException;
 
-@WebServlet("/process-data")
+@WebServlet("/task-data")
 public class ProcessAccessServlet extends HttpServlet {
 
     private Gson gson = new Gson();

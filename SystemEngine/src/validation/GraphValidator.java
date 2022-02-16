@@ -25,24 +25,21 @@ public class GraphValidator {
     }
 
     public boolean startValidation() throws Exception {
-        // conduct all test in order
 
 
-           // isAllTargetsExist();
+        isAllTargetsExist();
 
-
-        if (valid) {
+        if (valid)
             isTargetNameUnique();
-        }
-
 
         if (valid)
         {
             containsDependencyConflict();
         }
-        if (valid){
-            isTargetInSerialSetExist();
-        }
+
+//        if (valid){
+//            isTargetInSerialSetExist();
+//        }
 
         return valid;
 

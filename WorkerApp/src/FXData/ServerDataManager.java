@@ -1,0 +1,70 @@
+package FXData;
+
+import DTOs.GraphInfoDTO;
+import DTOs.MissionInfoDTO;
+import DTOs.UserDTO;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import dependency.graph.DependencyGraph;
+import dependency.graph.GraphFactory;
+import okhttp3.*;
+
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.HashSet;
+import java.util.Set;
+
+import static FXData.Constants.BASE_URL;
+
+public class ServerDataManager {
+
+    private OkHttpClient client;
+
+    public void setClient(OkHttpClient client) {
+        this.client = client;
+    }
+
+    public Set<UserDTO> getUsersWithRoles(){
+        Set<UserDTO> users = null;
+        Request userListRequest = new Request.Builder()
+                .url(BASE_URL+ "/userList")
+                .get()
+                .build();
+        Response userListResponse;
+        Call call = client.newCall(userListRequest);
+        try {
+             userListResponse = call.execute();
+             Gson gson = new Gson();
+             Type collectionType = new TypeToken<Set<UserDTO>>(){}.getType();
+             users = gson.fromJson(userListResponse.body().string(),collectionType);
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+    return users;
+    }
+
+    public Set<MissionInfoDTO> getAllMissionsDTO() {
+        Set<MissionInfoDTO> missionDTOSet = new HashSet<>();
+        Request request = new Request.Builder()
+                .url(BASE_URL +"/tasksList")
+                .build();
+
+        try {
+            Response response = client.newCall(request).execute();
+            Gson missionGson = new Gson();
+            Type collectionType = new TypeToken<Set<MissionInfoDTO>>(){}.getType();
+            missionDTOSet = missionGson.fromJson(response.body().string(),collectionType);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return missionDTOSet;
+    }
+
+
+}

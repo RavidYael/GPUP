@@ -3,7 +3,7 @@ package utils;
 import dependency.graph.DependencyGraph;
 import dependency.target.Target;
 import execution.TargetExecutionSummary;
-import utils.ProccecesDTOs.MissionInfoDTO;
+import DTOs.MissionInfoDTO;
 
 import java.util.*;
 
@@ -16,10 +16,11 @@ public class GraphInExecution {
     private String targetsSummaryDir;
     private Long totalDuration = 0L;
 
-    public GraphInExecution(MissionInfoDTO missionPreferences, DependencyGraph graphTheMissionDefinedUpon) {
+    public GraphInExecution(String missionName,Set<String> targetsToExecute, DependencyGraph graphTheMissionDefinedUpon) {
 
-        this.graphInExecution = createSubGraphForMission(missionPreferences,graphTheMissionDefinedUpon);
-        missionName = missionPreferences.getMissionName();
+      //  this.graphInExecution = createSubGraphForMission(missionPreferences,graphTheMissionDefinedUpon);
+        this.graphInExecution = graphTheMissionDefinedUpon.getSubGraphFromTargets(targetsToExecute);
+        this.missionName = missionName;
 
         status2Targets = new HashMap<>();
         status2Targets.put(Target.TargetStatus.Frozen, new HashSet<>());
@@ -41,26 +42,6 @@ public class GraphInExecution {
 
     //TODO IM ASSUMING THAT A MISSION DEFINED UPON ONE GRAPH ONLY
 
-    public DependencyGraph createSubGraphForMission(MissionInfoDTO missionPreferences, DependencyGraph graphTheMissionDefinedUpon){
-
-        DependencyGraph subGraph = new DependencyGraph();
-
-        for (String targetName : missionPreferences.getTargetsToExecute()){
-
-            Target curTarget = graphTheMissionDefinedUpon.getTargetByName(targetName);
-
-            subGraph.addTargetToGraph(targetName , curTarget);
-
-        }
-
-        subGraph.filterTargetDependendies();
-        subGraph.updateAllTargetDependencyLevel();
-
-        // TODO IS IT STILL RELEVANT?
-        //subGraph.setName2SerialSet(dependencyGraph.getName2SerialSet()); // not logically true
-
-        return subGraph;
-    }
 
 
     private void initializeTarget2summary() {

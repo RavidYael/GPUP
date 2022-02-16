@@ -1,6 +1,6 @@
 package utils;
 
-import DataManagment.GraphsManager;
+import GraphManagment.GraphsManager;
 import ProcessesManagment.ProcessesManager;
 import UserManagement.userManager;
 
@@ -11,9 +11,9 @@ import static UserManagement.UsersManagementServer.constants.Constants.INT_PARAM
 
 public class ServletUtils {
 
-	private static final String USER_MANAGER_ATTRIBUTE_NAME = "userManager";
-	private static final String GRAPHS_MANAGER_ATTRIBUTE_NAME = "graphsManager";
-	private static final String MISSIONS_MANAGER_ATTRIBUTE_NAME = "graphsManager";
+	public static final String USER_MANAGER_ATTRIBUTE_NAME = "userManager";
+	public static final String GRAPHS_MANAGER_ATTRIBUTE_NAME = "graphsManager";
+	public static final String MISSIONS_MANAGER_ATTRIBUTE_NAME = "missionManager";
 
 	/*
 	Note how the synchronization is done only on the question and\or creation of the relevant managers and once they exists -

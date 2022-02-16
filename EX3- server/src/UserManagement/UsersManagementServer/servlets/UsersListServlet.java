@@ -1,5 +1,6 @@
 package UserManagement.UsersManagementServer.servlets;
 
+import DTOs.UserDTO;
 import utils.ServletUtils;
 import UserManagement.userManager;
 
@@ -27,7 +28,7 @@ public class UsersListServlet extends HttpServlet {
             userManager userManager = ServletUtils.getUserManager(getServletContext());
 
             //IS IT WORKS WITH THE <GENERICS>?; SEEMS TO BE WORK
-            Set<UserManagement.userManager.User> usersList = userManager.getUsers();
+            Set<UserDTO> usersList = userManager.getUsers();
 
             String json = gson.toJson(usersList);
 

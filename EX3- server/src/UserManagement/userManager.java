@@ -2,6 +2,9 @@
 
 package UserManagement;
 
+
+import DTOs.UserDTO;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -13,45 +16,36 @@ of the user of this class to handle the synchronization of isUserExists with oth
  */
 public class userManager {
 
-    public class User{
 
-        private String name;
-        private String degree;
 
-        public User(String Name,String Degree){
-            this.name = Name;
-            this.degree = Degree;
-        }
-    }
-
-    private final Set<User> usersSet;
+    private final Set<UserDTO> usersSet;
 
     public userManager() {
         usersSet = new HashSet<>();
     }
 
     public synchronized void addUser(String username,String Degree) {
-        User newUser = new User(username,Degree);
+        UserDTO newUser = new UserDTO(username,Degree);
         usersSet.add(newUser);
     }
 
     //IS IT WORKS? may be cause the bug of deleting while iterating
     public synchronized void removeUser(String username) {
-        for (User user :usersSet) {
-            if (user.name==username)
+        for (UserDTO user :usersSet) {
+            if (user.getName().equals(username))
                 usersSet.remove(user);
             return;
         }
     }
 
-    public synchronized Set<User> getUsers() {
+    public synchronized Set<UserDTO> getUsers() {
         return Collections.unmodifiableSet(usersSet);
     }
 
 
     public boolean isUserExists(String username) {
-        for (User user :usersSet) {
-            if (user.name==username)
+        for (UserDTO user :usersSet) {
+            if (user.getName().equals(username))
                 return true;
         }
         return false;

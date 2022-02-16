@@ -1,14 +1,16 @@
 package ProcessesManagment;
 
-import DataManagment.GraphsManager;
+import DTOs.GraphInfoDTO;
+import GraphManagment.GraphsManager;
 import dependency.graph.DependencyGraph;
 import utils.GraphInExecution;
-import utils.GraphsDataDTOs.GraphInfoDTO;
-import utils.ProccecesDTOs.MissionInfoDTO;
-import utils.ProccecesDTOs.CompilationTaskDTO;
-import utils.ProccecesDTOs.SimulationTaskDTO;
+
+import DTOs.MissionInfoDTO;
+import DTOs.CompilationTaskDTO;
+import DTOs.SimulationTaskDTO;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ProcessesManager {
 
@@ -42,14 +44,14 @@ public class ProcessesManager {
         public synchronized void addSimulationTask(SimulationTaskDTO newTask) {
                 simulationTasksMap.put(newTask.getTaskName().toLowerCase(), newTask);
                 listOfAllTasks.add(newTask.getTaskName().toLowerCase());
-                addUserTask(newTask.getTaskCreator().toLowerCase(), newTask.getTaskName());
+                addUserTask(newTask.getTaskCreator(), newTask.getTaskName());
         }
 
         public synchronized void addCompilationTask(CompilationTaskDTO newTask) {
                 compilationTasksMap.put(newTask.getTaskName().toLowerCase(), newTask);
                 listOfAllTasks.add(newTask.getTaskName());
 
-                addUserTask(newTask.getTaskCreator().toLowerCase(), newTask.getTaskName());
+                addUserTask(newTask.getTaskCreator(), newTask.getTaskName());
         }
 
         public synchronized void addUserTask(String taskCreator, String taskName) {
@@ -72,8 +74,8 @@ public class ProcessesManager {
 
         public synchronized void addMissionsDTO(SimulationTaskDTO newTask,GraphsManager graphsManager)
         {
-                MissionDTOByName.put(newTask.getTaskName().toLowerCase(), new MissionInfoDTO(graphsManager.getGraphInfoDTO(newTask.getGraphName()),newTask.getTargetsToExecute(),newTask.getTaskName(), newTask.getTaskCreator(), DependencyGraph.TaskType.SIMULATION));
-                GraphInExecution subGraphToWorkOn = new GraphInExecution(getMissionInfoDTO(newTask.getTaskName()), graphsManager.getGraphByName(newTask.getGraphName()));
+                GraphInExecution subGraphToWorkOn = new GraphInExecution(newTask.getTaskName(), newTask.getTargetsToExecute(), graphsManager.getGraphByName(newTask.getGraphName()));
+                MissionDTOByName.put(newTask.getTaskName(),new MissionInfoDTO(subGraphToWorkOn.getGraphInExecution(),newTask.getTargetsToExecute(),newTask.getTaskName(), newTask.getTaskCreator(), DependencyGraph.TaskType.SIMULATION,newTask.getPricingForTarget(),0, MissionInfoDTO.MissionStatus.frozen));
                 graphInExecutionByName.put(newTask.getGraphName(),subGraphToWorkOn);
                 GraphInfoDTO graphInfoDTO = new GraphInfoDTO(subGraphToWorkOn.getGraphInExecution());
                 graphInExecutionInfoByName.put(graphInfoDTO.getGraphName(),graphInfoDTO);
@@ -81,17 +83,19 @@ public class ProcessesManager {
 
         public synchronized void addMissionsDTO(CompilationTaskDTO newTask, GraphsManager graphsManager)
         {
-                MissionDTOByName.put(newTask.getTaskName().toLowerCase(), new MissionInfoDTO(graphsManager.getGraphInfoDTO(newTask.getGraphName()),newTask.getTargetsToExecute(),newTask.getTaskName(), newTask.getTaskCreator(), DependencyGraph.TaskType.COMPILATION));
-                GraphInExecution subGraphToWorkOn = new GraphInExecution(getMissionInfoDTO(newTask.getTaskName()), graphsManager.getGraphByName(newTask.getGraphName()));
+                GraphInExecution subGraphToWorkOn = new GraphInExecution(newTask.getTaskName(),newTask.getTargetsToExecute(), graphsManager.getGraphByName(newTask.getGraphName()));
+                MissionDTOByName.put(newTask.getTaskName(), new MissionInfoDTO(subGraphToWorkOn.getGraphInExecution(),newTask.getTargetsToExecute(),newTask.getTaskName(), newTask.getTaskCreator(), DependencyGraph.TaskType.COMPILATION,newTask.getPricingForTarget(),0,MissionInfoDTO.MissionStatus.frozen));
                 graphInExecutionByName.put(newTask.getGraphName(),subGraphToWorkOn);
                 GraphInfoDTO graphInfoDTO = new GraphInfoDTO(subGraphToWorkOn.getGraphInExecution());
                 graphInExecutionInfoByName.put(graphInfoDTO.getGraphName(),graphInfoDTO);
         }
 
-
         public synchronized MissionInfoDTO getMissionInfoDTO(String missionName)
         {
                 return MissionDTOByName.get(missionName.toLowerCase());
+        }
+        public synchronized Set<MissionInfoDTO> getAllMissionInfoDTO(){
+                return MissionDTOByName.values().stream().collect(Collectors.toSet());
         }
 
 
