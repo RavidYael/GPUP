@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.BorderPane?>
+
+<BorderPane xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mainScreen.submittedTasksScreen.SubmittedTasksScreenController">
+   <center>
+      <SplitPane dividerPositions="0.7005730659025788" prefHeight="160.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+        <items>
+            <TableView fx:id="tasksTable" prefHeight="418.0" prefWidth="482.0">
+               <columns>
+                  <TableColumn fx:id="taskNameColumn" prefWidth="75.0" text="Name" />
+                  <TableColumn fx:id="taskUploadedByColumn" prefWidth="129.0" text="Uploaded by" />
+                  <TableColumn fx:id="taskTypeColumn" prefWidth="87.0" text="Task Type" />
+                  <TableColumn fx:id="totalTargetsColumn" prefWidth="106.0" text="Total targets" />
+                  <TableColumn fx:id="rootsColumn" prefWidth="71.0" text="Roots" />
+                  <TableColumn fx:id="middlesColumn" prefWidth="85.0" text="Middles" />
+                  <TableColumn fx:id="leafsColumn" prefWidth="62.0" text="Leafs" />
+                  <TableColumn fx:id="independentColumn" prefWidth="111.0" text="Independents" />
+                  <TableColumn fx:id="pricePerTargetColumn" prefWidth="129.0" text="Price per target" />
+                  <TableColumn fx:id="statusColumn" prefWidth="61.0" text="Status" />
+                  <TableColumn fx:id="workesrColumn" prefWidth="76.0" text="workers" />
+                  <TableColumn fx:id="amIListedColumn" minWidth="0.0" prefWidth="100.0" text="Am i listed" />
+               </columns>
+            </TableView>
+            <TabPane fx:id="submittedTaskTabPane" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE">
+              <tabs>
+                <Tab text="Running targets">
+                  <content>
+                        <TextArea fx:id="runningTargetsTA" />
+                  </content>
+                </Tab>
+                <Tab fx:id="taskPropertiesTab" text="Task properties">
+                  <content>
+                        <TextArea fx:id="taskPropertiesTA" />
+                  </content>
+                </Tab>
+              </tabs>
+            </TabPane>
+        </items>
+      </SplitPane>
+   </center>
+</BorderPane>

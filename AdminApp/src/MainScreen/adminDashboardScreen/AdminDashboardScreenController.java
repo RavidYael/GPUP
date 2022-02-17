@@ -104,10 +104,6 @@ public class AdminDashboardScreenController {
     private GraphInfoScreenController graphInfoScreenController;
     private ServerDataManager serverDataManager;
 
-    public void setGraphInfoScreen(Parent graphInfoScreen) {
-        this.graphInfoScreen = graphInfoScreen;
-    }
-
 
 
     @FXML
@@ -200,6 +196,9 @@ public class AdminDashboardScreenController {
         },0, 2000);
     }
 
+    public void setGraphInfoScreen(Parent graphInfoScreen) {
+        this.graphInfoScreen = graphInfoScreen;
+    }
 
     public void setClient(OkHttpClient client) {
         this.client = client;

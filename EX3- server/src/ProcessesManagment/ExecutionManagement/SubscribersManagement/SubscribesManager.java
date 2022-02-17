@@ -21,8 +21,8 @@ public class SubscribesManager {
     }
 
     public void addSubscriber(UserDTO user ,MissionInfoDTO missionInfoDTO){
-    missionInfoDTOWorkersMap.put(missionInfoDTO,new HashSet<>());
-    missionInfoDTOWorkersMap.get(missionInfoDTO).add(user);
+    //missionInfoDTOWorkersMap.put(missionInfoDTO,new HashSet<>()); // you don't want to create a new one each time, only the first time. so replaced with:
+    missionInfoDTOWorkersMap.computeIfAbsent(missionInfoDTO, s-> new HashSet<>()).add(user);
     missionInfoDTOMap.put(missionInfoDTO.getMissionName(),missionInfoDTO);
     }
 

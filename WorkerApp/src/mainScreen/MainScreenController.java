@@ -7,6 +7,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
+import mainScreen.submittedTasksScreen.SubmittedTasksScreenController;
 import mainScreen.workerDashboardScreen.WorkerDashboardScreenController;
 import okhttp3.OkHttpClient;
 
@@ -23,19 +24,34 @@ public class MainScreenController {
     private OkHttpClient client;
     private Scene mainScene;
     private Parent dashboardScreen;
+    private Parent submittedTasksScreen;
+    private SubmittedTasksScreenController submittedTasksScreenController;
+    private WorkerDashboardScreenController dashboardScreenController;
 
 
     public void myInitializer() {
-        FXMLLoader fxmlLoader2 = new FXMLLoader(getClass().getResource("worker dashboard screen.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("worker dashboard screen.fxml"));
         try {
-            dashboardScreen = fxmlLoader2.load();
+            dashboardScreen = fxmlLoader.load();
         } catch (IOException e) {
             e.printStackTrace();
         }
         centerPane.setCenter(dashboardScreen);
-        WorkerDashboardScreenController dashboardScreenController = fxmlLoader2.getController();
+         dashboardScreenController = fxmlLoader.getController();
         dashboardScreenController.setClient(client);
         dashboardScreenController.myInitializer();
+        dashboardScreenController.setCenterPane(centerPane);
+
+        FXMLLoader fxmlLoader1 = new FXMLLoader(getClass().getResource("submitted tasks.fxml"));
+        try {
+            submittedTasksScreen = fxmlLoader1.load();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        submittedTasksScreenController = fxmlLoader1.getController();
+        submittedTasksScreenController.myInitializer(client);
+        dashboardScreenController.setSubmittedTasksScreen(submittedTasksScreen, submittedTasksScreenController);
 
     }
 
@@ -43,6 +59,13 @@ public class MainScreenController {
     @FXML
     void dashBoardButtonAction(ActionEvent event) {
         centerPane.setCenter(dashboardScreen);
+        dashboardScreenController.setNotAgain(false);
+
+    }
+    @FXML
+    void submittedTasksButtonAction(ActionEvent event) {
+        centerPane.setCenter(submittedTasksScreen);
+
 
     }
 

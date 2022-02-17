@@ -92,7 +92,7 @@ public class ProcessesManager {
 
         public synchronized MissionInfoDTO getMissionInfoDTO(String missionName)
         {
-                return MissionDTOByName.get(missionName.toLowerCase());
+                return MissionDTOByName.get(missionName);
         }
         public synchronized Set<MissionInfoDTO> getAllMissionInfoDTO(){
                 return MissionDTOByName.values().stream().collect(Collectors.toSet());

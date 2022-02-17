@@ -11,6 +11,7 @@ public class SimpleCookieManager implements CookieJar {
 
     private final static String CACHE_MANAGER_PREFIX = "    [Cache Manager] ---> ";
     private final Map<String, Map<String, Cookie>> cookies = new HashMap<>();
+    private Map<String,String> simpleCookieMap = new HashMap<>();
 
     @NotNull
     @Override
@@ -40,6 +41,10 @@ public class SimpleCookieManager implements CookieJar {
                         cookiesMap.put(cookie.name(), cookie);
                     });
         }
+    }
+
+    public void addSimpleCookie(String key, String value){
+        simpleCookieMap.put(key,value);
     }
 
 }

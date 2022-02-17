@@ -25,7 +25,7 @@ import static UserManagement.UsersManagementServer.constants.Constants.USERNAME;
 public class SubscribeServlet extends HttpServlet {
 
         @Override
-        protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
             response.setContentType("text/plain;charset=UTF-8");
 
             //TODO : THAT'S INTERESTING, WHEN DO WE USE THE SESSION UTIL AND WHEN DO WE REQUEST PARAM?
@@ -38,11 +38,11 @@ public class SubscribeServlet extends HttpServlet {
 
             synchronized (this) {
                 String missionName = request.getParameter(MISSION_NAME);
-                String userName = request.getParameter(USERNAME);
+               //String userName = request.getParameter(USERNAME);
 
                 MissionInfoDTO theMission = processesManager.getMissionInfoDTO(missionName);
                 theMission.increaseCurrentNumOfxExecutingWorkers();
-                UserDTO theUser = userManager.getUserDTO(userName);
+                UserDTO theUser = userManager.getUserDTO(usernameFromSession);
                 subscribesManager.addSubscriber(theUser, theMission);
             }
 

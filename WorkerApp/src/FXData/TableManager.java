@@ -1,4 +1,4 @@
-package mainScreen.workerDashboardScreen;
+package FXData;
 
 import DTOs.MissionInfoDTO;
 import DTOs.UserDTO;
@@ -7,14 +7,16 @@ import FXData.UserInTable;
 import com.sun.jmx.snmp.tasks.TaskServer;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import mainScreen.workerDashboardScreen.TaskInTable;
+import mainScreen.workerDashboardScreen.WorkerDashboardScreenController;
 
 import java.util.Set;
 
-public class WorkerDashboardTableManager {
+public class TableManager {
 
     private ServerDataManager serverDataManager;
 
-    WorkerDashboardTableManager(ServerDataManager serverDataManager) {
+    public TableManager(ServerDataManager serverDataManager) {
         this.serverDataManager = serverDataManager;
     }
 
@@ -46,7 +48,7 @@ public class WorkerDashboardTableManager {
                         , curtask.getPriceByTaskType(curtask.getMissionType())
                         , curtask.getMissionStatus()
                         , curtask.getCurrentNumOfxExecutingWorkers()
-                        , WorkerDashboardScreenController.YesOrNo.no); //TODO send request to know if user is listed for task
+                        , (serverDataManager.amIListed(curtask.getMissionName())? WorkerDashboardScreenController.YesOrNo.yes : WorkerDashboardScreenController.YesOrNo.no));
 
                 tasksinTable.add(tempTaskInTable);
             }

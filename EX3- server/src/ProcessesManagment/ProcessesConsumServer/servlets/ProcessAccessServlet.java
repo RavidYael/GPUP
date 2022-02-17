@@ -22,7 +22,7 @@ public class ProcessAccessServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
-        ProcessesManager processesManager = ServletUtils.getMissionsManager(getServletContext());
+        ProcessesManager processesManager = ServletUtils.getProcessesManager(getServletContext());
 
         if(req.getParameter("selectedMissionName") != null)
         {

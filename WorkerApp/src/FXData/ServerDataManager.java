@@ -7,14 +7,16 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import dependency.graph.DependencyGraph;
 import dependency.graph.GraphFactory;
+import mainScreen.workerDashboardScreen.TaskInTable;
 import okhttp3.*;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import static FXData.Constants.BASE_URL;
+import static FXData.Constants.*;
 
 public class ServerDataManager {
 
@@ -66,5 +68,31 @@ public class ServerDataManager {
         return missionDTOSet;
     }
 
+    public boolean amIListed(String taskName) {
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(BASE_URL +"/subscribedUsers").newBuilder();
+        urlBuilder.addQueryParameter(MISSION_NAME, taskName);
+        boolean res = false;
 
+        Request request = new Request.Builder()
+                .url(urlBuilder.build())
+                .build();
+
+        try {
+            Response response = client.newCall(request).execute();
+            Gson usersGson = new Gson();
+            Type collectionType = new TypeToken<Set<UserDTO>>(){}.getType();
+            Set<UserDTO> usersFromServer = usersGson.fromJson(response.body().string(), collectionType);
+            if (usersFromServer!=null)
+             res = usersFromServer.stream().map(u->u.getName()).collect(Collectors.toSet()).contains(SimpleCookieManager.getSimpleCookie(USER_NAME));
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return res;
+    }
 }
+
+
+

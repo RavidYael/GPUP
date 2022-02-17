@@ -26,7 +26,7 @@ public class TaskUploadServlet extends HttpServlet {
         // TODO I HOPE GSON CREATE NEW OBJECT, OTHERWISE THE TASKS ARE LOCALLY TO THIS SCOPE AND WE LOSE THEM WHEN INSERTING TO THE MAPS
         // ITS NOT THAT COMPLICATED IT JUST THAT WE NEED TO CREATE A A CONSTRUCTOR WHICH I DONT HAVE ZAIN TO CREATE RIGHT NOW
 
-        ProcessesManager missionsManager = ServletUtils.getMissionsManager(getServletContext());
+        ProcessesManager missionsManager = ServletUtils.getProcessesManager(getServletContext());
 
         if(req.getHeader("taskType").equals("simulation")) //Uploaded simulation task
         {

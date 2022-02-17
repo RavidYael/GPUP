@@ -17,6 +17,7 @@ import okhttp3.*;
 import java.io.IOException;
 
 import static FXData.Constants.BASE_URL;
+import static FXData.Constants.USER_NAME;
 import static jakarta.servlet.http.HttpServletResponse.*;
 
 public class LoginScreenController {
@@ -45,6 +46,7 @@ public class LoginScreenController {
     void submitButtonAction(ActionEvent event) throws IOException {
         boolean valid = false;
         String workerName = this.adminNameTextField.getText();
+        SimpleCookieManager.addSimpleCookie(USER_NAME,workerName);
         HttpUrl.Builder urlBuilder = HttpUrl.parse(BASE_URL +"/login").newBuilder();
         urlBuilder.addQueryParameter("username", workerName);
         urlBuilder.addQueryParameter("user-degree","worker");

@@ -2,23 +2,35 @@ package mainScreen.workerDashboardScreen;
 
 import DTOs.MissionInfoDTO;
 import FXData.ServerDataManager;
+import FXData.TableManager;
 import FXData.UserInTable;
 import dependency.graph.DependencyGraph;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import okhttp3.OkHttpClient;
+import javafx.scene.layout.BorderPane;
+import mainScreen.submittedTasksScreen.SubmittedTasksScreenController;
+import okhttp3.*;
+import okio.BufferedSink;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.sql.rowset.serial.SerialArray;
+import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static FXData.Constants.BASE_URL;
+import static FXData.Constants.MISSION_NAME;
+
 public class WorkerDashboardScreenController {
 
-    public static enum YesOrNo {yes, no};
 
+
+
+    public static enum YesOrNo {yes, no;};
     @FXML
     private TableView<UserInTable> usersTable;
 
@@ -68,44 +80,72 @@ public class WorkerDashboardScreenController {
     private TableColumn<TaskInTable, Integer> pricePerTargetColumn;
 
     private ServerDataManager serverDataManager;
+
     private OkHttpClient client;
-    private WorkerDashboardTableManager tableManager;
-
-
+    private TableManager tableManager;
+    private Parent submittedTasksScreen;
+    private SubmittedTasksScreenController submittedTaskScreenController;
+    private BorderPane centerPane;
+    private boolean notAgain;
 
     public void myInitializer(){
         serverDataManager = new ServerDataManager();
         serverDataManager.setClient(client);
-        tableManager = new WorkerDashboardTableManager(serverDataManager);
+        tableManager = new TableManager(serverDataManager);
         refresh();
-        tasksTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            submitToTaskDialog(tasksTable.getSelectionModel().getSelectedItem().name);
+        tasksTable.getSelectionModel().selectedItemProperty().addListener(observable -> {
+            submitToTaskDialog(tasksTable.getSelectionModel().getSelectedItem());
         });
-
 
     }
 
-    private void submitToTaskDialog(String taskName){
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("submission to task");
-        alert.setContentText("Would you like to list as worker for this task?");
-        ButtonType okButton = new ButtonType("Yes", ButtonBar.ButtonData.YES);
-        ButtonType noButton = new ButtonType("no", ButtonBar.ButtonData.NO);
-        alert.getButtonTypes().setAll(okButton, noButton);
-        alert.showAndWait().ifPresent(type -> {
-            if (type == okButton) {
-                moveToTaskSubmissionScreen(taskName);
-            } else if (type == noButton) {
+    private void submitToTaskDialog(TaskInTable task) {
+
+        if (!notAgain) {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Would you like to list as worker for this task?", ButtonType.YES, ButtonType.NO);
+
+            // clicking X also means no
+            ButtonType result = alert.showAndWait().orElse(ButtonType.NO);
+
+            if (ButtonType.NO.equals(result)) {
                 alert.close();
-            } else {
+            } else if (result.equals(ButtonType.YES)) {
+                subscribeToTaskAction(task);
+                alert.close();
             }
-        });
+            this.notAgain = true;
+
+        }
+    }
+
+    private void subscribeToTaskAction(TaskInTable newTask){
+        centerPane.setCenter(submittedTasksScreen);
+        submittedTaskScreenController.addNewTask(newTask);
+        subscribeToTask(newTask);
+
+
 
     }
 
-    private void moveToTaskSubmissionScreen(String taskName){
+    private void subscribeToTask(TaskInTable newTask) {
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(BASE_URL +"/subscribe").newBuilder();
+        urlBuilder.addQueryParameter(MISSION_NAME,newTask.name);
 
+        Request request = new Request.Builder()
+                .url(urlBuilder.build())
+                .build();
 
+        try {
+            Response response = client.newCall(request).execute();
+            System.out.println(response.code());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void setCenterPane(BorderPane centerPane) {
+        this.centerPane = centerPane;
     }
 
     private void initializeUsersTable(){
@@ -135,6 +175,11 @@ public class WorkerDashboardScreenController {
 
     }
 
+    public void setSubmittedTasksScreen(Parent submittedTasksScreen, SubmittedTasksScreenController submittedTasksScreenController) {
+        this.submittedTasksScreen = submittedTasksScreen;
+        this.submittedTaskScreenController = submittedTasksScreenController;
+    }
+
     public void setClient(OkHttpClient client) {
         this.client = client;
     }
@@ -143,9 +188,14 @@ public class WorkerDashboardScreenController {
         initializeTasksTable();
     }
 
+    public void setNotAgain(boolean b) {
+        this.notAgain = b;
+    }
+
 
     private void refresh(){
         System.out.println("refreshing");
+
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
@@ -154,6 +204,7 @@ public class WorkerDashboardScreenController {
                     @Override
                     public void run() {
                         initializeAllTables();
+                        notAgain = false;
                     }
                 });
 
