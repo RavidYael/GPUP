@@ -2,10 +2,12 @@ package UserManagement.UsersManagementServer.servlets;
 
 import DTOs.UserDTO;
 import utils.ServletUtils;
-import UserManagement.userManager;
+import UserManagement.UserManager;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 
 import com.google.gson.Gson;
@@ -25,10 +27,10 @@ public class UsersListServlet extends HttpServlet {
 
             Gson gson = new Gson();
 
-            userManager userManager = ServletUtils.getUserManager(getServletContext());
+            UserManager userManager = ServletUtils.getUserManager(getServletContext());
 
-            //IS IT WORKS WITH THE <GENERICS>?; SEEMS TO BE WORK
-            Set<UserDTO> usersList = userManager.getUsers();
+            //TODO : I CHANGED IT TO BE COLLECTION, IS IT STILL WORK?
+            Collection<UserDTO> usersList = userManager.getUsers();
 
             String json = gson.toJson(usersList);
 

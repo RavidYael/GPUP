@@ -20,7 +20,15 @@ public class MissionInfoDTO {
         private  Integer independentsCount;
         private  Set<String> targetsToExecute;
         private Integer taskTotalPayment;
-        private Integer currentNumOfxExecutingWorkers;
+
+    public void increaseCurrentNumOfxExecutingWorkers() {
+        this.currentNumOfxExecutingWorkers++ ;
+    }
+    public void decreaseCurrentNumOfxExecutingWorkers() {
+        this.currentNumOfxExecutingWorkers-- ;
+    }
+
+    private Integer currentNumOfxExecutingWorkers;
         private MissionStatus missionStatus;
         private Integer simulationPrice;
         private Integer compilationPrice;
@@ -115,5 +123,7 @@ public class MissionInfoDTO {
     public Set<String> getTargetsToExecute() {
         return targetsToExecute;
     }
+
+
 
 }

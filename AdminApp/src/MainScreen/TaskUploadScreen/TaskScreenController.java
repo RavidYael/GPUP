@@ -4,7 +4,6 @@ import FXData.BackEndMediator;
 import FXData.TableManager;
 import FXData.TargetInTable;
 import FXData.TextAreaConsumer;
-import MainScreen.taskscreen.CompilationTaskController;
 import dependency.graph.DependencyGraph;
 import dependency.target.Target;
 import execution.*;

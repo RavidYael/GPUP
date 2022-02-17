@@ -5,7 +5,7 @@ import utils.SessionUtils;
 
 import java.io.IOException;
 
-import UserManagement.userManager;
+import UserManagement.UserManager;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,7 +19,7 @@ public class LogoutServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String usernameFromSession = SessionUtils.getUsername(request);
-        userManager userManager = ServletUtils.getUserManager(getServletContext());
+        UserManager userManager = ServletUtils.getUserManager(getServletContext());
 
         if (usernameFromSession != null) {
             System.out.println("Clearing session for " + usernameFromSession);

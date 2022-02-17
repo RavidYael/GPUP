@@ -1,18 +1,15 @@
 package MainScreen.TaskUploadScreen;
 
 import DTOs.CompilationTaskDTO;
-import DTOs.GPUPTaskDTO;
 import DTOs.SimulationTaskDTO;
 import DTOs.TasksPrefernces.CompilationParameters;
 import DTOs.TasksPrefernces.SimulationParameters;
 import FXData.BackEndMediator;
 import FXData.TableManager;
 import FXData.TargetInTable;
-import MainScreen.taskscreen.CompilationTaskController;
 import com.google.gson.Gson;
 import dependency.graph.DependencyGraph;
 import dependency.target.Target;
-import jakarta.servlet.http.HttpServletResponse;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -127,7 +124,7 @@ public class UploadTaskScreenController {
         String screenName = taskComboBox.getValue() + " screen.fxml";
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(screenName));
         taskSettingsPane.setCenter(fxmlLoader.load());
-        if (taskComboBox.getValue().equals("Simulation Task"))
+        if (taskComboBox.getValue().equals(SIMULATION))
             simulationTaskController = fxmlLoader.getController();
         else
             compilationTaskController = fxmlLoader.getController();

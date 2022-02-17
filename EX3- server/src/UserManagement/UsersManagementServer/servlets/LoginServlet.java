@@ -2,7 +2,7 @@ package UserManagement.UsersManagementServer.servlets;
 
 import UserManagement.UsersManagementServer.constants.Constants;
 import utils.ServletUtils;
-import UserManagement.userManager;
+import UserManagement.UserManager;
 import utils.SessionUtils;
 
 import jakarta.servlet.annotation.WebServlet;
@@ -23,7 +23,7 @@ public class LoginServlet extends HttpServlet {
         response.setContentType("text/plain;charset=UTF-8");
 
         String usernameFromSession = SessionUtils.getUsername(request);
-        userManager userManager = ServletUtils.getUserManager(getServletContext());
+        UserManager userManager = ServletUtils.getUserManager(getServletContext());
 
         if (usernameFromSession == null) { //user is not logged in yet
 
