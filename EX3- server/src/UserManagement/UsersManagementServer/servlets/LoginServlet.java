@@ -11,8 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static UserManagement.UsersManagementServer.constants.Constants.DEGREE;
-import static UserManagement.UsersManagementServer.constants.Constants.USERNAME;
+import static UserManagement.UsersManagementServer.constants.Constants.*;
 
 @WebServlet(name = "Login Servlet", urlPatterns = "/login")
 public class LoginServlet extends HttpServlet {
@@ -61,9 +60,10 @@ public class LoginServlet extends HttpServlet {
                     else {
                         //add the new user to the users list according to his degree
                         if(userDegree.equals("admin"))
-                        userManager.addUser(usernameFromParameter,"admin");
+                        userManager.addAdmin(usernameFromParameter,"admin");
                         else if(userDegree.equals("worker")){
-                            userManager.addUser(usernameFromParameter,"worker");
+                            Integer NumOfAvailableThreads = Integer.parseInt(request.getParameter(NUM_OF_THREADS));
+                            userManager.addWorker(usernameFromParameter,"worker",NumOfAvailableThreads);
                         }
                         else{
                             String errorMessage = "user-degree must be 'admin' or 'worker'";

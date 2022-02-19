@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.util.Set;
 
 import static ProcessesManagment.ExecutionManagement.SubscribersManagement.constants.Constants.MISSION_NAME;
-
+//TODO ITS NOT SHOULD BE LIKE THAT! WE SHOULD CHANGE IT TO POST AND A GET METHODS IN TH SUBSCRIBE SERVLET..
 
 @WebServlet("/subscribedUsers")
 public class getSubscribedUsers extends HttpServlet {

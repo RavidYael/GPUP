@@ -1,16 +1,15 @@
 package ProcessesManagment;
 
-import DTOs.GraphInfoDTO;
+import DTOs.*;
 import GraphManagment.GraphsManager;
 import dependency.graph.DependencyGraph;
+import dependency.target.Target;
 import utils.GraphInExecution;
-
-import DTOs.MissionInfoDTO;
-import DTOs.CompilationTaskDTO;
-import DTOs.SimulationTaskDTO;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static dependency.target.Target.TargetStatus.Waiting;
 
 public class ProcessesManager {
 
@@ -20,7 +19,8 @@ public class ProcessesManager {
         private static final Map<String, SimulationTaskDTO> simulationTasksMap = new HashMap<>();
         private static final Map<String, CompilationTaskDTO> compilationTasksMap = new HashMap<>();
         private static final Map<String, Set<String>> usersTasks = new HashMap<>();
-        private Set<String> listOfAllTasks = new HashSet<>();
+        private Set<String> listOfAllMissions = new HashSet<>();
+        private  List <TargetDTO> readyTargets = new LinkedList<>();
 
 
         public synchronized boolean isMissionExists(String missionName) {
@@ -43,13 +43,13 @@ public class ProcessesManager {
 
         public synchronized void addSimulationTask(SimulationTaskDTO newTask) {
                 simulationTasksMap.put(newTask.getTaskName().toLowerCase(), newTask);
-                listOfAllTasks.add(newTask.getTaskName().toLowerCase());
+                listOfAllMissions.add(newTask.getTaskName().toLowerCase());
                 addUserTask(newTask.getTaskCreator(), newTask.getTaskName());
         }
 
         public synchronized void addCompilationTask(CompilationTaskDTO newTask) {
                 compilationTasksMap.put(newTask.getTaskName().toLowerCase(), newTask);
-                listOfAllTasks.add(newTask.getTaskName());
+                listOfAllMissions.add(newTask.getTaskName());
 
                 addUserTask(newTask.getTaskCreator(), newTask.getTaskName());
         }
@@ -63,7 +63,7 @@ public class ProcessesManager {
 
         public synchronized Set<String> getAllTaskList()
         {
-                return listOfAllTasks;
+                return listOfAllMissions;
         }
 
         public synchronized Set<String> getUserTaskList(String userName)
@@ -98,6 +98,27 @@ public class ProcessesManager {
                 return MissionDTOByName.values().stream().collect(Collectors.toSet());
         }
 
+        private void refresh(){
+                System.out.println("refreshing");
+                Timer timer = new Timer();
+                timer.schedule(new TimerTask() {
 
+                        public void run() {
+                                                refreshReadyTargets();
+                        }
 
+                },0, 2000);
+        }
+
+        private void refreshReadyTargets() {
+                for (String mission: listOfAllMissions) {
+                        for (Target target: graphInExecutionByName.get(mission).getGraphInExecution().getAllTargets().values().stream().filter(t->t.getTargetStatus = Waiting)
+                             ) {
+                                readyTargets.add()
+
+                        }
+                }
+        }
 }
+
+

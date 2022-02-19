@@ -16,6 +16,8 @@ public class GraphInExecution {
     private String targetsSummaryDir;
     private Long totalDuration = 0L;
 
+    private Object CalculationLock = new Object();
+
     public GraphInExecution(String missionName,Set<String> targetsToExecute, DependencyGraph graphTheMissionDefinedUpon) {
 
       //  this.graphInExecution = createSubGraphForMission(missionPreferences,graphTheMissionDefinedUpon);
@@ -74,19 +76,25 @@ public class GraphInExecution {
         }
     }
 
+
+    //TARGETDTO
     public void updateEffectOfTargetsExecution(Set<Target> executedTargets){
-        System.out.println("i am in updateEffectedTargets");
-        Iterator<Target> curTargetIter = executedTargets.iterator();
-        while(curTargetIter.hasNext()){
-            Target curTarget = curTargetIter.next();
-            if(curTarget.getTargetStatus() == Target.TargetStatus.Finished) {
-                if (curTarget.getTaskResult() == Target.TaskResult.Success || curTarget.getTaskResult() == Target.TaskResult.Warning) {
-                    setAndUpdateTargetSuccess(curTarget);
-                } else if (curTarget.getTaskResult() == Target.TaskResult.Failure) {
-                    setAndUpdateTargetFailure(curTarget);
+
+        synchronized (CalculationLock) {
+            System.out.println("i am in updateEffectedTargets");
+            Iterator<Target> curTargetIter = executedTargets.iterator();
+            while (curTargetIter.hasNext()) {
+                Target curTarget = curTargetIter.next();
+                if (curTarget.getTargetStatus() == Target.TargetStatus.Finished) {
+                    if (curTarget.getTaskResult() == Target.TaskResult.Success || curTarget.getTaskResult() == Target.TaskResult.Warning) {
+                        setAndUpdateTargetSuccess(curTarget);
+                    } else if (curTarget.getTaskResult() == Target.TaskResult.Failure) {
+                        setAndUpdateTargetFailure(curTarget);
+                    }
                 }
+                curTargetIter.remove();
             }
-            curTargetIter.remove();
+            updateStatus2Target();
         }
     }
 
@@ -104,6 +112,7 @@ public class GraphInExecution {
         }
         return waitingTargets;
     }
+
     public Set<String> setAndUpdateTargetFailure(Target target) {
         Set<String> skippedTargets = new HashSet<>();
         for (String targetName : target.getRequiredFor()) {
@@ -115,7 +124,7 @@ public class GraphInExecution {
         return skippedTargets;
     }
 
-
+//TODO INSERT THE GOD DAM METHOD THAT CALCULATE WHATS AVAILABLE TO WORK.. (SOME INFO HAS TO BE GIVEN TO DO THAT) GETTING TARGETDTO
 
 
 }

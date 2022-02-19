@@ -12,13 +12,18 @@ public class TargetDTO {
     private String runLog;
     private String extraData;
     private String taskName;
+    private String missionName;
 
+    public String getMissionName() {
+        return missionName;
+    }
 
-    public TargetDTO(String name, String extraData, String taskName) {
+    public TargetDTO(String name, String extraData, String taskName, String missionName) {
         this.name = name;
         this.extraData = extraData;
         this.runLog = "";
         this.taskName = taskName;
+        this.missionName = missionName;
     }
 
 

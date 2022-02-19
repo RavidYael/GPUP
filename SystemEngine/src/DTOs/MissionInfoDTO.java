@@ -7,12 +7,13 @@ import java.util.Map;
 import java.util.Set;
 
 public class MissionInfoDTO {
+
     public static enum MissionStatus {frozen,running,paused,stopped,finished}
 
         private  String missionName;
         private  String MissionUploader;
         private  DependencyGraph.TaskType missionType;
-        private  String graphName;
+        private  String graphName; // TODO has to be unique (depend on the mission name) !
         private  Integer targetsCount;
         private  Integer rootsCount;
         private  Integer middlesCount;

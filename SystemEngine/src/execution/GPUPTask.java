@@ -4,6 +4,7 @@ import dependency.target.Target;
 import javafx.concurrent.Task;
 
 public abstract class GPUPTask extends Task<Void> {
+
     private String taskName;
     private Target curTarget;
     private Long totalWork;
