@@ -1,8 +1,7 @@
 package DTOs;
 
+import DTOs.TasksPrefernces.TaskPreferences;
 import dependency.target.Target;
-
-import java.util.Set;
 
 public class TargetDTO {
 
@@ -11,18 +10,19 @@ public class TargetDTO {
     private Target.TargetStatus status;
     private String runLog;
     private String extraData;
-    private String taskName;
+    private String taskType;
     private String missionName;
+    private TaskPreferences runningPreferences;
 
     public String getMissionName() {
         return missionName;
     }
 
-    public TargetDTO(String name, String extraData, String taskName, String missionName) {
+    public TargetDTO(String name, String extraData, String taskName, String missionName,TaskPreferences taskPreferences) {
         this.name = name;
         this.extraData = extraData;
         this.runLog = "";
-        this.taskName = taskName;
+        this.taskType = taskName;
         this.missionName = missionName;
     }
 
@@ -67,12 +67,12 @@ public class TargetDTO {
         this.extraData = extraData;
     }
 
-    public String getTaskName() {
-        return taskName;
+    public String getTaskType() {
+        return taskType;
     }
 
-    public void setTaskName(String taskName) {
-        this.taskName = taskName;
+    public void setTaskType(String taskType) {
+        this.taskType = taskType;
     }
 
 
