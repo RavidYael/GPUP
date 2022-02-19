@@ -3,83 +3,54 @@ package ProcessesManagment.ProcessesConsumServer.servlets;
 import DTOs.CompilationTaskDTO;
 import DTOs.MissionInfoDTO;
 import DTOs.SimulationTaskDTO;
+import DTOs.TargetDTO;
+import ProcessesManagment.ExecutionManagement.SubscribersManagement.SubscribesManager;
 import ProcessesManagment.ProcessesManager;
 import com.google.gson.Gson;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.omg.PortableInterceptor.SUCCESSFUL;
 import utils.ServletUtils;
+import utils.SessionUtils;
 
 import java.io.IOException;
+import java.util.Set;
+
+import static ProcessesManagment.ProcessesConsumServer.constants.Constants.WORKER_NAME;
+import static jakarta.servlet.http.HttpServletResponse.*;
 
 @WebServlet("/runnable-target")
 public class TargetDispenserServlet extends HttpServlet {
 
-        private Gson gson = new Gson();
+    private Gson gson = new Gson();
 
-        @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
-            ProcessesManager processesManager = ServletUtils.getProcessesManager(getServletContext());
+        ProcessesManager processesManager = ServletUtils.getProcessesManager(getServletContext());
 
-            if(req.getParameter("selectedMissionName") != null)
-            {
-                String missionInfoName = req.getParameter("selectedMissionName");
-                String infoAsString;
+        SubscribesManager subscribesManager = ServletUtils.getSubscribesManager(getServletContext());
 
-                if(processesManager.isMissionExists(missionInfoName))
-                {
-                    MissionInfoDTO missionInfo = processesManager.getMissionInfoDTO(missionInfoName);
-                    infoAsString = gson.toJson(missionInfo, MissionInfoDTO.class);
+        String workerName = SessionUtils.getUsername(req);
 
-                    resp.getWriter().write(infoAsString);
-                    resp.setStatus(HttpServletResponse.SC_ACCEPTED);
-                }
-                else //Task not exists in the system
-                {
-                    resp.getWriter().println("The task " + missionInfoName + " doesn't exist in the system!");
-                    resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                }
-            }
-            else if(req.getParameter("task") != null) //Requesting for task-info
-            {
-                String taskName = req.getParameter("task");
+        if (workerName != null) {
 
-                if(processesManager.isTaskExists(taskName)) //The task exists in the system
-                {
-                    String infoAsString = null;
+            Set<String> missionsWorkerSubscribes = subscribesManager.getWorkerMissionsNames(workerName);
 
-                    if(processesManager.isSimulationTask(taskName)) //Requesting for simulation task
-                    {
-                        SimulationTaskDTO simulationInfo = processesManager.getSimulationTaskInformation(taskName);
-                        infoAsString = this.gson.toJson(simulationInfo, SimulationTaskDTO.class);
+            TargetDTO targetDTO = processesManager.pollTaskReadyForWorker(missionsWorkerSubscribes);
 
-                        resp.addHeader("taskType", "simulation");
-                    }
-                    else  //Requesting for compilation task
-                    {
-                        CompilationTaskDTO compilationInfo = processesManager.getCompilationTaskInformation(taskName);
-                        infoAsString = this.gson.toJson(compilationInfo, CompilationTaskDTO.class);
+            if (targetDTO == null) {
+                resp.getWriter().println("there is no runnable targets for this worker");
+                resp.setStatus(SC_CONFLICT);
 
-                        resp.addHeader("taskType", "compilation");
-                    }
+            } else
 
-                    resp.getWriter().write(infoAsString);
-                    resp.setStatus(HttpServletResponse.SC_ACCEPTED);
-                }
-                else //Task not exists in the system
-                {
-                    resp.getWriter().println("Task not exists!");
-                    resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                }
-            }
-            else //Invalid request
-            {
-                resp.getWriter().println("Invalid parameter!");
-                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            }
+                resp.getWriter().write(gson.toJson(targetDTO));
+            resp.setStatus(SC_ACCEPTED);
         }
+    }
+}
 
- }
 

@@ -9,11 +9,17 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class SubscribesManager {
 
     Map<MissionInfoDTO, Set<UserDTO>> missionInfoDTOWorkersMap;
-    Map<UserDTO,Set<MissionInfoDTO>>workerMissionsMap;
+
+    public Set<String> getWorkerMissionsNames(String workerName) {
+        return workerMissionsMap.get(workerName).stream().map(M->M.getMissionName()).collect(Collectors.toSet());
+    }
+
+    Map<String,Set<MissionInfoDTO>>workerMissionsMap;
     Map<String,MissionInfoDTO> missionInfoDTOMap;
 
     public SubscribesManager() {
@@ -32,6 +38,5 @@ public class SubscribesManager {
     public Set<UserDTO> getMissionWorkers(String missionName){
         return missionInfoDTOWorkersMap.get(missionInfoDTOMap.get(missionName));
     }
-
 
 }

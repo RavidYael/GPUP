@@ -23,7 +23,7 @@ public class TaskListServlet extends HttpServlet {
         Set<MissionInfoDTO> missionDTOs = processesManager.getAllMissionInfoDTO();
         if (missionDTOs.isEmpty()){
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            resp.getWriter().println("not tasks have been uploaded yet!");
+            resp.getWriter().println("no tasks have been uploaded yet!");
         }
         Gson missionGson = new Gson();
         String missionsAsJson = missionGson.toJson(missionDTOs);

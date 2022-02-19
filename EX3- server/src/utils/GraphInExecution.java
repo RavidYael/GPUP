@@ -1,5 +1,6 @@
 package utils;
 
+import DTOs.TargetDTO;
 import dependency.graph.DependencyGraph;
 import dependency.target.Target;
 import execution.TargetExecutionSummary;
@@ -77,14 +78,15 @@ public class GraphInExecution {
     }
 
 
-    //TARGETDTO
-    public void updateEffectOfTargetsExecution(Set<Target> executedTargets){
+
+    public void updateEffectOfTargetsExecution(TargetDTO executedTarget){
 
         synchronized (CalculationLock) {
-            System.out.println("i am in updateEffectedTargets");
-            Iterator<Target> curTargetIter = executedTargets.iterator();
-            while (curTargetIter.hasNext()) {
-                Target curTarget = curTargetIter.next();
+
+            Target curTarget = graphInExecution.getTargetByName(executedTarget.getName());
+
+            curTarget.updateTargetByDTO(executedTarget);
+
                 if (curTarget.getTargetStatus() == Target.TargetStatus.Finished) {
                     if (curTarget.getTaskResult() == Target.TaskResult.Success || curTarget.getTaskResult() == Target.TaskResult.Warning) {
                         setAndUpdateTargetSuccess(curTarget);
@@ -92,11 +94,10 @@ public class GraphInExecution {
                         setAndUpdateTargetFailure(curTarget);
                     }
                 }
-                curTargetIter.remove();
             }
             updateStatus2Target();
-        }
     }
+
 
 
     public Set<String> setAndUpdateTargetSuccess(Target target) {

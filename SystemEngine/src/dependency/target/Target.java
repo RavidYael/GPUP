@@ -2,6 +2,7 @@
 
 package dependency.target;
 
+import DTOs.TargetDTO;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
@@ -13,7 +14,6 @@ import java.util.Set;
 
 
 public class Target implements Serializable {
-
 
     public static enum DependencyLevel {Root,Middle,Leaf, Independed}
     public static enum Dependency {DependsOn , RequiredFor}
@@ -37,6 +37,12 @@ public class Target implements Serializable {
 //    public Long getExecutionTime(){
 //    return executionTime;
 //    }
+
+
+    public void updateTargetByDTO(TargetDTO executedTarget) {
+    this.taskResult.set(executedTarget.getResult());
+    this.targetStatus.set(executedTarget.getStatus());
+    }
 
 
     public void setBeginProcessTime(Long beginProcessTime) {
