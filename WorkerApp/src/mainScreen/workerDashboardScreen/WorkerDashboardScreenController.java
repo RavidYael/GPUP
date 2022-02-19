@@ -89,8 +89,7 @@ public class WorkerDashboardScreenController {
     private boolean notAgain;
 
     public void myInitializer(){
-        serverDataManager = new ServerDataManager();
-        serverDataManager.setClient(client);
+
         tableManager = new TableManager(serverDataManager);
         refresh();
         tasksTable.getSelectionModel().selectedItemProperty().addListener(observable -> {
@@ -146,6 +145,10 @@ public class WorkerDashboardScreenController {
 
     public void setCenterPane(BorderPane centerPane) {
         this.centerPane = centerPane;
+    }
+
+    public void setServerDataManager(ServerDataManager serverDataManager) {
+        this.serverDataManager = serverDataManager;
     }
 
     private void initializeUsersTable(){

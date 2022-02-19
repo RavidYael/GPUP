@@ -6,21 +6,18 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 import mainScreen.MainScreenController;
 import okhttp3.*;
 
 import java.io.IOException;
 
-import static FXData.Constants.BASE_URL;
-import static FXData.Constants.USER_NAME;
+import static FXData.Constants.*;
 import static jakarta.servlet.http.HttpServletResponse.*;
 
 public class LoginScreenController {
+
 
     @FXML
     private TextField adminNameTextField;
@@ -40,6 +37,8 @@ public class LoginScreenController {
         client =  new OkHttpClient.Builder()
                 .cookieJar(new SimpleCookieManager())
                 .build();
+
+        numOfThreadsSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1,100,1,1));
     }
 
     @FXML
@@ -47,9 +46,11 @@ public class LoginScreenController {
         boolean valid = false;
         String workerName = this.adminNameTextField.getText();
         SimpleCookieManager.addSimpleCookie(USER_NAME,workerName);
+        SimpleCookieManager.addSimpleCookie(NUM_OF_THREADS, numOfThreadsSpinner.getValue());
         HttpUrl.Builder urlBuilder = HttpUrl.parse(BASE_URL +"/login").newBuilder();
         urlBuilder.addQueryParameter("username", workerName);
         urlBuilder.addQueryParameter("user-degree","worker");
+        urlBuilder.addQueryParameter("num-of-threads", numOfThreadsSpinner.getValue().toString());
         Request loginRequest = new Request.Builder()
                 .url(urlBuilder.build().toString())
                 .build();

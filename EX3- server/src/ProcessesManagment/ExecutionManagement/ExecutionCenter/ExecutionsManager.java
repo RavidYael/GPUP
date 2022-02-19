@@ -3,7 +3,6 @@ package ProcessesManagment.ExecutionManagement.ExecutionCenter;
 import DTOs.*;
 import ProcessesManagment.ExecutionManagement.SubscribersManagement.SubscribesManager;
 import ProcessesManagment.ProcessesManager;
-import execution.WorkerExecutor;
 import jakarta.servlet.ServletContext;
 import utils.GraphInExecution;
 import utils.ServletUtils;
@@ -25,7 +24,7 @@ public class ExecutionsManager {
     private Map<String, GraphInExecution> graphInExecutionByName = new HashMap<>();
     private Map<String, GraphInfoDTO> graphInExecutionInfoByName = new HashMap<>();
     private ThreadPoolExecutor calculators = (ThreadPoolExecutor)Executors.newFixedThreadPool(10);
-    private Map<WorkerExecutor,Set<MissionInfoDTO>> workerExecutorMissionsMap = new HashMap<>();
+   // private Map<WorkerExecutor,Set<MissionInfoDTO>> workerExecutorMissionsMap = new HashMap<>();
 
     void generateWorkForWorker(TargetDTO DoneTarget){
 

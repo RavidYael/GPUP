@@ -1,5 +1,6 @@
 package mainScreen;
 
+import FXData.ServerDataManager;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -27,9 +28,13 @@ public class MainScreenController {
     private Parent submittedTasksScreen;
     private SubmittedTasksScreenController submittedTasksScreenController;
     private WorkerDashboardScreenController dashboardScreenController;
+    ServerDataManager serverDataManager;
 
 
     public void myInitializer() {
+        serverDataManager = new ServerDataManager();
+        serverDataManager.setClient(client);
+
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("worker dashboard screen.fxml"));
         try {
             dashboardScreen = fxmlLoader.load();
@@ -39,8 +44,9 @@ public class MainScreenController {
         centerPane.setCenter(dashboardScreen);
          dashboardScreenController = fxmlLoader.getController();
         dashboardScreenController.setClient(client);
-        dashboardScreenController.myInitializer();
         dashboardScreenController.setCenterPane(centerPane);
+        dashboardScreenController.setServerDataManager(serverDataManager);
+        dashboardScreenController.myInitializer();
 
         FXMLLoader fxmlLoader1 = new FXMLLoader(getClass().getResource("submitted tasks.fxml"));
         try {
@@ -50,6 +56,7 @@ public class MainScreenController {
         }
 
         submittedTasksScreenController = fxmlLoader1.getController();
+        submittedTasksScreenController.setServerDataManager(serverDataManager);
         submittedTasksScreenController.myInitializer(client);
         dashboardScreenController.setSubmittedTasksScreen(submittedTasksScreen, submittedTasksScreenController);
 

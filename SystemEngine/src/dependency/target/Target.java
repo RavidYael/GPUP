@@ -41,7 +41,7 @@ public class Target implements Serializable {
 
     public void updateTargetByDTO(TargetDTO executedTarget) {
     this.taskResult.set(executedTarget.getResult());
-    this.targetStatus.set(executedTarget.getStatus());
+    this.targetStatus.set(executedTarget.getTargetStatus());
     }
 
 

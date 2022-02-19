@@ -2,6 +2,7 @@ package FXData;
 
 import DTOs.GraphInfoDTO;
 import DTOs.MissionInfoDTO;
+import DTOs.TargetDTO;
 import DTOs.UserDTO;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -76,14 +77,13 @@ public class ServerDataManager {
         Request request = new Request.Builder()
                 .url(urlBuilder.build())
                 .build();
-
         try {
             Response response = client.newCall(request).execute();
             Gson usersGson = new Gson();
             Type collectionType = new TypeToken<Set<UserDTO>>(){}.getType();
             Set<UserDTO> usersFromServer = usersGson.fromJson(response.body().string(), collectionType);
             if (usersFromServer!=null)
-             res = usersFromServer.stream().map(u->u.getName()).collect(Collectors.toSet()).contains(SimpleCookieManager.getSimpleCookie(USER_NAME));
+             res = usersFromServer.stream().map(u->u.getName()).collect(Collectors.toSet()).contains((String)SimpleCookieManager.getSimpleCookie(USER_NAME));
 
 
         } catch (IOException e) {
@@ -91,6 +91,34 @@ public class ServerDataManager {
         }
 
         return res;
+    }
+    public TargetDTO getTargetToRunFromServer(){
+        TargetDTO targetDTOFromServer = null;
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(BASE_URL +"/runnable-target").newBuilder(); //TODO url not final
+       // urlBuilder.addQueryParameter("MissionName",missionName);
+
+        Request request = new Request.Builder()
+                .url(urlBuilder.build())
+                .build();
+
+        try {
+            Response response = client.newCall(request).execute();
+            targetDTOFromServer = new Gson().fromJson(response.body().string(),TargetDTO.class);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return targetDTOFromServer;
+
+    }
+
+    public void updateServerWithTaskResult(TargetDTO targetDTOToRun) {
+        Request request = new Request.Builder()
+                .url(BASE_URL +"/update-target-result")
+                .post(RequestBody.create(MediaType.parse("application/json"),new Gson().toJson(targetDTOToRun)))
+                .build();
+
+
     }
 }
 

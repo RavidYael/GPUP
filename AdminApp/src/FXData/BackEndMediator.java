@@ -3,7 +3,6 @@ package FXData;
 import dependency.graph.DependencyGraph;
 import dependency.graph.GraphFactory;
 import dependency.target.Target;
-import execution.TaskExecution;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.CheckBox;

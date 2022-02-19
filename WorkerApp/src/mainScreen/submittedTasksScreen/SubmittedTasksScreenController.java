@@ -1,7 +1,7 @@
 package mainScreen.submittedTasksScreen;
 
 import DTOs.MissionInfoDTO;
-import FXData.TableManager;
+import FXData.*;
 import dependency.graph.DependencyGraph;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -11,6 +11,12 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import mainScreen.workerDashboardScreen.TaskInTable;
 import mainScreen.workerDashboardScreen.WorkerDashboardScreenController;
 import okhttp3.OkHttpClient;
+
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+
+import static FXData.Constants.NUM_OF_THREADS;
+import static java.util.concurrent.TimeUnit.MINUTES;
 
 public class SubmittedTasksScreenController {
 
@@ -65,7 +71,14 @@ public class SubmittedTasksScreenController {
     private OkHttpClient client;
     private TableManager tableManager;
     ObservableList<TaskInTable> tasksInTable = FXCollections.observableArrayList();
+    WorkerExecutor workerExecutor;
+    private ServerDataManager serverDataManager;
+    private Integer numOfThreads = (Integer)SimpleCookieManager.getSimpleCookie(NUM_OF_THREADS);
+    private TextAreaConsumer textAreaConsumer;
 
+    public void setServerDataManager(ServerDataManager serverDataManager) {
+        this.serverDataManager = serverDataManager;
+    }
 
     public OkHttpClient getClient() {
         return client;
@@ -79,6 +92,8 @@ public class SubmittedTasksScreenController {
     @FXML
     public void initialize(){
         bindSpecificTask();
+        textAreaConsumer = new TextAreaConsumer(runningTargetsTA);
+
 
     }
 
@@ -99,6 +114,7 @@ public class SubmittedTasksScreenController {
         this.client = client;
         this.tableManager = tableManager;
         initializeTasksTable();
+        workerExecutor = new WorkerExecutor(numOfThreads,serverDataManager,textAreaConsumer);
 
     }
 
@@ -121,6 +137,17 @@ public class SubmittedTasksScreenController {
     public void addNewTask(TaskInTable newTask) {
         tasksInTable.add(newTask);
         initializeTasksTable();
+        beginExecution(); //TODO check if already executing
+    }
+
+    private void beginExecution() {
+
+        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(numOfThreads,numOfThreads,1000, MINUTES,new LinkedBlockingQueue<Runnable>());
+        while (threadPoolExecutor.getActiveCount()< numOfThreads){
+            threadPoolExecutor.submit(workerExecutor);
+        }
+
+
     }
 
 }

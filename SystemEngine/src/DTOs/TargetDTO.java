@@ -1,6 +1,8 @@
 package DTOs;
 
-import DTOs.TasksPrefernces.TaskPreferences;
+import DTOs.TasksPrefernces.CompilationParameters;
+import DTOs.TasksPrefernces.SimulationParameters;
+import dependency.graph.DependencyGraph;
 import dependency.target.Target;
 
 public class TargetDTO {
@@ -10,20 +12,22 @@ public class TargetDTO {
     private Target.TargetStatus status;
     private String runLog;
     private String extraData;
-    private String taskType;
+    private DependencyGraph.TaskType taskType;
     private String missionName;
-    private TaskPreferences runningPreferences;
+    private SimulationParameters simulationParameters;
+    private CompilationParameters compilationParameters;
 
     public String getMissionName() {
         return missionName;
     }
 
-    public TargetDTO(String name, String extraData, String taskName, String missionName,TaskPreferences taskPreferences) {
+    public TargetDTO(String name, String extraData, DependencyGraph.TaskType taskType, String missionName) {
         this.name = name;
         this.extraData = extraData;
         this.runLog = "";
-        this.taskType = taskName;
+        this.taskType = taskType;
         this.missionName = missionName;
+        //this.runningPreferences = taskPreferences;
     }
 
 
@@ -43,11 +47,11 @@ public class TargetDTO {
         this.result = result;
     }
 
-    public Target.TargetStatus getStatus() {
+    public Target.TargetStatus getTargetStatus() {
         return status;
     }
 
-    public void setStatus(Target.TargetStatus status) {
+    public void setTargetStatus(Target.TargetStatus status) {
         this.status = status;
     }
 
@@ -67,16 +71,27 @@ public class TargetDTO {
         this.extraData = extraData;
     }
 
-    public String getTaskType() {
+    public DependencyGraph.TaskType getTaskType() {
         return taskType;
     }
 
-    public void setTaskType(String taskType) {
+    public void setTaskType(DependencyGraph.TaskType taskType) {
         this.taskType = taskType;
     }
 
+    public SimulationParameters getSimulationParameters() {
+        return simulationParameters;
+    }
 
+    public CompilationParameters getCompilationParameters() {
+        return compilationParameters;
+    }
 
+    public void setSimulationParameters(SimulationParameters simulationParameters) {
+        this.simulationParameters = simulationParameters;
+    }
 
-
+    public void setCompilationParameters(CompilationParameters compilationParameters) {
+        this.compilationParameters = compilationParameters;
+    }
 }

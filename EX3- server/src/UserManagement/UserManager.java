@@ -37,6 +37,7 @@ public class UserManager {
         WorkerDTO newWorker = new WorkerDTO(username,Degree,availableThreads);
         usersDTOMap.put(username,newWorker);
         WorkersDTOMap.put(username,newWorker);
+        
     }
 
 

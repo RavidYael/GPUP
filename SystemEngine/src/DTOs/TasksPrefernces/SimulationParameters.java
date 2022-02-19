@@ -1,6 +1,6 @@
 package DTOs.TasksPrefernces;
 
-public class SimulationParameters extends TaskPreferences {
+public class SimulationParameters {
 
         private int processingTime;
         private Boolean isRandom;
