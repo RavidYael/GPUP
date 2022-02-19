@@ -19,7 +19,7 @@ public class WorkerExecutor extends Thread{
     private ThreadPoolExecutor threadPoolExecutors = (ThreadPoolExecutor) Executors.newFixedThreadPool(numOfThreads);
 
     public void run(){
-    while(workers.getActiveCount() != numOfThreads){
+    while(threadPoolExecutors.getActiveCount() != numOfThreads){
     //TODO WE NEED TO GET NEW TARGET TO WORK ON
     }
     }

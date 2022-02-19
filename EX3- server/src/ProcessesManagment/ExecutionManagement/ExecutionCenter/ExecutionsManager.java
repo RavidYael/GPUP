@@ -29,18 +29,12 @@ public class ExecutionsManager {
 
     void generateWorkForWorker(TargetDTO DoneTarget){
 
-            GraphInExecution theGraph = graphInExecutionByName.get(DoneTarget.getMissionName);
-            calculators.submit(theGraph.generateAvailableTargets()); //TODO: THIS METHOD HAS TO BE RUNNABLE, AND SHOULD TAKE TO DUMMY CALCULATOR LOCK
+//            GraphInExecution theGraph = graphInExecutionByName.get(DoneTarget.getMissionName);
+//            calculators.submit(theGraph.generateAvailableTargets()); //TODO: THIS METHOD HAS TO BE RUNNABLE, AND SHOULD TAKE TO DUMMY CALCULATOR LOCK
 
-        }
     }
-
-
-
-
-
-
-
-
-
 }
+
+
+
+
