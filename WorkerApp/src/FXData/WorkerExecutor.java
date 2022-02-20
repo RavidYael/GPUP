@@ -35,9 +35,18 @@ public class WorkerExecutor extends Thread implements Runnable{
     }
 
     public void run(){
+        System.out.println("in worker executer");
         GPUPTask gpupTask;
         TargetDTO targetDTOToRun = serverDataManager.getTargetToRunFromServer();
         //TODO check if there are no more targets available
+        if (targetDTOToRun == null){
+            try {
+                Thread.sleep(500);
+                return;
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
         if (targetDTOToRun.getTaskType().equals(DependencyGraph.TaskType.SIMULATION)){
              gpupTask = new SimulationGPUPTask(targetDTOToRun.getSimulationParameters());
         }

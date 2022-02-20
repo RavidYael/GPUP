@@ -119,8 +119,8 @@ public class WorkerDashboardScreenController {
 
     private void subscribeToTaskAction(TaskInTable newTask){
         centerPane.setCenter(submittedTasksScreen);
-        submittedTaskScreenController.addNewTask(newTask);
         subscribeToTask(newTask);
+        submittedTaskScreenController.addNewTask(newTask);
 
 
 

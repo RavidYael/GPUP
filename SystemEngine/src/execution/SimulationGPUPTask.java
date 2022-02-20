@@ -156,7 +156,7 @@ public class SimulationGPUPTask extends GPUPTask implements Serializable {
         String additionalInfo = "";
 
         Instant start = Instant.now();
-        curTarget.setBeginProcessTime(System.currentTimeMillis());
+       // curTarget.setBeginProcessTime(System.currentTimeMillis());
 
         Target.TaskResult taskResult;
 

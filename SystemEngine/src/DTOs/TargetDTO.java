@@ -21,13 +21,14 @@ public class TargetDTO {
         return missionName;
     }
 
-    public TargetDTO(String name, String extraData, DependencyGraph.TaskType taskType, String missionName) {
+    public TargetDTO(String name, String extraData, MissionInfoDTO missionInfoDTO) {
         this.name = name;
         this.extraData = extraData;
         this.runLog = "";
-        this.taskType = taskType;
-        this.missionName = missionName;
-        //this.runningPreferences = taskPreferences;
+        this.taskType = missionInfoDTO.getMissionType();
+        this.missionName = missionInfoDTO.getMissionName();
+        this.compilationParameters = missionInfoDTO.getCompilationParameters();
+        this.simulationParameters = missionInfoDTO.getSimulationParameters();
     }
 
 

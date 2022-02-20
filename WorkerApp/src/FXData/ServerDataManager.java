@@ -18,6 +18,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static FXData.Constants.*;
+import static jakarta.servlet.http.HttpServletResponse.SC_ACCEPTED;
+import static jakarta.servlet.http.HttpServletResponse.SC_CONFLICT;
 
 public class ServerDataManager {
 
@@ -103,7 +105,11 @@ public class ServerDataManager {
 
         try {
             Response response = client.newCall(request).execute();
-            targetDTOFromServer = new Gson().fromJson(response.body().string(),TargetDTO.class);
+            if (response.code() == SC_CONFLICT)
+                targetDTOFromServer = null;
+            else if (response.code() == SC_ACCEPTED) {
+                targetDTOFromServer = new Gson().fromJson(response.body().string(), TargetDTO.class);
+            }
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -117,7 +123,12 @@ public class ServerDataManager {
                 .url(BASE_URL +"/update-target-result")
                 .post(RequestBody.create(MediaType.parse("application/json"),new Gson().toJson(targetDTOToRun)))
                 .build();
-
+        try {
+            Response response = client.newCall(request).execute();
+            System.out.println("update server: "+ response.code());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 }

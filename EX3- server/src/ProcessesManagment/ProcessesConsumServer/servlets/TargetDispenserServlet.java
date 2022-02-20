@@ -39,16 +39,18 @@ public class TargetDispenserServlet extends HttpServlet {
 
             Set<String> missionsWorkerSubscribes = subscribesManager.getWorkerMissionsNames(workerName);
 
-            TargetDTO targetDTO = processesManager.pollTaskReadyForWorker(missionsWorkerSubscribes);
+            TargetDTO targetDTO = processesManager.pullTaskReadyForWorker(missionsWorkerSubscribes);
 
             if (targetDTO == null) {
+
                 resp.getWriter().println("there is no runnable targets for this worker");
                 resp.setStatus(SC_CONFLICT);
 
-            } else
-
+            }
+            else {
                 resp.getWriter().write(gson.toJson(targetDTO));
-            resp.setStatus(SC_ACCEPTED);
+                resp.setStatus(SC_ACCEPTED);
+            }
         }
     }
 }

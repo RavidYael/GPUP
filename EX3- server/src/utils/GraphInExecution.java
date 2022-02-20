@@ -32,9 +32,9 @@ public class GraphInExecution {
         status2Targets.put(Target.TargetStatus.InProcess, new HashSet<>());
         status2Targets.put(Target.TargetStatus.Finished, new HashSet<>());
         status2Targets.put(Target.TargetStatus.Done, new HashSet<>());
+        graphInExecution.initializeWaitingTargets();
         updateStatus2Target();
         initializeTarget2summary();
-        graphInExecution.initializeWaitingTargets();
 
     }
 

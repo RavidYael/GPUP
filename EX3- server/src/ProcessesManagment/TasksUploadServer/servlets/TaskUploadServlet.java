@@ -41,6 +41,7 @@ public class TaskUploadServlet extends HttpServlet {
                 resp.setStatus(HttpServletResponse.SC_ACCEPTED);
                 GraphsManager graphsManager = ServletUtils.getGraphsManager(getServletContext());
                 missionsManager.addMissionsDTO(newTaskInfo,graphsManager);
+
             }
             else //A task with the same name already exists in the system
             {

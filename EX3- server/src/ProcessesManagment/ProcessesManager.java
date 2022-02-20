@@ -79,18 +79,20 @@ public class ProcessesManager {
 
         public synchronized void addMissionsDTO(SimulationTaskDTO newTask, GraphsManager graphsManager) {
                 GraphInExecution subGraphToWorkOn = new GraphInExecution(newTask.getTaskName(), newTask.getTargetsToExecute(), graphsManager.getGraphByName(newTask.getGraphName()));
-                MissionDTOByName.put(newTask.getTaskName(), new MissionInfoDTO(subGraphToWorkOn.getGraphInExecution(), newTask.getTargetsToExecute(), newTask.getTaskName(), newTask.getTaskCreator(), DependencyGraph.TaskType.SIMULATION, newTask.getPricingForTarget(), 0, MissionInfoDTO.MissionStatus.frozen));
-                graphInExecutionByName.put(newTask.getGraphName(), subGraphToWorkOn);
+                MissionDTOByName.put(newTask.getTaskName(), new MissionInfoDTO(subGraphToWorkOn.getGraphInExecution(), newTask.getTargetsToExecute(), newTask.getTaskName(), newTask.getTaskCreator(), DependencyGraph.TaskType.SIMULATION, newTask.getPricingForTarget(), 0, MissionInfoDTO.MissionStatus.frozen,newTask));
+                graphInExecutionByName.put(newTask.getTaskName(), subGraphToWorkOn);
                 GraphInfoDTO graphInfoDTO = new GraphInfoDTO(subGraphToWorkOn.getGraphInExecution());
                 graphInExecutionInfoByName.put(graphInfoDTO.getGraphName(), graphInfoDTO);
+                refreshReadyTargets();
         }
 
         public synchronized void addMissionsDTO(CompilationTaskDTO newTask, GraphsManager graphsManager) {
                 GraphInExecution subGraphToWorkOn = new GraphInExecution(newTask.getTaskName(), newTask.getTargetsToExecute(), graphsManager.getGraphByName(newTask.getGraphName()));
-                MissionDTOByName.put(newTask.getTaskName(), new MissionInfoDTO(subGraphToWorkOn.getGraphInExecution(), newTask.getTargetsToExecute(), newTask.getTaskName(), newTask.getTaskCreator(), DependencyGraph.TaskType.COMPILATION, newTask.getPricingForTarget(), 0, MissionInfoDTO.MissionStatus.frozen));
-                graphInExecutionByName.put(newTask.getGraphName(), subGraphToWorkOn);
+                MissionDTOByName.put(newTask.getTaskName(), new MissionInfoDTO(subGraphToWorkOn.getGraphInExecution(), newTask.getTargetsToExecute(), newTask.getTaskName(), newTask.getTaskCreator(), DependencyGraph.TaskType.COMPILATION, newTask.getPricingForTarget(), 0, MissionInfoDTO.MissionStatus.frozen,newTask));
+                graphInExecutionByName.put(newTask.getTaskName(), subGraphToWorkOn);
                 GraphInfoDTO graphInfoDTO = new GraphInfoDTO(subGraphToWorkOn.getGraphInExecution());
                 graphInExecutionInfoByName.put(graphInfoDTO.getGraphName(), graphInfoDTO);
+                refreshReadyTargets();
         }
 
         public synchronized MissionInfoDTO getMissionInfoDTO(String missionName) {
@@ -113,16 +115,17 @@ public class ProcessesManager {
         }
 //TODO: THERE IS A BUG! WE DONT REMOVE TARGETS THAT ARE NO LONGER WAITING
         private void refreshReadyTargets() {
+                allReadyTargetsInSystem.clear();
                 for (String mission : listOfAllMissions) {
                         for (Target target : graphInExecutionByName.get(mission).getGraphInExecution().getAllTargets().values().stream().filter(t -> t.getTargetStatus().equals(Waiting)).collect(Collectors.toSet())) {
                                 if (!allReadyTargetsInSystem.stream().anyMatch(targetDTO -> targetDTO.getName().equals(target.getName()) && targetDTO.getTaskType().equals(mission))) {
-                                        allReadyTargetsInSystem.add(new TargetDTO(target.getName(), target.getData(), getMissionInfoDTO(mission).getMissionType(), mission));
+                                        allReadyTargetsInSystem.add(new TargetDTO(target.getName(), target.getData(), getMissionInfoDTO(mission)));
                                 }
                         }
                 }
         }
 
-        public synchronized TargetDTO pollTaskReadyForWorker(Set<String> tasksThatWorkerIsSignedTo) {
+        public synchronized TargetDTO pullTaskReadyForWorker(Set<String> tasksThatWorkerIsSignedTo) {
 
                 List<TargetDTO> filteredList = allReadyTargetsInSystem.stream().filter
                         (targetDTO -> tasksThatWorkerIsSignedTo.contains(targetDTO.getMissionName()))
@@ -131,6 +134,7 @@ public class ProcessesManager {
                 if(!filteredList.isEmpty()) {
                         TargetDTO ret = filteredList.get(0);
                         filteredList.remove(0);
+                        allReadyTargetsInSystem.remove(ret);
                         return ret;
                 }
 

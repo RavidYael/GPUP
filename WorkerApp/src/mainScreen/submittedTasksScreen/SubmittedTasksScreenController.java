@@ -75,6 +75,7 @@ public class SubmittedTasksScreenController {
     private ServerDataManager serverDataManager;
     private Integer numOfThreads = (Integer)SimpleCookieManager.getSimpleCookie(NUM_OF_THREADS);
     private TextAreaConsumer textAreaConsumer;
+    private boolean beenPaused =  false;
 
     public void setServerDataManager(ServerDataManager serverDataManager) {
         this.serverDataManager = serverDataManager;
@@ -137,17 +138,34 @@ public class SubmittedTasksScreenController {
     public void addNewTask(TaskInTable newTask) {
         tasksInTable.add(newTask);
         initializeTasksTable();
-        beginExecution(); //TODO check if already executing
+        Thread thread = new Thread(()->beginExecution());
+        thread.run();
+        //TODO check if already executing
     }
 
     private void beginExecution() {
 
         ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(numOfThreads,numOfThreads,1000, MINUTES,new LinkedBlockingQueue<Runnable>());
-        while (threadPoolExecutor.getActiveCount()< numOfThreads){
-            threadPoolExecutor.submit(workerExecutor);
+        while (true) {
+            //  threadPoolExecutor.submit(workerExecutor);
+            if (threadPoolExecutor.getActiveCount() == numOfThreads){
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            else{
+
+            threadPoolExecutor.execute(workerExecutor);
+            }
+
+        }
+
+
         }
 
 
     }
 
-}
+

@@ -32,7 +32,7 @@ public class SubscribesManager {
     //missionInfoDTOWorkersMap.put(missionInfoDTO,new HashSet<>()); // you don't want to create a new one each time, only the first time. so replaced with:
     missionInfoDTOWorkersMap.computeIfAbsent(missionInfoDTO, s-> new HashSet<>()).add(user);
     missionInfoDTOMap.put(missionInfoDTO.getMissionName(),missionInfoDTO);
-    //TODO OMER TRICK WITH INSERT INTO NEW SET
+    workerMissionsMap.computeIfAbsent(user.getName(),s-> new HashSet<>()).add(missionInfoDTO);
     }
 
     public Set<UserDTO> getMissionWorkers(String missionName){
