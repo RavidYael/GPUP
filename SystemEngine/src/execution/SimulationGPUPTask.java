@@ -148,7 +148,7 @@ public class SimulationGPUPTask extends GPUPTask implements Serializable {
 
     @Override
     public Void runOnTarget(TargetDTO target, Consumer consumer) {
-
+        System.out.println("running simulation");
         if(target.getTargetStatus() == Target.TargetStatus.Finished)
             return null;
 
@@ -163,7 +163,7 @@ public class SimulationGPUPTask extends GPUPTask implements Serializable {
 
         target.setTargetStatus(Target.TargetStatus.InProcess);
         double rand = new Random().nextDouble();
-        consumer.accept("Target " + target.getName() + " is now processing " +
+        consumer.accept("Target " + target.getName() + "from task: "+ target.getMissionName()+ " is now processing " +
                 "\nTarget information: " + target.getExtraData());
 
         Instant startSleeping = Instant.now();

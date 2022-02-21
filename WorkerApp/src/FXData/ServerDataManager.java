@@ -131,6 +131,26 @@ public class ServerDataManager {
         }
 
     }
+
+    public MissionInfoDTO getTaskFromServer(String taskName) {
+        MissionInfoDTO missionInfoDTO = null;
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(BASE_URL +"/task-data").newBuilder();
+        urlBuilder.addQueryParameter("selectedMissionName", taskName);
+
+        Request request = new Request.Builder()
+                .url(urlBuilder.build())
+                .build();
+
+        try {
+            Response response = client.newCall(request).execute();
+            missionInfoDTO = new Gson().fromJson(response.body().string(),MissionInfoDTO.class);
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return missionInfoDTO;
+    }
 }
 
 

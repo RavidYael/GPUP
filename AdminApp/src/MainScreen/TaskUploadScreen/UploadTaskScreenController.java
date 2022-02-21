@@ -158,7 +158,7 @@ public class UploadTaskScreenController {
                     .map(targetInTable -> targetInTable.getName())
                     .collect(Collectors.toSet());
             if (taskComboBox.getValue().equals(SIMULATION)) {
-                int proccessTime = simulationTaskController.getMaxSecToRun();
+                int proccessTime = simulationTaskController.getMaxSecToRun() *1000;
                 boolean isTimeRandom = simulationTaskController.isTaskTimeRandom();
                 Double suceessProb = simulationTaskController.getChancesOfSuccess();
                 Double warningProb = simulationTaskController.getChancesOfWarning();

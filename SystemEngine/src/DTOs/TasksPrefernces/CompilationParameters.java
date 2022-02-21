@@ -27,4 +27,11 @@ public class CompilationParameters  {
         ExtraData = extraData;
     }
 
+    @Override
+    public String toString() {
+        return
+                "source Path='" + sourcePath + "\n" +
+                " destination Path='" + destinationPath + "\n" +
+                " Extra Data='" + ExtraData + "\n";
+    }
 }

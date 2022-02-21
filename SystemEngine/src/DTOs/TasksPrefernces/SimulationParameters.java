@@ -50,5 +50,15 @@ public class SimulationParameters {
         public void setProcessingTime(int processingTime) {
             this.processingTime = processingTime;
         }
+
+    @Override
+    public String toString() {
+        return
+                "processingTime =" + processingTime +"\n" +
+                "is Time Random =" + isRandom + "\n" +
+                "Chances Of sucess =" + successRate + "\n" +
+                "success of Success With Warnings=" + successWithWarnings ;
     }
+}
+
 

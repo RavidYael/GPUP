@@ -1,6 +1,8 @@
 package mainScreen.submittedTasksScreen;
 
 import DTOs.MissionInfoDTO;
+import DTOs.TasksPrefernces.CompilationParameters;
+import DTOs.TasksPrefernces.SimulationParameters;
 import FXData.*;
 import dependency.graph.DependencyGraph;
 import javafx.collections.FXCollections;
@@ -100,14 +102,30 @@ public class SubmittedTasksScreenController {
 
     private void bindSpecificTask() {
         tasksTable.getSelectionModel().selectedItemProperty().addListener(observable -> {
-            specificTaskAction();
+            specificTaskAction(tasksTable.getSelectionModel().getSelectedItem().getName());
 
         });
     }
 
-    private void specificTaskAction() {
+    private void specificTaskAction(String taskName) {
+        taskPropertiesTA.clear();
         submittedTaskTabPane.getSelectionModel().select(1);
         // display specific task information
+        MissionInfoDTO missionInfoDTO = serverDataManager.getTaskFromServer(taskName);
+        if (missionInfoDTO != null){
+            taskPropertiesTA.appendText("Task parameters: \n"+
+                    "Task Type = ");
+            if (missionInfoDTO.getMissionType().equals(DependencyGraph.TaskType.SIMULATION)) {
+                SimulationParameters simulationParameters = missionInfoDTO.getSimulationParameters();
+                taskPropertiesTA.appendText("Simulation\n");
+                taskPropertiesTA.appendText(simulationParameters.toString());
+            }
+            else{
+                CompilationParameters compilationParameters = missionInfoDTO.getCompilationParameters();
+                taskPropertiesTA.appendText("Compilation\n");
+                taskPropertiesTA.appendText(compilationParameters.toString());
+            }
+        }
 
     }
 
@@ -139,7 +157,7 @@ public class SubmittedTasksScreenController {
         tasksInTable.add(newTask);
         initializeTasksTable();
         Thread thread = new Thread(()->beginExecution());
-        thread.run();
+        thread.start();
         //TODO check if already executing
     }
 

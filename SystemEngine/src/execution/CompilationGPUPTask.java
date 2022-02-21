@@ -31,6 +31,7 @@ public class CompilationGPUPTask extends GPUPTask {
     public CompilationGPUPTask(CompilationParameters compilationParameters){
         this.toCompilePath = compilationParameters.getSourcePath();
         this.outPutPath = compilationParameters.getDestinationPath();
+        this.processingTime = 0;
 
     }
 
@@ -120,6 +121,8 @@ public class CompilationGPUPTask extends GPUPTask {
     @Override
     public Void runOnTarget(TargetDTO target, Consumer consumer)
     {
+        System.out.println("running compilation");
+
         if(target.getTargetStatus() == Target.TargetStatus.Finished)
             return null;
 

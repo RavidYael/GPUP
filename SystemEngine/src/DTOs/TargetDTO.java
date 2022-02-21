@@ -16,6 +16,7 @@ public class TargetDTO {
     private String missionName;
     private SimulationParameters simulationParameters;
     private CompilationParameters compilationParameters;
+    private int payment;
 
     public String getMissionName() {
         return missionName;
@@ -29,6 +30,7 @@ public class TargetDTO {
         this.missionName = missionInfoDTO.getMissionName();
         this.compilationParameters = missionInfoDTO.getCompilationParameters();
         this.simulationParameters = missionInfoDTO.getSimulationParameters();
+        this.payment = missionInfoDTO.getPriceByTaskType(missionInfoDTO.getMissionType());
     }
 
 
