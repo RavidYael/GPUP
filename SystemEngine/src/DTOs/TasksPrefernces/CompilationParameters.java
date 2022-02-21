@@ -1,6 +1,6 @@
 package DTOs.TasksPrefernces;
 
-public class CompilationParameters  {
+public class CompilationParameters {
 
     private final String sourcePath;
     private final String destinationPath;

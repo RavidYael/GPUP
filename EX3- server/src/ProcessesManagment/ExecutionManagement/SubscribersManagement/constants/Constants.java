@@ -5,6 +5,8 @@ public class Constants {
         public static final String DEGREE = "user-degree";
         public static final String USER_NAME_ERROR = "username_error";
 
+        public static final String SUBSCRIBE_TYPE = "subscribe-type";
+
         public static final String CHAT_PARAMETER = "userstring";
         public static final String CHAT_VERSION_PARAMETER = "chatversion";
 

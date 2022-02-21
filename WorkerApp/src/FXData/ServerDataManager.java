@@ -22,6 +22,8 @@ import static jakarta.servlet.http.HttpServletResponse.SC_ACCEPTED;
 import static jakarta.servlet.http.HttpServletResponse.SC_CONFLICT;
 
 public class ServerDataManager {
+    //TODO : HERE YOU PROBABLY GOING To WRITE THE REQUEST TO BE PAUSED AND RESUME ,
+    // WE NEED TO UPDATE THE WORK EXECUTOR THAT HE IS BEING PAUSED TROUGH THE REQUEST (:
 
     private OkHttpClient client;
 

@@ -77,7 +77,7 @@ public class SubmittedTasksScreenController {
     private ServerDataManager serverDataManager;
     private Integer numOfThreads = (Integer)SimpleCookieManager.getSimpleCookie(NUM_OF_THREADS);
     private TextAreaConsumer textAreaConsumer;
-    private boolean beenPaused =  false;
+
 
     public void setServerDataManager(ServerDataManager serverDataManager) {
         this.serverDataManager = serverDataManager;
@@ -174,6 +174,13 @@ public class SubmittedTasksScreenController {
                 }
             }
             else{
+                while(workerExecutor.isPaused()){
+                        try {
+                            Thread.sleep(500);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                }
 
             threadPoolExecutor.execute(workerExecutor);
             }

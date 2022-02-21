@@ -24,7 +24,12 @@ public class ProcessesManager {
 
 
         public void updateTargetResult(TargetDTO theUpdatedTarget){
-                graphInExecutionByName.get(theUpdatedTarget.getMissionName()).updateEffectOfTargetsExecution(theUpdatedTarget);
+
+                MissionInfoDTO.MissionStatus missionStatus = graphInExecutionByName.get(theUpdatedTarget.getMissionName()).updateEffectOfTargetsExecution(theUpdatedTarget);
+
+                if(missionStatus == MissionInfoDTO.MissionStatus.finished){
+                missionFinished(theUpdatedTarget.getMissionName());
+                }
         }
 
 
@@ -125,10 +130,11 @@ public class ProcessesManager {
                 }
         }
 
-        public synchronized TargetDTO pullTaskReadyForWorker(Set<String> tasksThatWorkerIsSignedTo) {
+        public synchronized TargetDTO pullTaskReadyForWorker(Set<String> tasksThatWorkerIsWorkOn) {
+
 
                 List<TargetDTO> filteredList = allReadyTargetsInSystem.stream().filter
-                        (targetDTO -> tasksThatWorkerIsSignedTo.contains(targetDTO.getMissionName()))
+                        (targetDTO -> tasksThatWorkerIsWorkOn.contains(targetDTO.getMissionName()))
                         .collect(Collectors.toList());
 
                 if(!filteredList.isEmpty()) {
@@ -143,6 +149,9 @@ public class ProcessesManager {
 
         }
 
+        public void missionFinished(String missionName){
+                getMissionInfoDTO(missionName).setMissionStatus(MissionInfoDTO.MissionStatus.finished);
+        }
 
 }
 

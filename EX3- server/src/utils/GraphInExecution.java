@@ -17,6 +17,7 @@ public class GraphInExecution {
     private String targetsSummaryDir;
     private Long totalDuration = 0L;
 
+
     private Object CalculationLock = new Object();
 
     public GraphInExecution(String missionName,Set<String> targetsToExecute, DependencyGraph graphTheMissionDefinedUpon) {
@@ -79,7 +80,7 @@ public class GraphInExecution {
 
 
 
-    public void updateEffectOfTargetsExecution(TargetDTO executedTarget){
+    public MissionInfoDTO.MissionStatus updateEffectOfTargetsExecution(TargetDTO executedTarget){
 
         synchronized (CalculationLock) {
 
@@ -97,6 +98,10 @@ public class GraphInExecution {
             }
             updateStatus2Target();
 
+        if (status2Targets.get(Target.TargetStatus.Waiting).size() == 0 && status2Targets.get(Target.TargetStatus.InProcess).size() == 0){
+            return MissionInfoDTO.MissionStatus.finished;
+        }
+        else return MissionInfoDTO.MissionStatus.running;
     }
 
 

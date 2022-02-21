@@ -26,6 +26,7 @@ public class WorkerExecutor extends Thread implements Runnable{
     private int numOfThreads;
    // private ThreadPoolExecutor threadPoolExecutors = (ThreadPoolExecutor) Executors.newFixedThreadPool(numOfThreads);
     ServerDataManager serverDataManager;
+    Boolean isPaused = false;
 
 
     public WorkerExecutor(int numOfThreads, ServerDataManager serverDataManager, TextAreaConsumer textAreaConsumer){
@@ -41,6 +42,7 @@ public class WorkerExecutor extends Thread implements Runnable{
         //TODO check if there are no more targets available
         if (targetDTOToRun == null){
             try {
+                System.out.println("there is no more targets to run right now");
                 Thread.sleep(500);
                 return;
             } catch (InterruptedException e) {
@@ -59,7 +61,17 @@ public class WorkerExecutor extends Thread implements Runnable{
 
     }
 
+    public boolean isPaused() {
+    return isPaused;
+    }
 
+    public void setPaused() {
+        isPaused = true;
+    }
+
+    public void setResume(){
+        isPaused = false;
+    }
 }
 
 

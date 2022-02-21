@@ -37,7 +37,7 @@ public class TargetDispenserServlet extends HttpServlet {
 
         if (workerName != null) {
 
-            Set<String> missionsWorkerSubscribes = subscribesManager.getWorkerMissionsNames(workerName);
+            Set<String> missionsWorkerSubscribes = subscribesManager.getWorkerWorkingMissionsNames(workerName);
 
             TargetDTO targetDTO = processesManager.pullTaskReadyForWorker(missionsWorkerSubscribes);
 

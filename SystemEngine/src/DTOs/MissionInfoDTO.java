@@ -34,7 +34,15 @@ public class MissionInfoDTO {
     }
 
     private Integer currentNumOfxExecutingWorkers;
-        private MissionStatus missionStatus;
+
+    public void setMissionStatus(MissionStatus missionStatus) {
+        this.missionStatus = missionStatus;
+        if(missionStatus.equals(MissionStatus.finished)){
+            //TODO: HAS TO THINK WHAT THE CONSEQUENCES
+        }
+    }
+
+    private MissionStatus missionStatus;
         private Integer simulationPrice;
         private Integer compilationPrice;
 
