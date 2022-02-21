@@ -5,6 +5,8 @@ public class Constants {
     public static final String MISSION_NAME = "mission_name";
     public static final String USER_NAME = "userName" ;
     public static final String NUM_OF_THREADS = "numOfThreads";
+    public static final String SUBSCRIBE_TYPE = "subscribe-type";
+
 
 
 }

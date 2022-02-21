@@ -32,6 +32,7 @@ public class TableManager {
         return usersInTable;
     }
 
+
     public ObservableList<TaskInTable> getTasksForTable() {
         ObservableList<TaskInTable> tasksinTable = FXCollections.observableArrayList();
         Set<MissionInfoDTO> missionsDTOSet = serverDataManager.getAllMissionsDTO();
@@ -55,6 +56,24 @@ public class TableManager {
 
         }
         return tasksinTable;
+    }
+
+    public ObservableList<SubmittedTaskInTable> getSubmittedTasksForTable() {
+        ObservableList<SubmittedTaskInTable> tasksInTable = FXCollections.observableArrayList();
+        Set<MissionInfoDTO> missionsDTOSet = serverDataManager.getAllMissionsForUser();
+        if (!missionsDTOSet.isEmpty()) {
+            for (MissionInfoDTO curtask : missionsDTOSet) {
+                SubmittedTaskInTable tempTaskInTable = new SubmittedTaskInTable();
+                tempTaskInTable.setNumOfWorkers(curtask.getCurrentNumOfxExecutingWorkers());
+                tempTaskInTable.setName(curtask.getMissionName());
+                tempTaskInTable.setProgress(serverDataManager.getTaskProcess(curtask.getMissionName()));
+                tempTaskInTable.numOfTargets = serverDataManager.getExecutedTargetsForUser(curtask.getMissionName());
+                tasksInTable.add(tempTaskInTable);
+            }
+
+        }
+
+        return tasksInTable;
     }
 
 }

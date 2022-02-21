@@ -14,6 +14,7 @@ public class TargetDTO {
     private String extraData;
     private DependencyGraph.TaskType taskType;
     private String missionName;
+    private String runBy;
     private SimulationParameters simulationParameters;
     private CompilationParameters compilationParameters;
     private int payment;
@@ -62,6 +63,10 @@ public class TargetDTO {
         return runLog;
     }
 
+    public int getPayment() {
+        return payment;
+    }
+
     public void setRunLog(String runLog) {
         this.runLog = runLog;
     }
@@ -97,4 +102,13 @@ public class TargetDTO {
     public void setCompilationParameters(CompilationParameters compilationParameters) {
         this.compilationParameters = compilationParameters;
     }
+
+    public void setRunBy(String runBy) {
+        this.runBy = runBy;
+    }
+
+    public String getRunBy() {
+        return runBy;
+    }
+
 }

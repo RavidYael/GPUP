@@ -164,7 +164,7 @@ public class UploadTaskScreenController {
                 Double warningProb = simulationTaskController.getChancesOfWarning();
                 SimulationParameters simulationParameters = new SimulationParameters(proccessTime, isTimeRandom, suceessProb, warningProb);
                 int price = backEndMediator.getDependencyGraph().getTaskPricing().get(DependencyGraph.TaskType.SIMULATION) * targetsToExecute.size();
-                SimulationTaskDTO simulationTaskDTO = new SimulationTaskDTO(taskName, new String(), graphName, targetsToExecute, price, simulationParameters); //TODO missing name of uploader
+                SimulationTaskDTO simulationTaskDTO = new SimulationTaskDTO(taskName, new String(), graphName, targetsToExecute, price, simulationParameters);
                 taskAsJson = taskGson.toJson(simulationTaskDTO);
                 taskHeader = "simulation";
 

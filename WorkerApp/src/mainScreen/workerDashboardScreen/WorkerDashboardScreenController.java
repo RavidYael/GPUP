@@ -95,6 +95,8 @@ public class WorkerDashboardScreenController {
         tasksTable.getSelectionModel().selectedItemProperty().addListener(observable -> {
             submitToTaskDialog(tasksTable.getSelectionModel().getSelectedItem());
         });
+        submittedTaskScreenController.setTableManager(tableManager);
+
 
     }
 
@@ -122,13 +124,12 @@ public class WorkerDashboardScreenController {
         subscribeToTask(newTask);
         submittedTaskScreenController.addNewTask(newTask);
 
-
-
     }
 
     private void subscribeToTask(TaskInTable newTask) {
         HttpUrl.Builder urlBuilder = HttpUrl.parse(BASE_URL +"/subscribe").newBuilder();
         urlBuilder.addQueryParameter(MISSION_NAME,newTask.name);
+        urlBuilder.addQueryParameter("subscribe-type","register");
 
         Request request = new Request.Builder()
                 .url(urlBuilder.build())

@@ -26,10 +26,15 @@ public class ProcessesManager {
         public void updateTargetResult(TargetDTO theUpdatedTarget){
 
                 MissionInfoDTO.MissionStatus missionStatus = graphInExecutionByName.get(theUpdatedTarget.getMissionName()).updateEffectOfTargetsExecution(theUpdatedTarget);
+                graphInExecutionByName.get(theUpdatedTarget.getMissionName()).incrementTargetExecutedForUser(theUpdatedTarget.getRunBy());
 
                 if(missionStatus == MissionInfoDTO.MissionStatus.finished){
                 missionFinished(theUpdatedTarget.getMissionName());
                 }
+        }
+
+        public void missionFinished(String missionName){
+                getMissionInfoDTO(missionName).setMissionStatus(MissionInfoDTO.MissionStatus.finished);
         }
 
 
@@ -59,6 +64,10 @@ public class ProcessesManager {
                 addUserTask(newTask.getTaskCreator(), newTask.getTaskName());
         }
 
+        public Map<String, GraphInExecution> getGraphInExecutionByName() {
+                return graphInExecutionByName;
+        }
+
         public synchronized void addCompilationTask(CompilationTaskDTO newTask) {
                 compilationTasksMap.put(newTask.getTaskName().toLowerCase(), newTask);
                 listOfAllMissions.add(newTask.getTaskName());
@@ -78,7 +87,7 @@ public class ProcessesManager {
         }
 
         public synchronized Set<String> getUserTaskList(String userName) {
-                return usersTasks.get(userName.toLowerCase());
+                return usersTasks.get(userName);
         }
 
 
@@ -122,7 +131,10 @@ public class ProcessesManager {
         private void refreshReadyTargets() {
                 allReadyTargetsInSystem.clear();
                 for (String mission : listOfAllMissions) {
+                        if (getMissionInfoDTO(mission).getMissionStatus().equals(MissionInfoDTO.MissionStatus.finished))
+                                continue;
                         for (Target target : graphInExecutionByName.get(mission).getGraphInExecution().getAllTargets().values().stream().filter(t -> t.getTargetStatus().equals(Waiting)).collect(Collectors.toSet())) {
+
                                 if (!allReadyTargetsInSystem.stream().anyMatch(targetDTO -> targetDTO.getName().equals(target.getName()) && targetDTO.getTaskType().equals(mission))) {
                                         allReadyTargetsInSystem.add(new TargetDTO(target.getName(), target.getData(), getMissionInfoDTO(mission)));
                                 }
@@ -130,11 +142,10 @@ public class ProcessesManager {
                 }
         }
 
-        public synchronized TargetDTO pullTaskReadyForWorker(Set<String> tasksThatWorkerIsWorkOn) {
-
+        public synchronized TargetDTO pullTaskReadyForWorker(Set<String> tasksThatWorkerIsSignedTo) {
 
                 List<TargetDTO> filteredList = allReadyTargetsInSystem.stream().filter
-                        (targetDTO -> tasksThatWorkerIsWorkOn.contains(targetDTO.getMissionName()))
+                        (targetDTO -> tasksThatWorkerIsSignedTo.contains(targetDTO.getMissionName()))
                         .collect(Collectors.toList());
 
                 if(!filteredList.isEmpty()) {
@@ -149,9 +160,6 @@ public class ProcessesManager {
 
         }
 
-        public void missionFinished(String missionName){
-                getMissionInfoDTO(missionName).setMissionStatus(MissionInfoDTO.MissionStatus.finished);
-        }
 
 }
 

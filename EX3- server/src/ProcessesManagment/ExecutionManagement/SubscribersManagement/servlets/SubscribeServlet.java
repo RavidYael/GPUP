@@ -40,9 +40,9 @@ public class SubscribeServlet extends HttpServlet {
         ProcessesManager processesManager = ServletUtils.getProcessesManager(getServletContext());
 
         synchronized (this) {
-            String missionName = request.getParameter(MISSION_NAME);
             //String userName = request.getParameter(USERNAME);
 
+            String missionName = request.getParameter(MISSION_NAME);
             MissionInfoDTO theMission = processesManager.getMissionInfoDTO(missionName);
 
             if (subscribeType.equals("register")) {

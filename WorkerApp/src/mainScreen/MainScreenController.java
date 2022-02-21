@@ -46,7 +46,7 @@ public class MainScreenController {
         dashboardScreenController.setClient(client);
         dashboardScreenController.setCenterPane(centerPane);
         dashboardScreenController.setServerDataManager(serverDataManager);
-        dashboardScreenController.myInitializer();
+
 
         FXMLLoader fxmlLoader1 = new FXMLLoader(getClass().getResource("submitted tasks.fxml"));
         try {
@@ -59,6 +59,7 @@ public class MainScreenController {
         submittedTasksScreenController.setServerDataManager(serverDataManager);
         submittedTasksScreenController.myInitializer(client);
         dashboardScreenController.setSubmittedTasksScreen(submittedTasksScreen, submittedTasksScreenController);
+        dashboardScreenController.myInitializer();
 
     }
 

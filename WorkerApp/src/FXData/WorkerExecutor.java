@@ -9,12 +9,18 @@ import dependency.target.Target;
 import execution.CompilationGPUPTask;
 import execution.GPUPTask;
 import execution.SimulationGPUPTask;
+import javafx.application.Platform;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.scene.control.Label;
 
+import java.awt.*;
+import java.util.Observable;
 import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import static FXData.Constants.USER_NAME;
 import static sun.management.snmp.jvminstr.JvmThreadInstanceEntryImpl.ThreadStateMap.Byte0.runnable;
 
 public class WorkerExecutor extends Thread implements Runnable{
@@ -24,15 +30,20 @@ public class WorkerExecutor extends Thread implements Runnable{
    // private Set<MissionInfoDTO> missionsMyWorkerSubscribe;
   //  private Set<TargetDTO> runnableTargetsForTheWorker;
     private int numOfThreads;
+    private Label numOfCreditsLabel;
+    private Integer numOfCredits =0;
    // private ThreadPoolExecutor threadPoolExecutors = (ThreadPoolExecutor) Executors.newFixedThreadPool(numOfThreads);
     ServerDataManager serverDataManager;
     Boolean isPaused = false;
 
 
-    public WorkerExecutor(int numOfThreads, ServerDataManager serverDataManager, TextAreaConsumer textAreaConsumer){
+    public WorkerExecutor(int numOfThreads, Label numOfCreditsLabel, ServerDataManager serverDataManager, TextAreaConsumer textAreaConsumer){
         this.serverDataManager = serverDataManager;
         this.numOfThreads = numOfThreads;
         this.textAreaConsumer = textAreaConsumer;
+        this.numOfCreditsLabel = numOfCreditsLabel;
+
+        //this.numOfCreditsLabel.textProperty().bind(new SimpleIntegerProperty(numOfCredits).asString());
     }
 
     public void run(){
@@ -55,9 +66,16 @@ public class WorkerExecutor extends Thread implements Runnable{
         else
             gpupTask = new CompilationGPUPTask(targetDTOToRun.getCompilationParameters());
 
-        gpupTask.runOnTarget(targetDTOToRun,textAreaConsumer); //TODO update message
+        gpupTask.runOnTarget(targetDTOToRun,textAreaConsumer);
+        targetDTOToRun.setRunBy((String)SimpleCookieManager.getSimpleCookie(USER_NAME));
+        if (targetDTOToRun.getResult().equals(Target.TaskResult.Success) || targetDTOToRun.getResult().equals(Target.TaskResult.Warning)){
+            numOfCredits +=targetDTOToRun.getPayment();
+            Platform.runLater(()-> numOfCreditsLabel.setText(numOfCredits.toString()));
+        }
 
         serverDataManager.updateServerWithTaskResult(targetDTOToRun);
+
+
 
     }
 

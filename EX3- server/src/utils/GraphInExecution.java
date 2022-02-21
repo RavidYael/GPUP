@@ -14,8 +14,10 @@ public class GraphInExecution {
     private DependencyGraph graphInExecution;
     private Map<Target.TargetStatus, Set<Target>> status2Targets;
     private Map<Target, TargetExecutionSummary> target2summary;
+    private Map<DependencyGraph.TaskType, Integer> taskPricing;
     private String targetsSummaryDir;
     private Long totalDuration = 0L;
+    private Map<String,Integer> user2executedTargets;
 
 
     private Object CalculationLock = new Object();
@@ -25,6 +27,7 @@ public class GraphInExecution {
       //  this.graphInExecution = createSubGraphForMission(missionPreferences,graphTheMissionDefinedUpon);
         this.graphInExecution = graphTheMissionDefinedUpon.getSubGraphFromTargets(targetsToExecute);
         this.missionName = missionName;
+        this.graphInExecution.setTaskPricing(graphTheMissionDefinedUpon.getTaskPricing());
 
         status2Targets = new HashMap<>();
         status2Targets.put(Target.TargetStatus.Frozen, new HashSet<>());
@@ -33,6 +36,7 @@ public class GraphInExecution {
         status2Targets.put(Target.TargetStatus.InProcess, new HashSet<>());
         status2Targets.put(Target.TargetStatus.Finished, new HashSet<>());
         status2Targets.put(Target.TargetStatus.Done, new HashSet<>());
+        user2executedTargets = new HashMap<>();
         graphInExecution.initializeWaitingTargets();
         updateStatus2Target();
         initializeTarget2summary();
@@ -41,6 +45,10 @@ public class GraphInExecution {
 
     public DependencyGraph getGraphInExecution() {
         return graphInExecution;
+    }
+
+    public Integer getNumOfExecutedTargetsForUser(String userName) {
+        return user2executedTargets.get(userName);
     }
 
 
@@ -78,6 +86,12 @@ public class GraphInExecution {
         }
     }
 
+    public void incrementTargetExecutedForUser(String userName){
+       Integer curCount = user2executedTargets.computeIfAbsent(userName,t-> 0);
+       user2executedTargets.put(userName,curCount+1);
+
+    }
+
 
 
     public MissionInfoDTO.MissionStatus updateEffectOfTargetsExecution(TargetDTO executedTarget){
@@ -85,7 +99,6 @@ public class GraphInExecution {
         synchronized (CalculationLock) {
 
             Target curTarget = graphInExecution.getTargetByName(executedTarget.getName());
-
             curTarget.updateTargetByDTO(executedTarget);
 
                 if (curTarget.getTargetStatus() == Target.TargetStatus.Finished) {

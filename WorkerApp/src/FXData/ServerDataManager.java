@@ -73,6 +73,29 @@ public class ServerDataManager {
         return missionDTOSet;
     }
 
+    public Set<MissionInfoDTO> getAllMissionsForUser(){
+        Set<MissionInfoDTO> missionDTOSet = new HashSet<>();
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(BASE_URL +"/tasksListForUser").newBuilder();
+        urlBuilder.addQueryParameter(USER_NAME, (String)SimpleCookieManager.getSimpleCookie(USER_NAME));
+
+        Request request = new Request.Builder()
+                .url(urlBuilder.build())
+                .build();
+
+        try {
+            Response response = client.newCall(request).execute();
+            Gson missionGson = new Gson();
+            Type collectionType = new TypeToken<Set<MissionInfoDTO>>(){}.getType();
+            missionDTOSet = missionGson.fromJson(response.body().string(),collectionType);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return missionDTOSet;
+
+    }
+
     public boolean amIListed(String taskName) {
         HttpUrl.Builder urlBuilder = HttpUrl.parse(BASE_URL +"/subscribedUsers").newBuilder();
         urlBuilder.addQueryParameter(MISSION_NAME, taskName);
@@ -153,6 +176,80 @@ public class ServerDataManager {
         }
         return missionInfoDTO;
     }
+
+    public void pauseResumeOrStopRequest(String taskName,String action) {
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(BASE_URL+ "/subscribe").newBuilder();
+        urlBuilder.addQueryParameter(MISSION_NAME, taskName);
+        urlBuilder.addQueryParameter(SUBSCRIBE_TYPE, action);
+
+        Request request = new Request.Builder()
+                .url(urlBuilder.build())
+                .build();
+
+        try {
+            Response response = client.newCall(request).execute();
+            if (response.code()>= 500){
+                System.out.println("error in server trying to " +action);
+            }
+            else if(response.code() >=200 && response.code() <300){
+                System.out.println("server " + action +" succesfully");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public Double getTaskProcess(String missionName) {
+        Double progress = 0.0;
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(BASE_URL+ "/task-progress").newBuilder();
+        urlBuilder.addQueryParameter(MISSION_NAME, missionName);
+
+        Request request = new Request.Builder()
+                .url(urlBuilder.build())
+                .build();
+
+        try {
+            Response response = client.newCall(request).execute();
+            //progress = new Gson().fromJson(response.body().string(),Long.class);
+            progress = Double.valueOf(response.body().string());
+
+            if (response.code()>= 500){
+                System.out.println("error in server trying to progress ");
+            }
+            else if(response.code() >=200 && response.code() <300){
+                System.out.println("server " +"progress"+" succesfully");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return progress;
+
+    }
+
+    public Integer getExecutedTargetsForUser(String missionName) {
+        Integer numOfTargets =0;
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(BASE_URL+ "/target-run-by-user").newBuilder();
+        urlBuilder.addQueryParameter(MISSION_NAME, missionName);
+        urlBuilder.addQueryParameter(USER_NAME, (String)SimpleCookieManager.getSimpleCookie(USER_NAME));
+
+        Request request = new Request.Builder()
+                .url(urlBuilder.build())
+                .build();
+
+        try {
+            Response response = client.newCall(request).execute();
+            numOfTargets = new Gson().fromJson(response.body().string(),Integer.class);
+            if (numOfTargets == null)
+                numOfTargets =0;
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    return numOfTargets;
+    }
+
 }
 
 

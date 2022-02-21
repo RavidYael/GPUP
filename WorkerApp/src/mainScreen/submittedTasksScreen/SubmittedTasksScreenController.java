@@ -5,8 +5,10 @@ import DTOs.TasksPrefernces.CompilationParameters;
 import DTOs.TasksPrefernces.SimulationParameters;
 import FXData.*;
 import dependency.graph.DependencyGraph;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -14,6 +16,8 @@ import mainScreen.workerDashboardScreen.TaskInTable;
 import mainScreen.workerDashboardScreen.WorkerDashboardScreenController;
 import okhttp3.OkHttpClient;
 
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -23,43 +27,22 @@ import static java.util.concurrent.TimeUnit.MINUTES;
 public class SubmittedTasksScreenController {
 
     @FXML
-    private TableView<TaskInTable> tasksTable;
+    private TableView<SubmittedTaskInTable> tasksTable;
 
     @FXML
-    private TableColumn<TaskInTable, String> taskNameColumn;
+    private TableColumn<SubmittedTaskInTable, String> taskNameColumn;
 
     @FXML
-    private TableColumn<TaskInTable, String> taskUploadedByColumn;
+    private TableColumn <SubmittedTaskInTable, Integer> workesrColumn;
 
     @FXML
-    private TableColumn<TaskInTable, DependencyGraph.TaskType> taskTypeColumn;
+    private TableColumn <SubmittedTaskInTable, Double> taskProgressColumn;
 
     @FXML
-    private TableColumn<TaskInTable, Integer> totalTargetsColumn;
+    private TableColumn <SubmittedTaskInTable, Integer> targetsRunColumn;
 
     @FXML
-    private TableColumn<TaskInTable, Integer>  rootsColumn;
-
-    @FXML
-    private TableColumn<TaskInTable, Integer>  middlesColumn;
-
-    @FXML
-    private TableColumn<TaskInTable, Integer>  leafsColumn;
-
-    @FXML
-    private TableColumn<TaskInTable, Integer>  independentColumn;
-
-    @FXML
-    private TableColumn<TaskInTable, MissionInfoDTO.MissionStatus>  statusColumn;
-
-    @FXML
-    private TableColumn<TaskInTable, Integer>  workesrColumn;
-
-    @FXML
-    private TableColumn<TaskInTable, WorkerDashboardScreenController.YesOrNo>  amIListedColumn;
-
-    @FXML
-    private TableColumn<TaskInTable, Integer> pricePerTargetColumn;
+    private TableColumn <SubmittedTaskInTable, Integer> creditsColumn;
 
     @FXML
     private TextArea runningTargetsTA;
@@ -69,6 +52,18 @@ public class SubmittedTasksScreenController {
 
     @FXML
     private TextArea taskPropertiesTA;
+
+    @FXML
+    private Button pauseButton;
+
+    @FXML
+    private Button playButton;
+
+    @FXML
+    private Button stopButton;
+
+    @FXML
+    private Label numOfCredits;
 
     private OkHttpClient client;
     private TableManager tableManager;
@@ -131,31 +126,26 @@ public class SubmittedTasksScreenController {
 
     public void myInitializer(OkHttpClient client){
         this.client = client;
-        this.tableManager = tableManager;
-        initializeTasksTable();
-        workerExecutor = new WorkerExecutor(numOfThreads,serverDataManager,textAreaConsumer);
+       // this.tableManager = tableManager;
+        //initializeTasksTable();
+       workerExecutor = new WorkerExecutor(numOfThreads,numOfCredits,serverDataManager,textAreaConsumer);
 
     }
 
     private void initializeTasksTable(){
-        taskNameColumn.setCellValueFactory(new PropertyValueFactory<TaskInTable,String>("name"));
-        taskUploadedByColumn.setCellValueFactory(new PropertyValueFactory<TaskInTable,String>("uploadedBy"));
-        taskTypeColumn.setCellValueFactory(new PropertyValueFactory<TaskInTable,DependencyGraph.TaskType>("taskType"));
-        totalTargetsColumn.setCellValueFactory(new PropertyValueFactory<TaskInTable,Integer>("totalTargets"));
-        rootsColumn.setCellValueFactory(new PropertyValueFactory<TaskInTable,Integer>("roots"));
-        middlesColumn.setCellValueFactory(new PropertyValueFactory<TaskInTable,Integer>("middles"));
-        leafsColumn.setCellValueFactory(new PropertyValueFactory<TaskInTable,Integer>("leafs"));
-        independentColumn.setCellValueFactory(new PropertyValueFactory<TaskInTable,Integer>("independent"));
-        pricePerTargetColumn.setCellValueFactory(new PropertyValueFactory<TaskInTable,Integer>("priceForTarget"));
-        workesrColumn.setCellValueFactory(new PropertyValueFactory<TaskInTable,Integer>("numOfWorkers"));
-        statusColumn.setCellValueFactory(new PropertyValueFactory<TaskInTable, MissionInfoDTO.MissionStatus>("missionStatus"));
-        amIListedColumn.setCellValueFactory(new PropertyValueFactory<TaskInTable, WorkerDashboardScreenController.YesOrNo>("amIListed"));
+
+        ObservableList<SubmittedTaskInTable> tasksInTable = tableManager.getSubmittedTasksForTable();
+        taskNameColumn.setCellValueFactory(new PropertyValueFactory<SubmittedTaskInTable,String>("name"));
+        workesrColumn.setCellValueFactory(new PropertyValueFactory<SubmittedTaskInTable,Integer>("numOfWorkers"));
+        taskProgressColumn.setCellValueFactory(new PropertyValueFactory<SubmittedTaskInTable,Double>("progress"));
+        targetsRunColumn.setCellValueFactory(new PropertyValueFactory<SubmittedTaskInTable,Integer>("numOfTargets"));
+      //  creditsColumn.setCellValueFactory(new PropertyValueFactory<SubmittedTaskInTable,Integer>("credits"));
         tasksTable.setItems(tasksInTable);
     }
 
     public void addNewTask(TaskInTable newTask) {
-        tasksInTable.add(newTask);
-        initializeTasksTable();
+      //  tasksInTable.add(newTask);
+        refresh();
         Thread thread = new Thread(()->beginExecution());
         thread.start();
         //TODO check if already executing
@@ -174,7 +164,7 @@ public class SubmittedTasksScreenController {
                 }
             }
             else{
-                while(workerExecutor.isPaused()){
+                while(workerExecutor.isPaused()){ //TODO not correct
                         try {
                             Thread.sleep(500);
                         } catch (InterruptedException e) {
@@ -189,6 +179,70 @@ public class SubmittedTasksScreenController {
 
 
         }
+
+    @FXML
+    void pauseButtonAction(ActionEvent event) {
+
+        if (tasksTable.getSelectionModel().getSelectedItem() != null) {
+            serverDataManager.pauseResumeOrStopRequest(tasksTable.getSelectionModel().getSelectedItem().getName(),"pause");
+            //workerExecutor.setPaused();
+        }
+        else{
+            Alert alert = new Alert(Alert.AlertType.ERROR,"please select task to pause");
+            alert.showAndWait();
+        }
+
+    }
+
+    @FXML
+    void playButtonAction(ActionEvent event) {
+        //TODO check if been paused
+        if (tasksTable.getSelectionModel().getSelectedItem() != null) {
+            serverDataManager.pauseResumeOrStopRequest(tasksTable.getSelectionModel().getSelectedItem().getName(),"resume");
+
+
+        }
+        else{
+            Alert alert = new Alert(Alert.AlertType.ERROR,"please select task to resume");
+            alert.showAndWait();
+        }
+
+
+    }
+
+
+
+    @FXML
+    void stopButtonAction(ActionEvent event) {
+        if (tasksTable.getSelectionModel().getSelectedItem() != null) {
+            serverDataManager.pauseResumeOrStopRequest(tasksTable.getSelectionModel().getSelectedItem().getName(),"unregister");
+
+
+        }
+        else{
+            Alert alert = new Alert(Alert.AlertType.ERROR,"please select task to stop");
+            alert.showAndWait();
+        }
+
+    }
+
+    private void refresh(){
+        System.out.println("refreshing");
+
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        initializeTasksTable();
+                    }
+                });
+
+            }
+        },0, 2000);
+    }
 
 
     }

@@ -30,6 +30,10 @@ public class SubscribesManager {
         workerWorkOnMissionMap = new HashMap<>();
     }
 
+    public Map<String, Set<MissionInfoDTO>> getWorkerSubscribesMissionsMap() {
+        return workerSubscribesMissionsMap;
+    }
+
     public void addMission(MissionInfoDTO theMission){
         missionInfoDTOMap.put(theMission.getMissionName(),theMission);
     }
@@ -40,6 +44,7 @@ public class SubscribesManager {
 
     public void addSubscriber(UserDTO user ,MissionInfoDTO missionInfoDTO){
     //missionInfoDTOWorkersMap.put(missionInfoDTO,new HashSet<>()); // you don't want to create a new one each time, only the first time. so replaced with:
+        missionInfoDTO.setMissionStatus(MissionInfoDTO.MissionStatus.running);
         missionInfoDTOWorkersMap.computeIfAbsent(missionInfoDTO, s-> new HashSet<>()).add(user);
         missionInfoDTOMap.put(missionInfoDTO.getMissionName(),missionInfoDTO); //TODO: it doesnt ha to be here! whats between the subscriber and the mission?
     //I HAD WRITTEN SOME METHODS FOR DOING THAT AND JUST NEED TO THINK WHERE THEY SHOULD BE LOCATED
