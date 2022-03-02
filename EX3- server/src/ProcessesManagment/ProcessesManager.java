@@ -2,8 +2,7 @@ package ProcessesManagment;
 
 import DTOs.*;
 import GraphManagment.GraphsManager;
-import ProcessesManagment.ExecutionManagement.SubscribersManagement.SubscribesManager;
-import com.sun.deploy.net.MessageHeader;
+import ProcessesManagment.SubscribersManagement.SubscribesManager;
 import dependency.graph.DependencyGraph;
 import dependency.target.Target;
 import utils.GraphInExecution;
@@ -28,6 +27,33 @@ public class ProcessesManager {
         private Set<String> listOfAllFinishedMissions = new HashSet<>();
         private Set<String> listOfAllStoppedMissions = new HashSet<>();
         private List<TargetDTO> allExecutedTargets = new LinkedList<>();
+
+        public void controlMission(String MissionName,String controlType){
+
+                if(controlType.equals("resume")){
+                        resumeMission(MissionName);
+                }
+                else if(controlType.equals("pause")){
+                        pauseMission(MissionName);
+                }
+                else if(controlType.equals("stop")){
+                        stopMission(MissionName);
+                }
+        }
+
+//        public void createIncrementalMission(String originalMissionName,SubscribesManager subscribesManager,String incrementalType){
+//
+//                if(incrementalType.equals("fromScratch")) {
+//                        D
+//                        MissionInfoDTO theNewMission new MissionInfoDTO()
+//                                getMissionInfoDTO(originalMissionName)
+//
+//
+//                }
+//
+//        }
+
+
 
         public void resumeMission(String missionName) {
                 if(listOfAllPausedMissions.contains(missionName)) {

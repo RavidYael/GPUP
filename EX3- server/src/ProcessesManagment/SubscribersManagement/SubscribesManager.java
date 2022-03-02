@@ -1,4 +1,4 @@
-package ProcessesManagment.ExecutionManagement.SubscribersManagement;
+package ProcessesManagment.SubscribersManagement;
 
 import DTOs.MissionInfoDTO;
 import DTOs.UserDTO;

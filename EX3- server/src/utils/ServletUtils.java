@@ -1,7 +1,7 @@
 package utils;
 
 import GraphManagment.GraphsManager;
-import ProcessesManagment.ExecutionManagement.SubscribersManagement.SubscribesManager;
+import ProcessesManagment.SubscribersManagement.SubscribesManager;
 import ProcessesManagment.ProcessesManager;
 import UserManagement.UserManager;
 

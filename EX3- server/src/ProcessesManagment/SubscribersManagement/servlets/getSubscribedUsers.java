@@ -1,7 +1,7 @@
-package ProcessesManagment.ExecutionManagement.SubscribersManagement.servlets;
+package ProcessesManagment.SubscribersManagement.servlets;
 
 import DTOs.UserDTO;
-import ProcessesManagment.ExecutionManagement.SubscribersManagement.SubscribesManager;
+import ProcessesManagment.SubscribersManagement.SubscribesManager;
 import com.google.gson.Gson;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -13,7 +13,7 @@ import utils.ServletUtils;
 import java.io.IOException;
 import java.util.Set;
 
-import static ProcessesManagment.ExecutionManagement.SubscribersManagement.constants.Constants.MISSION_NAME;
+import static ProcessesManagment.SubscribersManagement.constants.Constants.MISSION_NAME;
 //TODO ITS NOT SHOULD BE LIKE THAT! WE SHOULD CHANGE IT TO POST AND A GET METHODS IN TH SUBSCRIBE SERVLET..
 
 @WebServlet("/subscribedUsers")

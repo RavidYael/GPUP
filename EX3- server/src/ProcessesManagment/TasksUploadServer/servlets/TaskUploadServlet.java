@@ -2,7 +2,7 @@ package ProcessesManagment.TasksUploadServer.servlets;
 
 
 import GraphManagment.GraphsManager;
-import ProcessesManagment.ExecutionManagement.SubscribersManagement.SubscribesManager;
+import ProcessesManagment.SubscribersManagement.SubscribesManager;
 import ProcessesManagment.ProcessesManager;
 import UserManagement.UsersManagementServer.constants.Constants;
 import com.google.gson.Gson;
@@ -24,8 +24,6 @@ public class TaskUploadServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
-        // TODO I HOPE GSON CREATE NEW OBJECT, OTHERWISE THE TASKS ARE LOCALLY TO THIS SCOPE AND WE LOSE THEM WHEN INSERTING TO THE MAPS
-        // ITS NOT THAT COMPLICATED IT JUST THAT WE NEED TO CREATE A A CONSTRUCTOR WHICH I DONT HAVE ZAIN TO CREATE RIGHT NOW
 
         ProcessesManager missionsManager = ServletUtils.getProcessesManager(getServletContext());
         SubscribesManager subscribesManager = ServletUtils.getSubscribesManager(getServletContext());

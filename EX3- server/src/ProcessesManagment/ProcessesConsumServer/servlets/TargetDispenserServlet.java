@@ -1,17 +1,13 @@
 package ProcessesManagment.ProcessesConsumServer.servlets;
 
-import DTOs.CompilationTaskDTO;
-import DTOs.MissionInfoDTO;
-import DTOs.SimulationTaskDTO;
 import DTOs.TargetDTO;
-import ProcessesManagment.ExecutionManagement.SubscribersManagement.SubscribesManager;
+import ProcessesManagment.SubscribersManagement.SubscribesManager;
 import ProcessesManagment.ProcessesManager;
 import com.google.gson.Gson;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.omg.PortableInterceptor.SUCCESSFUL;
 import utils.ServletUtils;
 import utils.SessionUtils;
 

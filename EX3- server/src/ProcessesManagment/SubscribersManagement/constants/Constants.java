@@ -1,4 +1,4 @@
-package ProcessesManagment.ExecutionManagement.SubscribersManagement.constants;
+package ProcessesManagment.SubscribersManagement.constants;
 
 public class Constants {
         public static final String MISSION_NAME = "mission_name";
