@@ -3,7 +3,7 @@ package UserManagement.UsersManagementServer.constants;
 public class Constants {
     public static final String USERNAME = "username";
     public static final String DEGREE = "user-degree";
-    public static final String NUM_OF_THREADS = "num-of-threads";
+    public static final String NUM_OF_THREADS = "numOfThreads";
     public static final String USER_NAME_ERROR = "username_error";
 
     public static final String CHAT_PARAMETER = "userstring";

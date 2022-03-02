@@ -23,9 +23,9 @@ public class TaskListForUser extends HttpServlet {
         String userName = SessionUtils.getUsername(req);
         SubscribesManager subscribesManager = ServletUtils.getSubscribesManager(getServletContext());
         Set<MissionInfoDTO> missionDTOs = subscribesManager.getWorkerSubscribesMissionsMap().get(userName);
-        if (missionDTOs.isEmpty()){
+        if (missionDTOs == null ){
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            resp.getWriter().println("no tasks for this user");
+            return;
         }
         Gson missionGson = new Gson();
         String missionsAsJson = missionGson.toJson(missionDTOs);

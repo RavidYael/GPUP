@@ -38,39 +38,45 @@ public class SubscribeServlet extends HttpServlet {
         SubscribesManager subscribesManager = ServletUtils.getSubscribesManager(getServletContext());
         UserManager userManager = ServletUtils.getUserManager(getServletContext());
         ProcessesManager processesManager = ServletUtils.getProcessesManager(getServletContext());
+        UserDTO theUser = userManager.getUserDTO(usernameFromSession);
 
         synchronized (this) {
-            //String userName = request.getParameter(USERNAME);
 
             String missionName = request.getParameter(MISSION_NAME);
             MissionInfoDTO theMission = processesManager.getMissionInfoDTO(missionName);
 
             if (subscribeType.equals("register")) {
-
-                theMission.increaseCurrentNumOfxExecutingWorkers();
-                UserDTO theUser = userManager.getUserDTO(usernameFromSession);
-                subscribesManager.addSubscriber(theUser, theMission);
+                if(!theMission.getMissionStatus().equals(MissionInfoDTO.MissionStatus.finished) &&
+                   !theMission.getMissionStatus().equals(MissionInfoDTO.MissionStatus.stopped) &&
+                   !subscribesManager.getMissionWorkers(missionName).contains(theUser))
+                {
+                    theMission.increaseCurrentNumOfxExecutingWorkers();
+                    subscribesManager.addSubscriber(theUser, theMission);
+                }
 
             } else if (subscribeType.equals("unregister")) {
-
-                theMission.decreaseCurrentNumOfxExecutingWorkers();
-                UserDTO theUser = userManager.getUserDTO(usernameFromSession);
-                subscribesManager.removeSubscriber(theUser, theMission);
-
+                if(!theMission.getMissionStatus().equals(MissionInfoDTO.MissionStatus.finished) &&
+                   !theMission.getMissionStatus().equals(MissionInfoDTO.MissionStatus.stopped) &&
+                   subscribesManager.getWorkerSubscribesMissionsMap().get(usernameFromSession).contains(theMission))
+                {
+                    theMission.decreaseCurrentNumOfxExecutingWorkers();
+                    subscribesManager.removeSubscriber(theUser, theMission);
+                }
             } else if (subscribeType.equals("pause")) {
-
-                theMission.decreaseCurrentNumOfxExecutingWorkers();
-                UserDTO theUser = userManager.getUserDTO(usernameFromSession);
-                subscribesManager.pauseSubscriber(theUser, theMission);
-
+                if(theMission.getMissionStatus().equals(MissionInfoDTO.MissionStatus.running) &&
+                   subscribesManager.getWorkerSubscribesMissionsMap().get(usernameFromSession).contains(theMission))
+                {
+                    theMission.decreaseCurrentNumOfxExecutingWorkers();
+                    subscribesManager.pauseSubscriber(theUser, theMission);
+                }
             } else if (subscribeType.equals("resume")) {
-
-                theMission.increaseCurrentNumOfxExecutingWorkers();
-                UserDTO theUser = userManager.getUserDTO(usernameFromSession);
-                subscribesManager.resumeSubscriber(theUser, theMission);
-
+                if(subscribesManager.getWorkerSubscribesMissionsMap().get(usernameFromSession).contains(theMission))
+                {
+                    theMission.increaseCurrentNumOfxExecutingWorkers();
+                    subscribesManager.resumeSubscriber(theUser, theMission);
+                }
             }
-            // TODO : ADD RESPONSE STATUS IN RETURN
+
         }
     }
 

@@ -18,10 +18,31 @@ public class SubscribesManager {
     Map<String,Set<MissionInfoDTO>>workerWorkOnMissionMap;
     Map<String,MissionInfoDTO> missionInfoDTOMap;
 
+    public void removeMission(MissionInfoDTO theMission){
+        missionInfoDTOWorkersMap.remove(theMission);
+        missionInfoDTOMap.remove(theMission.getMissionName(),theMission);
+
+        for (String worker: workerSubscribesMissionsMap.keySet()) {
+            if(workerSubscribesMissionsMap.get(worker).contains(theMission)){
+                workerSubscribesMissionsMap.get(worker).remove(theMission);
+            }
+        }
+        for (String worker: workerWorkOnMissionMap.keySet()) {
+            if(workerWorkOnMissionMap.get(worker).contains(theMission)){
+                workerWorkOnMissionMap.get(worker).remove(theMission);
+            }
+        }
+
+    }
 
     public Set<String> getWorkerWorkingMissionsNames(String workerName) {
         return workerWorkOnMissionMap.get(workerName).stream().map(M->M.getMissionName()).collect(Collectors.toSet());
     }
+
+//    public Set<String> getWorkerWorkingMissionsNamesWhichNotDone(String workerName) {
+//        return workerWorkOnMissionMap.get(workerName).stream().filter(M->m.getMis).map(M->M.getMissionName()).collect(Collectors.toSet());
+//    }
+
 
     public SubscribesManager() {
         missionInfoDTOWorkersMap= new HashMap<>();
@@ -36,18 +57,15 @@ public class SubscribesManager {
 
     public void addMission(MissionInfoDTO theMission){
         missionInfoDTOMap.put(theMission.getMissionName(),theMission);
+        missionInfoDTOWorkersMap.put(theMission,new HashSet<>());
+
     }
 
-    public void removeMission(MissionInfoDTO theMission){
-        missionInfoDTOMap.remove(theMission.getMissionName(),theMission);
-    }
 
     public void addSubscriber(UserDTO user ,MissionInfoDTO missionInfoDTO){
     //missionInfoDTOWorkersMap.put(missionInfoDTO,new HashSet<>()); // you don't want to create a new one each time, only the first time. so replaced with:
         missionInfoDTO.setMissionStatus(MissionInfoDTO.MissionStatus.running);
-        missionInfoDTOWorkersMap.computeIfAbsent(missionInfoDTO, s-> new HashSet<>()).add(user);
-        missionInfoDTOMap.put(missionInfoDTO.getMissionName(),missionInfoDTO); //TODO: it doesnt ha to be here! whats between the subscriber and the mission?
-    //I HAD WRITTEN SOME METHODS FOR DOING THAT AND JUST NEED TO THINK WHERE THEY SHOULD BE LOCATED
+        missionInfoDTOWorkersMap.get(missionInfoDTO).add(user);
         workerSubscribesMissionsMap.computeIfAbsent(user.getName(),s-> new HashSet<>()).add(missionInfoDTO);
         workerWorkOnMissionMap.computeIfAbsent(user.getName(),s-> new HashSet<>()).add(missionInfoDTO);
     }
@@ -59,16 +77,18 @@ public class SubscribesManager {
     public void removeSubscriber(UserDTO theUser, MissionInfoDTO theMission) {
 
         missionInfoDTOWorkersMap.get(theMission).remove(theUser);
-        workerWorkOnMissionMap.get(theUser).remove(theMission);
+        workerWorkOnMissionMap.get(theUser.getName()).remove(theMission);
         workerSubscribesMissionsMap.get(theUser).remove(theMission);
 
     }
 
     public void pauseSubscriber(UserDTO theUser, MissionInfoDTO theMission) {
-        workerWorkOnMissionMap.get(theMission).remove(theUser);
+        workerWorkOnMissionMap.get(theUser.getName()).remove(theMission);
     }
 
     public void resumeSubscriber(UserDTO theUser, MissionInfoDTO theMission) {
         workerWorkOnMissionMap.computeIfAbsent(theUser.getName(),s-> new HashSet<>()).add(theMission);
     }
+
+
 }

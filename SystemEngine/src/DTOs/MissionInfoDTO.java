@@ -15,7 +15,7 @@ public class MissionInfoDTO {
         private  String missionName;
         private  String MissionUploader;
         private  DependencyGraph.TaskType missionType;
-        private  String graphName; // TODO has to be unique (depend on the mission name) !
+        private  String graphName;
         private  Integer targetsCount;
         private  Integer rootsCount;
         private  Integer middlesCount;
@@ -25,27 +25,30 @@ public class MissionInfoDTO {
         private Integer taskTotalPayment;
         private CompilationParameters compilationParameters;
         private SimulationParameters simulationParameters;
+        private MissionStatus missionStatus;
+        private Integer simulationPrice;
+        private Integer compilationPrice;
+        private Integer currentNumOfxExecutingWorkers;
+
 
     public void increaseCurrentNumOfxExecutingWorkers() {
         this.currentNumOfxExecutingWorkers++ ;
+        if(currentNumOfxExecutingWorkers >= 1){
+            missionStatus = MissionStatus.running;
+        }
     }
     public void decreaseCurrentNumOfxExecutingWorkers() {
         this.currentNumOfxExecutingWorkers-- ;
-    }
-
-    private Integer currentNumOfxExecutingWorkers;
-
-    public void setMissionStatus(MissionStatus missionStatus) {
-        this.missionStatus = missionStatus;
-        if(missionStatus.equals(MissionStatus.finished)){
-            //TODO: HAS TO THINK WHAT THE CONSEQUENCES
+        if(currentNumOfxExecutingWorkers == 0){
+            missionStatus = MissionStatus.frozen;
         }
     }
 
-    private MissionStatus missionStatus;
-        private Integer simulationPrice;
-        private Integer compilationPrice;
 
+
+    public void setMissionStatus(MissionStatus missionStatus) {
+        this.missionStatus = missionStatus;
+    }
     public MissionInfoDTO(DependencyGraph theGraph, Set<String> TargetsToExecute , String MissionName , String MissionUploader, DependencyGraph.TaskType MissionType, Integer taskTotalPayment, Integer curWorkers, MissionStatus status, SimulationTaskDTO simulationTaskDTO) {
 
         this.graphName = theGraph.getGraphName();

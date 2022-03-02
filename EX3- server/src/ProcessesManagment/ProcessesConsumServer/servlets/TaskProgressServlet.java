@@ -23,7 +23,9 @@ public class TaskProgressServlet extends HttpServlet {
         double progress;
         String taskName = req.getParameter(MISSION_NAME);
         ProcessesManager processesManager = ServletUtils.getProcessesManager(getServletContext());
-        double finishedTargets = processesManager.getGraphInExecutionByName().get(taskName).getGraphInExecution().getAllTargets().values().stream().filter(t-> t.getTargetStatus().equals(Target.TargetStatus.Finished)).collect(Collectors.toSet()).size();
+        double finishedTargets = processesManager.getGraphInExecutionByName().get(taskName)
+                .getGraphInExecution().getAllTargets().values().stream()
+                    .filter(t-> t.getTargetStatus().equals(Target.TargetStatus.Finished)).collect(Collectors.toSet()).size();
         double allTargets = processesManager.getGraphInExecutionByName().get(taskName).getGraphInExecution().getAllTargets().values().size();
 
             progress = (finishedTargets / allTargets) * 100.0;

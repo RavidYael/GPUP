@@ -29,7 +29,7 @@ public class UsersListServlet extends HttpServlet {
 
             UserManager userManager = ServletUtils.getUserManager(getServletContext());
 
-            //TODO : I CHANGED IT TO BE COLLECTION, IS IT STILL WORK?
+
             Collection<UserDTO> usersList = userManager.getUsers();
 
             String json = gson.toJson(usersList);

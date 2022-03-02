@@ -67,11 +67,18 @@ public class SubmittedTasksScreenController {
 
     private OkHttpClient client;
     private TableManager tableManager;
-    ObservableList<TaskInTable> tasksInTable = FXCollections.observableArrayList();
-    WorkerExecutor workerExecutor;
+    private WorkerExecutor workerExecutor;
     private ServerDataManager serverDataManager;
     private Integer numOfThreads = (Integer)SimpleCookieManager.getSimpleCookie(NUM_OF_THREADS);
     private TextAreaConsumer textAreaConsumer;
+    private ThreadPoolExecutor threadPoolExecutor;
+    private Boolean inExecution = false;
+
+
+    public void setInExecution(Boolean inExecution) {
+        this.inExecution = inExecution;
+    }
+
 
 
     public void setServerDataManager(ServerDataManager serverDataManager) {
@@ -91,7 +98,6 @@ public class SubmittedTasksScreenController {
     public void initialize(){
         bindSpecificTask();
         textAreaConsumer = new TextAreaConsumer(runningTargetsTA);
-
 
     }
 
@@ -129,7 +135,8 @@ public class SubmittedTasksScreenController {
        // this.tableManager = tableManager;
         //initializeTasksTable();
        workerExecutor = new WorkerExecutor(numOfThreads,numOfCredits,serverDataManager,textAreaConsumer);
-
+       threadPoolExecutor = new ThreadPoolExecutor(numOfThreads,numOfThreads,1000, MINUTES,new LinkedBlockingQueue<Runnable>());
+       refresh();
     }
 
     private void initializeTasksTable(){
@@ -145,46 +152,53 @@ public class SubmittedTasksScreenController {
 
     public void addNewTask(TaskInTable newTask) {
       //  tasksInTable.add(newTask);
-        refresh();
-        Thread thread = new Thread(()->beginExecution());
-        thread.start();
-        //TODO check if already executing
+
+        if(inExecution == false) {
+            inExecution = true;
+            Thread thread = new Thread(() -> beginExecution());
+            thread.start();
+        }
     }
 
     private void beginExecution() {
 
-        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(numOfThreads,numOfThreads,1000, MINUTES,new LinkedBlockingQueue<Runnable>());
         while (true) {
+
             //  threadPoolExecutor.submit(workerExecutor);
             if (threadPoolExecutor.getActiveCount() == numOfThreads){
                 try {
+                    System.out.println( " im going to sleep and wait that a a sub - worker will finish his job");
                     Thread.sleep(500);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
-            else{
-                while(workerExecutor.isPaused()){ //TODO not correct
-                        try {
-                            Thread.sleep(500);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                }
 
             threadPoolExecutor.execute(workerExecutor);
+            if (threadPoolExecutor.getActiveCount() == numOfThreads) {
+                try {
+                    Thread.sleep(1500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
 
-        }
-
 
         }
+
+    }
+
+
+
 
     @FXML
     void pauseButtonAction(ActionEvent event) {
 
         if (tasksTable.getSelectionModel().getSelectedItem() != null) {
-            serverDataManager.pauseResumeOrStopRequest(tasksTable.getSelectionModel().getSelectedItem().getName(),"pause");
+            new Thread(() -> {
+               serverDataManager.pauseResumeOrStopRequest(tasksTable.getSelectionModel().getSelectedItem().getName(),"pause");
+            }).start();
+
             //workerExecutor.setPaused();
         }
         else{
@@ -197,10 +211,11 @@ public class SubmittedTasksScreenController {
     @FXML
     void playButtonAction(ActionEvent event) {
         //TODO check if been paused
+
         if (tasksTable.getSelectionModel().getSelectedItem() != null) {
+            new Thread(() -> {
             serverDataManager.pauseResumeOrStopRequest(tasksTable.getSelectionModel().getSelectedItem().getName(),"resume");
-
-
+        }).start();
         }
         else{
             Alert alert = new Alert(Alert.AlertType.ERROR,"please select task to resume");
@@ -214,9 +229,9 @@ public class SubmittedTasksScreenController {
 
     @FXML
     void stopButtonAction(ActionEvent event) {
-        if (tasksTable.getSelectionModel().getSelectedItem() != null) {
+        if (tasksTable.getSelectionModel().getSelectedItem() != null) {  new Thread(() -> {
             serverDataManager.pauseResumeOrStopRequest(tasksTable.getSelectionModel().getSelectedItem().getName(),"unregister");
-
+        }).start();
 
         }
         else{

@@ -86,7 +86,8 @@ public class ServerDataManager {
             Response response = client.newCall(request).execute();
             Gson missionGson = new Gson();
             Type collectionType = new TypeToken<Set<MissionInfoDTO>>(){}.getType();
-            missionDTOSet = missionGson.fromJson(response.body().string(),collectionType);
+            if(response.body() != null)
+                missionDTOSet = missionGson.fromJson(response.body().string(),collectionType);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -119,10 +120,11 @@ public class ServerDataManager {
 
         return res;
     }
-    public TargetDTO getTargetToRunFromServer(){
+    public TargetDTO getTargetToRunFromServer() {
+
         TargetDTO targetDTOFromServer = null;
-        HttpUrl.Builder urlBuilder = HttpUrl.parse(BASE_URL +"/runnable-target").newBuilder(); //TODO url not final
-       // urlBuilder.addQueryParameter("MissionName",missionName);
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(BASE_URL + "/runnable-target").newBuilder(); //TODO url not final
+        // urlBuilder.addQueryParameter("MissionName",missionName);
 
         Request request = new Request.Builder()
                 .url(urlBuilder.build())
@@ -135,13 +137,16 @@ public class ServerDataManager {
             else if (response.code() == SC_ACCEPTED) {
                 targetDTOFromServer = new Gson().fromJson(response.body().string(), TargetDTO.class);
             }
-
-        } catch (IOException e) {
-            e.printStackTrace();
         }
+
+        catch (IOException e) {
+            e.printStackTrace();
+            }
+
         return targetDTOFromServer;
 
     }
+
 
     public void updateServerWithTaskResult(TargetDTO targetDTOToRun) {
         Request request = new Request.Builder()
@@ -240,6 +245,7 @@ public class ServerDataManager {
         try {
             Response response = client.newCall(request).execute();
             numOfTargets = new Gson().fromJson(response.body().string(),Integer.class);
+
             if (numOfTargets == null)
                 numOfTargets =0;
 

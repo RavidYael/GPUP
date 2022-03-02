@@ -453,7 +453,7 @@ public class DependencyGraph implements Serializable {
         DependencyGraph subGraph = new DependencyGraph();
 
         for (String curTargetName : selectedTargets){
-            Target curTarget = getTargetByName(curTargetName);
+            Target curTarget = new Target(getTargetByName(curTargetName));
             subGraph.addTargetToGraph(curTargetName,curTarget);
         }
         subGraph.filterTargetDependendies();

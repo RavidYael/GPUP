@@ -34,7 +34,8 @@ public class WorkerExecutor extends Thread implements Runnable{
     private Integer numOfCredits =0;
    // private ThreadPoolExecutor threadPoolExecutors = (ThreadPoolExecutor) Executors.newFixedThreadPool(numOfThreads);
     ServerDataManager serverDataManager;
-    Boolean isPaused = false;
+    //TODO: IT MIGHT BE HELPFUL
+    private Set<String>tasksThatWorkerWorksOn;
 
 
     public WorkerExecutor(int numOfThreads, Label numOfCreditsLabel, ServerDataManager serverDataManager, TextAreaConsumer textAreaConsumer){
@@ -47,14 +48,14 @@ public class WorkerExecutor extends Thread implements Runnable{
     }
 
     public void run(){
-        System.out.println("in worker executer");
+        System.out.println("in worker executor");
         GPUPTask gpupTask;
         TargetDTO targetDTOToRun = serverDataManager.getTargetToRunFromServer();
         //TODO check if there are no more targets available
         if (targetDTOToRun == null){
             try {
                 System.out.println("there is no more targets to run right now");
-                Thread.sleep(500);
+                Thread.sleep(2000);
                 return;
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -75,21 +76,8 @@ public class WorkerExecutor extends Thread implements Runnable{
 
         serverDataManager.updateServerWithTaskResult(targetDTOToRun);
 
-
-
     }
 
-    public boolean isPaused() {
-    return isPaused;
-    }
-
-    public void setPaused() {
-        isPaused = true;
-    }
-
-    public void setResume(){
-        isPaused = false;
-    }
 }
 
 

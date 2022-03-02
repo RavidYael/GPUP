@@ -2,6 +2,8 @@ package ProcessesManagment;
 
 import DTOs.*;
 import GraphManagment.GraphsManager;
+import ProcessesManagment.ExecutionManagement.SubscribersManagement.SubscribesManager;
+import com.sun.deploy.net.MessageHeader;
 import dependency.graph.DependencyGraph;
 import dependency.target.Target;
 import utils.GraphInExecution;
@@ -9,6 +11,7 @@ import utils.GraphInExecution;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static dependency.target.Target.TargetStatus.InProcess;
 import static dependency.target.Target.TargetStatus.Waiting;
 
 public class ProcessesManager {
@@ -19,8 +22,39 @@ public class ProcessesManager {
         private static final Map<String, SimulationTaskDTO> simulationTasksMap = new HashMap<>();
         private static final Map<String, CompilationTaskDTO> compilationTasksMap = new HashMap<>();
         private static final Map<String, Set<String>> usersTasks = new HashMap<>();
-        private Set<String> listOfAllMissions = new HashSet<>();
+        private Set<String> listOfAllExecutingMissions = new HashSet<>();
         private List<TargetDTO> allReadyTargetsInSystem = new LinkedList<>();
+        private Set<String> listOfAllPausedMissions = new HashSet<>();
+        private Set<String> listOfAllFinishedMissions = new HashSet<>();
+        private Set<String> listOfAllStoppedMissions = new HashSet<>();
+        private List<TargetDTO> allExecutedTargets = new LinkedList<>();
+
+        public void resumeMission(String missionName) {
+                if(listOfAllPausedMissions.contains(missionName)) {
+                        listOfAllPausedMissions.remove(missionName);
+                        listOfAllExecutingMissions.add(missionName);
+                        refreshReadyTargets();
+                        getMissionInfoDTO(missionName).setMissionStatus(MissionInfoDTO.MissionStatus.running);
+                }
+        }
+
+
+        public void pauseMission(String missionName){
+                if(listOfAllExecutingMissions.contains(missionName)) {
+                        listOfAllExecutingMissions.remove(missionName);
+                        listOfAllPausedMissions.add(missionName);
+                        refreshReadyTargets();
+                        getMissionInfoDTO(missionName).setMissionStatus(MissionInfoDTO.MissionStatus.paused);
+                }
+        }
+
+
+        public void stopMission(String missionName){
+                listOfAllExecutingMissions.remove(missionName);
+                listOfAllStoppedMissions.add(missionName);
+                refreshReadyTargets();
+                getMissionInfoDTO(missionName).setMissionStatus(MissionInfoDTO.MissionStatus.stopped);
+        }
 
 
         public void updateTargetResult(TargetDTO theUpdatedTarget){
@@ -35,6 +69,9 @@ public class ProcessesManager {
 
         public void missionFinished(String missionName){
                 getMissionInfoDTO(missionName).setMissionStatus(MissionInfoDTO.MissionStatus.finished);
+                graphInExecutionByName.get(missionName).setMissionStatus(MissionInfoDTO.MissionStatus.finished);
+                listOfAllExecutingMissions.remove(missionName);
+                listOfAllFinishedMissions.add(missionName);
         }
 
 
@@ -59,8 +96,8 @@ public class ProcessesManager {
         }
 
         public synchronized void addSimulationTask(SimulationTaskDTO newTask) {
-                simulationTasksMap.put(newTask.getTaskName().toLowerCase(), newTask);
-                listOfAllMissions.add(newTask.getTaskName().toLowerCase());
+                simulationTasksMap.put(newTask.getTaskName(), newTask);
+                listOfAllExecutingMissions.add(newTask.getTaskName());
                 addUserTask(newTask.getTaskCreator(), newTask.getTaskName());
         }
 
@@ -69,8 +106,8 @@ public class ProcessesManager {
         }
 
         public synchronized void addCompilationTask(CompilationTaskDTO newTask) {
-                compilationTasksMap.put(newTask.getTaskName().toLowerCase(), newTask);
-                listOfAllMissions.add(newTask.getTaskName());
+                compilationTasksMap.put(newTask.getTaskName(), newTask);
+                listOfAllExecutingMissions.add(newTask.getTaskName());
 
                 addUserTask(newTask.getTaskCreator(), newTask.getTaskName());
         }
@@ -83,7 +120,7 @@ public class ProcessesManager {
         }
 
         public synchronized Set<String> getAllTaskList() {
-                return listOfAllMissions;
+                return listOfAllExecutingMissions;
         }
 
         public synchronized Set<String> getUserTaskList(String userName) {
@@ -91,25 +128,27 @@ public class ProcessesManager {
         }
 
 
-        public synchronized void addMissionsDTO(SimulationTaskDTO newTask, GraphsManager graphsManager) {
-                GraphInExecution subGraphToWorkOn = new GraphInExecution(newTask.getTaskName(), newTask.getTargetsToExecute(), graphsManager.getGraphByName(newTask.getGraphName()));
+        public synchronized void addMissionsDTO(SimulationTaskDTO newTask, GraphsManager graphsManager, SubscribesManager subscribesManager,String uploader) {
+                GraphInExecution subGraphToWorkOn = new GraphInExecution(newTask.getTaskName(), newTask.getTargetsToExecute(), graphsManager.getGraphByName(newTask.getGraphName()),uploader);
                 MissionDTOByName.put(newTask.getTaskName(), new MissionInfoDTO(subGraphToWorkOn.getGraphInExecution(), newTask.getTargetsToExecute(), newTask.getTaskName(), newTask.getTaskCreator(), DependencyGraph.TaskType.SIMULATION, newTask.getPricingForTarget(), 0, MissionInfoDTO.MissionStatus.frozen,newTask));
                 graphInExecutionByName.put(newTask.getTaskName(), subGraphToWorkOn);
                 GraphInfoDTO graphInfoDTO = new GraphInfoDTO(subGraphToWorkOn.getGraphInExecution());
                 graphInExecutionInfoByName.put(graphInfoDTO.getGraphName(), graphInfoDTO);
+                subscribesManager.addMission(MissionDTOByName.get(newTask.getTaskName()));
                 refreshReadyTargets();
         }
 
-        public synchronized void addMissionsDTO(CompilationTaskDTO newTask, GraphsManager graphsManager) {
-                GraphInExecution subGraphToWorkOn = new GraphInExecution(newTask.getTaskName(), newTask.getTargetsToExecute(), graphsManager.getGraphByName(newTask.getGraphName()));
+        public synchronized void addMissionsDTO(CompilationTaskDTO newTask, GraphsManager graphsManager, SubscribesManager subscribesManager,String uploader) {
+                GraphInExecution subGraphToWorkOn = new GraphInExecution(newTask.getTaskName(), newTask.getTargetsToExecute(), graphsManager.getGraphByName(newTask.getGraphName()),uploader);
                 MissionDTOByName.put(newTask.getTaskName(), new MissionInfoDTO(subGraphToWorkOn.getGraphInExecution(), newTask.getTargetsToExecute(), newTask.getTaskName(), newTask.getTaskCreator(), DependencyGraph.TaskType.COMPILATION, newTask.getPricingForTarget(), 0, MissionInfoDTO.MissionStatus.frozen,newTask));
                 graphInExecutionByName.put(newTask.getTaskName(), subGraphToWorkOn);
                 GraphInfoDTO graphInfoDTO = new GraphInfoDTO(subGraphToWorkOn.getGraphInExecution());
                 graphInExecutionInfoByName.put(graphInfoDTO.getGraphName(), graphInfoDTO);
+                subscribesManager.addMission(MissionDTOByName.get(newTask.getTaskName()));
                 refreshReadyTargets();
         }
 
-        public synchronized MissionInfoDTO getMissionInfoDTO(String missionName) {
+        public MissionInfoDTO getMissionInfoDTO(String missionName) {
                 return MissionDTOByName.get(missionName);
         }
 
@@ -117,46 +156,52 @@ public class ProcessesManager {
                 return MissionDTOByName.values().stream().collect(Collectors.toSet());
         }
 
-        private void refresh() {
-                Timer timer = new Timer();
-                timer.schedule(new TimerTask() {
 
-                        public void run() {
-                                refreshReadyTargets();
-                        }
+        private synchronized void refreshReadyTargets() {
 
-                }, 0, 2000);
-        }
-//TODO: THERE IS A BUG! WE DONT REMOVE TARGETS THAT ARE NO LONGER WAITING
-        private void refreshReadyTargets() {
                 allReadyTargetsInSystem.clear();
-                for (String mission : listOfAllMissions) {
-                        if (getMissionInfoDTO(mission).getMissionStatus().equals(MissionInfoDTO.MissionStatus.finished))
-                                continue;
-                        for (Target target : graphInExecutionByName.get(mission).getGraphInExecution().getAllTargets().values().stream().filter(t -> t.getTargetStatus().equals(Waiting)).collect(Collectors.toSet())) {
+                for (String mission : listOfAllExecutingMissions) {
 
-                                if (!allReadyTargetsInSystem.stream().anyMatch(targetDTO -> targetDTO.getName().equals(target.getName()) && targetDTO.getTaskType().equals(mission))) {
-                                        allReadyTargetsInSystem.add(new TargetDTO(target.getName(), target.getData(), getMissionInfoDTO(mission)));
-                                }
+                        for (Target target : graphInExecutionByName.get(mission)
+                                .getGraphInExecution().getAllTargets().values().stream()
+                                .filter(t -> t.getTargetStatus().equals(Waiting)).collect(Collectors.toSet()))
+                        {
+                                        allReadyTargetsInSystem.add
+                                        (new TargetDTO(target.getName(), target.getData(), getMissionInfoDTO(mission)));
                         }
                 }
+
         }
 
-        public synchronized TargetDTO pullTaskReadyForWorker(Set<String> tasksThatWorkerIsSignedTo) {
+
+
+        public TargetDTO pullTaskReadyForWorker(Set<String> tasksThatWorkerIsSignedTo,String workerName) {
 
                 List<TargetDTO> filteredList = allReadyTargetsInSystem.stream().filter
                         (targetDTO -> tasksThatWorkerIsSignedTo.contains(targetDTO.getMissionName()))
                         .collect(Collectors.toList());
 
                 if(!filteredList.isEmpty()) {
-                        TargetDTO ret = filteredList.get(0);
-                        filteredList.remove(0);
-                        allReadyTargetsInSystem.remove(ret);
-                        return ret;
-                }
+                        synchronized (this) {
+                                TargetDTO ret = filteredList.get(0);
+                                if(ret.getRunBy() != null){
+                                        return null;
+                                }
 
+                                graphInExecutionByName.get(ret.getMissionName())
+                                        .getGraphInExecution().getTargetByName(ret.getName())
+                                        .setTargetStatus(InProcess);
+
+                                ret.setRunBy(workerName);
+                                allReadyTargetsInSystem.remove(ret);
+                                return ret;
+                        }
+                }
                 else //filtered list is empty
+                {
+                        refreshReadyTargets();
                         return null;
+                }
 
         }
 

@@ -2,6 +2,7 @@ package ProcessesManagment.TasksUploadServer.servlets;
 
 
 import GraphManagment.GraphsManager;
+import ProcessesManagment.ExecutionManagement.SubscribersManagement.SubscribesManager;
 import ProcessesManagment.ProcessesManager;
 import UserManagement.UsersManagementServer.constants.Constants;
 import com.google.gson.Gson;
@@ -27,20 +28,22 @@ public class TaskUploadServlet extends HttpServlet {
         // ITS NOT THAT COMPLICATED IT JUST THAT WE NEED TO CREATE A A CONSTRUCTOR WHICH I DONT HAVE ZAIN TO CREATE RIGHT NOW
 
         ProcessesManager missionsManager = ServletUtils.getProcessesManager(getServletContext());
+        SubscribesManager subscribesManager = ServletUtils.getSubscribesManager(getServletContext());
 
         if(req.getHeader("taskType").equals("simulation")) //Uploaded simulation task
         {
             SimulationTaskDTO newTaskInfo = gson.fromJson(req.getReader(), SimulationTaskDTO.class);
             newTaskInfo.setTaskCreator((String)req.getSession(false).getAttribute(Constants.USERNAME));
-            //TODO adding here the name of the task uploader? will be easy becuase i have his session
+
             if(!missionsManager.isMissionExists(newTaskInfo.getTaskName())) //No task with the same name was found
             {
                 missionsManager.addSimulationTask(newTaskInfo);
 
+
                 resp.addHeader("message", "The task " + newTaskInfo.getTaskName() + " uploaded successfully!");
                 resp.setStatus(HttpServletResponse.SC_ACCEPTED);
                 GraphsManager graphsManager = ServletUtils.getGraphsManager(getServletContext());
-                missionsManager.addMissionsDTO(newTaskInfo,graphsManager);
+                missionsManager.addMissionsDTO(newTaskInfo,graphsManager,subscribesManager,(String)req.getSession().getAttribute(Constants.USERNAME));
 
             }
             else //A task with the same name already exists in the system
@@ -61,7 +64,7 @@ public class TaskUploadServlet extends HttpServlet {
                 resp.addHeader("message", "The task " + newTaskInfo.getTaskName() + " uploaded successfully!");
                 resp.setStatus(HttpServletResponse.SC_ACCEPTED);
                 GraphsManager graphsManager = ServletUtils.getGraphsManager(getServletContext());
-                missionsManager.addMissionsDTO(newTaskInfo,graphsManager);
+                missionsManager.addMissionsDTO(newTaskInfo,graphsManager,subscribesManager,(String)req.getSession().getAttribute(Constants.USERNAME));
             }
             else //A task with the same name already exists in the system
             {

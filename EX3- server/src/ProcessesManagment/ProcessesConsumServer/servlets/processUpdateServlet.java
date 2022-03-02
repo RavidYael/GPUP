@@ -28,6 +28,8 @@ public class processUpdateServlet extends HttpServlet {
 
             TargetDTO updatedTargetDTO = gson.fromJson(req.getReader(), TargetDTO.class);
 
+        System.out.println(updatedTargetDTO.getMissionName() +" "+ updatedTargetDTO.getName() + " " + updatedTargetDTO.getRunBy() + " " + updatedTargetDTO.getTargetStatus());
+
             ProcessesManager processesManager = ServletUtils.getProcessesManager(getServletContext());
 
             processesManager.updateTargetResult(updatedTargetDTO);

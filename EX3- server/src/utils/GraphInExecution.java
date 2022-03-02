@@ -18,14 +18,22 @@ public class GraphInExecution {
     private String targetsSummaryDir;
     private Long totalDuration = 0L;
     private Map<String,Integer> user2executedTargets;
+    private MissionInfoDTO.MissionStatus missionStatus;
+
+    public void setMissionStatus(MissionInfoDTO.MissionStatus missionStatus) {
+        this.missionStatus = missionStatus;
+    }
 
 
     private Object CalculationLock = new Object();
 
-    public GraphInExecution(String missionName,Set<String> targetsToExecute, DependencyGraph graphTheMissionDefinedUpon) {
+    public GraphInExecution(String missionName,Set<String> targetsToExecute, DependencyGraph graphTheMissionDefinedUpon, String uploader) {
 
       //  this.graphInExecution = createSubGraphForMission(missionPreferences,graphTheMissionDefinedUpon);
         this.graphInExecution = graphTheMissionDefinedUpon.getSubGraphFromTargets(targetsToExecute);
+        graphInExecution.setGraphName(missionName);
+        graphInExecution.setUploaderName(uploader);
+
         this.missionName = missionName;
         this.graphInExecution.setTaskPricing(graphTheMissionDefinedUpon.getTaskPricing());
 
@@ -51,8 +59,6 @@ public class GraphInExecution {
         return user2executedTargets.get(userName);
     }
 
-
-    //TODO IM ASSUMING THAT A MISSION DEFINED UPON ONE GRAPH ONLY
 
 
 
@@ -111,12 +117,20 @@ public class GraphInExecution {
             }
             updateStatus2Target();
 
-        if (status2Targets.get(Target.TargetStatus.Waiting).size() == 0 && status2Targets.get(Target.TargetStatus.InProcess).size() == 0){
+        printGraphAndStatus();
+
+        if (status2Targets.get(Target.TargetStatus.Finished).size() + status2Targets.get(Target.TargetStatus.Done).size() + status2Targets.get(Target.TargetStatus.Skipped).size() == graphInExecution.getAllTargets().values().size()  ){
             return MissionInfoDTO.MissionStatus.finished;
         }
         else return MissionInfoDTO.MissionStatus.running;
     }
 
+    private void printGraphAndStatus() {
+        for (Target curTarget :graphInExecution.getAllTargets().values()
+             ) {
+            System.out.println(curTarget.getName() + " " + curTarget.getTargetStatus());
+        }
+    }
 
 
     public Set<String> setAndUpdateTargetSuccess(Target target) {
@@ -143,8 +157,5 @@ public class GraphInExecution {
         }
         return skippedTargets;
     }
-
-//TODO INSERT THE GOD DAM METHOD THAT CALCULATE WHATS AVAILABLE TO WORK.. (SOME INFO HAS TO BE GIVEN TO DO THAT) GETTING TARGETDTO
-
 
 }

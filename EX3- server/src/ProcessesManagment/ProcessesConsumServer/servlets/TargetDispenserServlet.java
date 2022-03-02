@@ -18,7 +18,7 @@ import utils.SessionUtils;
 import java.io.IOException;
 import java.util.Set;
 
-import static ProcessesManagment.ProcessesConsumServer.constants.Constants.WORKER_NAME;
+
 import static jakarta.servlet.http.HttpServletResponse.*;
 
 @WebServlet("/runnable-target")
@@ -37,9 +37,9 @@ public class TargetDispenserServlet extends HttpServlet {
 
         if (workerName != null) {
 
-            Set<String> missionsWorkerSubscribes = subscribesManager.getWorkerWorkingMissionsNames(workerName);
+            Set<String> missionsWorkerWorksOn = subscribesManager.getWorkerWorkingMissionsNames(workerName);
 
-            TargetDTO targetDTO = processesManager.pullTaskReadyForWorker(missionsWorkerSubscribes);
+            TargetDTO targetDTO = processesManager.pullTaskReadyForWorker(missionsWorkerWorksOn,workerName);
 
             if (targetDTO == null) {
 

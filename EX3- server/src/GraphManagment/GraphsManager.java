@@ -16,7 +16,6 @@ public class GraphsManager {
     private Map<String, GraphInfoDTO> graphInfoDTOMap;
 
 
-
     public GraphsManager(){
         GraphsByNames = new HashMap<>();
         GraphsXmlsByName = new HashMap<>();

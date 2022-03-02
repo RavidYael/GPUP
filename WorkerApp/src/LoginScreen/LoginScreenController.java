@@ -48,9 +48,9 @@ public class LoginScreenController {
         SimpleCookieManager.addSimpleCookie(USER_NAME,workerName);
         SimpleCookieManager.addSimpleCookie(NUM_OF_THREADS, numOfThreadsSpinner.getValue());
         HttpUrl.Builder urlBuilder = HttpUrl.parse(BASE_URL +"/login").newBuilder();
-        urlBuilder.addQueryParameter("username", workerName);
-        urlBuilder.addQueryParameter("user-degree","worker");
-        urlBuilder.addQueryParameter("num-of-threads", numOfThreadsSpinner.getValue().toString());
+        urlBuilder.addQueryParameter(USER_NAME, workerName);
+        urlBuilder.addQueryParameter(DEGREE,"worker");
+        urlBuilder.addQueryParameter(NUM_OF_THREADS, numOfThreadsSpinner.getValue().toString());
         Request loginRequest = new Request.Builder()
                 .url(urlBuilder.build().toString())
                 .build();

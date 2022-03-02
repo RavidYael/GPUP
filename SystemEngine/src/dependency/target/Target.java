@@ -27,6 +27,7 @@ public class Target implements Serializable {
     private DependencyLevel dependencyLevel;
     private Long beginProcessTime;
     private Long startWaitingTime;
+    private String runBy = null;
 
     // private TargetStatus targetStatus = TargetStatus.Frozen;
     // private TaskResult taskResult = TaskResult.Skipped;
@@ -38,10 +39,16 @@ public class Target implements Serializable {
 //    return executionTime;
 //    }
 
+    public void setRunBy(String runBy) {
+        this.runBy = runBy;
+    }
+
 
     public void updateTargetByDTO(TargetDTO executedTarget) {
     this.taskResult.set(executedTarget.getResult());
     this.targetStatus.set(executedTarget.getTargetStatus());
+    this.runBy = executedTarget.getRunBy();
+
     }
 
 
@@ -86,7 +93,7 @@ public class Target implements Serializable {
         this.setName(other.getName());
         this.setData(other.data);
         this.setTaskResult(other.getTaskResult());
-        this.targetStatus = other.targetStatus;
+        this.setTargetStatus(other.getTargetStatus());
         this.requiredFor = new HashSet<>();
         for (String req : other.requiredFor){
             requiredFor.add(req);
@@ -95,11 +102,6 @@ public class Target implements Serializable {
         for (String dep : other.dependsOn){
             dependsOn.add(dep);
         }
-
-
-
-
-        this.setDependencyLevel(other.dependencyLevel);
 
     }
 
@@ -130,6 +132,7 @@ public class Target implements Serializable {
     public TargetStatus getTargetStatus() {
         return targetStatus.get();
     }
+
 
 
     public ObjectProperty<TargetStatus> targetStatusProperty() {
