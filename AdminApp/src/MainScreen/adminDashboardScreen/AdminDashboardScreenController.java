@@ -157,7 +157,7 @@ public class AdminDashboardScreenController {
 
     private void moveToTaskInfoScreen(String name) throws IOException {
 
-        tasksInfoScreenController.populateTableWithNewTask(name);
+        tasksInfoScreenController.refreshTaskInfoScreenWithNewTask(name);
         centerPane.setCenter(tasksInfoScreen);
 
 

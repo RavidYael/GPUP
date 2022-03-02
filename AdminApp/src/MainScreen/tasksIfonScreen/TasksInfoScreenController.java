@@ -56,6 +56,7 @@ public class TasksInfoScreenController {
     private Button stopButton;
     private ServerDataManager serverDataManager;
     private TasksInfoTableManager tableManager;
+    private String taskName;
 
 
     public void myInitializer(){
@@ -75,8 +76,13 @@ public class TasksInfoScreenController {
     }
 
 
+    public void refreshTaskInfoScreenWithNewTask(String taskName){
+        this.taskName = taskName;
+        reUploadTaskName.setText(taskName);
+        populateTableWithNewTask(taskName);
+    }
+
     public void populateTableWithNewTask(String name) {
-        reUploadTaskName.setText(name);
         TaskInfoInTable taskInfoInTable = tableManager.getTaskInfoForTable(name);
         tasksTable.setItems(FXCollections.observableArrayList(taskInfoInTable));
 
