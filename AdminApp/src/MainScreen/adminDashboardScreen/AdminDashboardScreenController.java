@@ -3,6 +3,7 @@ package MainScreen.adminDashboardScreen;
 import FXData.BackEndMediator;
 import FXData.ServerDataManager;
 import MainScreen.graphInfoScreen.GraphInfoScreenController;
+import MainScreen.tasksIfonScreen.TasksInfoScreenController;
 import dependency.graph.DependencyGraph;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
@@ -103,7 +104,8 @@ public class AdminDashboardScreenController {
     private FXMLLoader graphScreenLoader;
     private GraphInfoScreenController graphInfoScreenController;
     private ServerDataManager serverDataManager;
-
+    private Parent tasksInfoScreen;
+    private TasksInfoScreenController tasksInfoScreenController;
 
 
     @FXML
@@ -119,6 +121,7 @@ public class AdminDashboardScreenController {
          refresh();
 
 
+
     }
 
     private void componentsInitializer() {
@@ -129,6 +132,23 @@ public class AdminDashboardScreenController {
                 e.printStackTrace();
             }
         });
+
+        tasksTable.getSelectionModel().selectedItemProperty().addListener(observable -> {
+            try {
+                moveToTaskInfoScreen(tasksTable.getSelectionModel().getSelectedItem().name);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    private void moveToTaskInfoScreen(String name) throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("tasks info screen.fxml"));
+        tasksInfoScreen = fxmlLoader.load();
+        tasksInfoScreenController = fxmlLoader.getController();
+        //tasksInfoScreenController.myInitialize();
+        centerPane.setCenter(tasksInfoScreen);
+
     }
 
     private void initializeUsersTable(){
