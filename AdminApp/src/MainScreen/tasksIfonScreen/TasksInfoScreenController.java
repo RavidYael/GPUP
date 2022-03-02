@@ -89,23 +89,27 @@ public class TasksInfoScreenController {
     }
 
     @FXML
-    void pauseButtonAction(ActionEvent event) {
+    void reUploadTaskButtonAction(ActionEvent event) {
+
 
     }
 
     @FXML
-    void reUploadTaskButtonAction(ActionEvent event) {
+    void pauseButtonAction(ActionEvent event) {
+        serverDataManager.taskExecutionControl(taskName,"pause");
+
 
     }
 
     @FXML
     void resumeButton(ActionEvent event) {
+        serverDataManager.taskExecutionControl(taskName,"resume");
 
     }
 
     @FXML
     void stopButtonAction(ActionEvent event) {
-
+        serverDataManager.taskExecutionControl(taskName,"stop");
     }
 
     public void setServerDataManager(ServerDataManager serverDataManager) {

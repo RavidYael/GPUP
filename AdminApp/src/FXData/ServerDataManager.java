@@ -5,6 +5,7 @@ import DTOs.MissionInfoDTO;
 import DTOs.UserDTO;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.sun.javafx.fxml.builder.URLBuilder;
 import dependency.graph.DependencyGraph;
 import dependency.graph.GraphFactory;
 import okhttp3.*;
@@ -15,8 +16,7 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static FXData.Constants.BASE_URL;
-import static FXData.Constants.MISSION_NAME;
+import static FXData.Constants.*;
 
 public class ServerDataManager {
 
@@ -146,5 +146,21 @@ public class ServerDataManager {
         }
         return progress;
 
+    }
+    public void taskExecutionControl(String taskName,String action){
+        HttpUrl.Builder urlBuilder  = HttpUrl.parse(BASE_URL+"/task-control").newBuilder();
+        urlBuilder.addQueryParameter(MISSION_NAME,taskName );
+        urlBuilder.addQueryParameter(CONTROL_TYPE, action);
+
+        Request request = new Request.Builder()
+                .url(urlBuilder.build())
+                .build();
+
+        try {
+            Response response = client.newCall(request).execute();
+            System.out.println("Admin attempted " +action+ " ended with status: " + response.code());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
