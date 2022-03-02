@@ -41,17 +41,51 @@ public class ProcessesManager {
                 }
         }
 
-//        public void createIncrementalMission(String originalMissionName,SubscribesManager subscribesManager,String incrementalType){
-//
-//                if(incrementalType.equals("fromScratch")) {
-//                        D
-//                        MissionInfoDTO theNewMission new MissionInfoDTO()
-//                                getMissionInfoDTO(originalMissionName)
-//
-//
-//                }
-//
-//        }
+        public void createBasedOnMission(String originalMissionName,SubscribesManager subscribesManager,String incrementalType,GraphsManager graphsManager,String uploaderName){
+
+                MissionInfoDTO theNewMission = getMissionInfoDTO(originalMissionName);
+
+                if(incrementalType.equals("fromScratch")) {
+
+                        if (theNewMission.getMissionType().equals(DependencyGraph.TaskType.SIMULATION)) {
+                                SimulationTaskDTO originalTask = simulationTasksMap.get(originalMissionName);
+                                SimulationTaskDTO theNewTask = new SimulationTaskDTO(originalTask.getTaskName() + "1", uploaderName, originalTask.getTaskName() + "1", originalTask.getTargetsToExecute(), originalTask.getPricingForTarget(), originalTask.getSimulationParameters());
+                                addMissionsDTO(theNewTask, graphsManager, subscribesManager, uploaderName);
+                                addSimulationTask(theNewTask);
+                        } else if (theNewMission.getMissionType().equals(DependencyGraph.TaskType.COMPILATION)) {
+                                CompilationTaskDTO originalTask = compilationTasksMap.get(originalMissionName);
+                                CompilationTaskDTO theNewTask = new CompilationTaskDTO(originalTask.getTaskName() + "1", uploaderName, originalTask.getTaskName() + "1", originalTask.getTargetsToExecute(), originalTask.getPricingForTarget(), originalTask.getCompilationParameters());
+                                addMissionsDTO(theNewTask, graphsManager, subscribesManager, uploaderName);
+                                addCompilationTask(theNewTask);
+                        }
+                }
+                else if(incrementalType.equals("incrementally")){
+                        if (theNewMission.getMissionType().equals(DependencyGraph.TaskType.SIMULATION)) {
+                                SimulationTaskDTO originalTask = simulationTasksMap.get(originalMissionName);
+                                DependencyGraph incrementGraph = getGraphInExecutionByName().get(originalMissionName).getGraphInExecution().createDeepCopy();
+                                incrementGraph.updateTargetStatusForIncrementalExecution();
+                                incrementGraph.setGraphName(originalMissionName + "1");
+                                GraphInExecution IncrementGraphInExec = new GraphInExecution(originalMissionName,originalTask.getTargetsToExecute(),incrementGraph,uploaderName);
+                                SimulationTaskDTO theNewTask = new SimulationTaskDTO(originalTask.getTaskName() + "1", uploaderName , originalTask.getTaskName() + "1", originalTask.getTargetsToExecute(), originalTask.getPricingForTarget(), originalTask.getSimulationParameters());
+                                addMissionsDTOIncrement(theNewTask, IncrementGraphInExec, subscribesManager, originalTask.getTaskCreator());
+                                addSimulationTask(theNewTask);
+
+                        }else if((theNewMission.getMissionType().equals(DependencyGraph.TaskType.COMPILATION))){
+                                CompilationTaskDTO originalTask = compilationTasksMap.get(originalMissionName);
+                                DependencyGraph incrementGraph = getGraphInExecutionByName().get(originalMissionName).getGraphInExecution().createDeepCopy();
+                                incrementGraph.updateTargetStatusForIncrementalExecution();
+                                incrementGraph.setGraphName(originalMissionName + "1");
+                                GraphInExecution IncrementGraphInExec = new GraphInExecution(originalMissionName,originalTask.getTargetsToExecute(),incrementGraph,uploaderName);
+                                CompilationTaskDTO theNewTask = new CompilationTaskDTO(originalTask.getTaskName() + "1", uploaderName, originalTask.getTaskName() + "1", originalTask.getTargetsToExecute(), originalTask.getPricingForTarget(), originalTask.getCompilationParameters());
+                                addMissionsDTOIncrement(theNewTask, IncrementGraphInExec, subscribesManager, uploaderName);
+                                addCompilationTask(theNewTask);
+                        }
+
+
+                }
+
+
+        }
 
 
 
@@ -151,6 +185,25 @@ public class ProcessesManager {
 
         public synchronized Set<String> getUserTaskList(String userName) {
                 return usersTasks.get(userName);
+        }
+
+
+        public synchronized void addMissionsDTOIncrement(SimulationTaskDTO newTask, GraphInExecution theNewGraphInExe, SubscribesManager subscribesManager,String uploader) {
+                MissionDTOByName.put(newTask.getTaskName(), new MissionInfoDTO(theNewGraphInExe.getGraphInExecution(), newTask.getTargetsToExecute(), newTask.getTaskName(), newTask.getTaskCreator(), DependencyGraph.TaskType.SIMULATION, newTask.getPricingForTarget(), 0, MissionInfoDTO.MissionStatus.frozen,newTask));
+                graphInExecutionByName.put(newTask.getTaskName(), theNewGraphInExe);
+                GraphInfoDTO graphInfoDTO = new GraphInfoDTO(theNewGraphInExe.getGraphInExecution());
+                graphInExecutionInfoByName.put(graphInfoDTO.getGraphName(), graphInfoDTO);
+                subscribesManager.addMission(MissionDTOByName.get(newTask.getTaskName()));
+                refreshReadyTargets();
+        }
+
+        public synchronized void addMissionsDTOIncrement(CompilationTaskDTO newTask, GraphInExecution theNewGraphInExe, SubscribesManager subscribesManager,String uploader) {
+                MissionDTOByName.put(newTask.getTaskName(), new MissionInfoDTO(theNewGraphInExe.getGraphInExecution(), newTask.getTargetsToExecute(), newTask.getTaskName(), newTask.getTaskCreator(), DependencyGraph.TaskType.COMPILATION, newTask.getPricingForTarget(), 0, MissionInfoDTO.MissionStatus.frozen,newTask));
+                graphInExecutionByName.put(newTask.getTaskName(), theNewGraphInExe);
+                GraphInfoDTO graphInfoDTO = new GraphInfoDTO(theNewGraphInExe.getGraphInExecution());
+                graphInExecutionInfoByName.put(graphInfoDTO.getGraphName(), graphInfoDTO);
+                subscribesManager.addMission(MissionDTOByName.get(newTask.getTaskName()));
+                refreshReadyTargets();
         }
 
 
