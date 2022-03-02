@@ -16,13 +16,13 @@ import java.io.IOException;
 import static ProcessesManagment.ExecutionManagement.Constants.CONTROL_TYPE;
 import static ProcessesManagment.SubscribersManagement.constants.Constants.MISSION_NAME;
 
-@WebServlet(name = "IncrementalTasksUploadServlet", urlPatterns = "/upload-incremental-task")
+@WebServlet(name = "IncrementalTasksUploadServlet", urlPatterns = "/re-upload-task")
 public class IncrementalTaskUploadServlet extends HttpServlet {
 
     private Gson gson = new Gson();
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
 
         ProcessesManager missionsManager = ServletUtils.getProcessesManager(getServletContext());
@@ -30,11 +30,11 @@ public class IncrementalTaskUploadServlet extends HttpServlet {
         GraphsManager graphsManager = ServletUtils.getGraphsManager(getServletContext());
         String originalMissionName = req.getHeader(MISSION_NAME);
 
-        if(req.getHeader(CONTROL_TYPE).equals("fromScratch")) {
+        if(req.getHeader(CONTROL_TYPE).equals("From Scratch")) {
             missionsManager.createBasedOnMission(originalMissionName, subscribesManager, "fromScratch", graphsManager, (String) req.getSession().getAttribute(Constants.USERNAME));
         }
-         else if(req.getHeader(CONTROL_TYPE).equals("Incremental")){
-            missionsManager.createBasedOnMission(originalMissionName, subscribesManager, "fromScratch", graphsManager, (String) req.getSession().getAttribute(Constants.USERNAME));
+         else if(req.getHeader(CONTROL_TYPE).equals("Incrementally")){
+            missionsManager.createBasedOnMission(originalMissionName, subscribesManager, "incrementally", graphsManager, (String) req.getSession().getAttribute(Constants.USERNAME));
         }
     }
 }

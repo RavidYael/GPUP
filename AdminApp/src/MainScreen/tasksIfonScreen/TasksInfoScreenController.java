@@ -90,6 +90,13 @@ public class TasksInfoScreenController {
 
     @FXML
     void reUploadTaskButtonAction(ActionEvent event) {
+        if (!fromScratch.isSelected() && !incrementally.isSelected()){
+            Alert alert = new Alert(Alert.AlertType.ERROR,"please choose from scratch or incrementally");
+            alert.showAndWait();
+        }
+        String type = fromScratch.isSelected() ? fromScratch.getText() : incrementally.getText();
+        serverDataManager.reUploadTask(taskName,type);
+
 
 
     }

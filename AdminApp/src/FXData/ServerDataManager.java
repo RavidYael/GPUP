@@ -163,4 +163,19 @@ public class ServerDataManager {
             e.printStackTrace();
         }
     }
+
+    public void reUploadTask(String taskName, String type) {
+        Request request = new Request.Builder()
+                .url(BASE_URL +"/re-upload-task")
+                .addHeader(CONTROL_TYPE,type)
+                .addHeader(MISSION_NAME,taskName)
+                .build();
+
+        try {
+            Response response = client.newCall(request).execute();
+            System.out.println("re-upload Task: " +taskName +" "+type +" ended with status code: "+ response.code());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
