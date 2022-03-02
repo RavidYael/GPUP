@@ -118,10 +118,23 @@ public class AdminDashboardScreenController {
         serverDataManager = new ServerDataManager();
         serverDataManager.setClient(client);
         dashboardTableManager = new AdminDashboardTableManager(serverDataManager);
-         refresh();
+        initializeTaskInfoScreen();
+        refresh();
 
 
 
+    }
+
+    private void initializeTaskInfoScreen() {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("tasks info screen.fxml"));
+        try {
+            tasksInfoScreen = fxmlLoader.load();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        tasksInfoScreenController = fxmlLoader.getController();
+        tasksInfoScreenController.setServerDataManager(serverDataManager);
+        tasksInfoScreenController.myInitializer();
     }
 
     private void componentsInitializer() {
@@ -143,11 +156,10 @@ public class AdminDashboardScreenController {
     }
 
     private void moveToTaskInfoScreen(String name) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("tasks info screen.fxml"));
-        tasksInfoScreen = fxmlLoader.load();
-        tasksInfoScreenController = fxmlLoader.getController();
-        //tasksInfoScreenController.myInitialize();
+
+        tasksInfoScreenController.populateTableWithNewTask(name);
         centerPane.setCenter(tasksInfoScreen);
+
 
     }
 

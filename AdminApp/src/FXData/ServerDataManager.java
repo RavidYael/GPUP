@@ -12,12 +12,11 @@ import okhttp3.*;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static FXData.Constants.BASE_URL;
+import static FXData.Constants.MISSION_NAME;
 
 public class ServerDataManager {
 
@@ -114,5 +113,38 @@ public class ServerDataManager {
         }
 
     return missionDTOSet;
+    }
+
+
+    public List<MissionInfoDTO> getMissionDTOByName(String missionName){
+        Set<MissionInfoDTO> allMissions = getAllMissionsDTO();
+        return allMissions.stream().filter(m-> m.getMissionName().equals(missionName)).collect(Collectors.toList());
+    }
+
+    public Double getTaskProcess(String missionName) {
+        Double progress = 0.0;
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(BASE_URL+ "/task-progress").newBuilder();
+        urlBuilder.addQueryParameter(MISSION_NAME, missionName);
+
+        Request request = new Request.Builder()
+                .url(urlBuilder.build())
+                .build();
+
+        try {
+            Response response = client.newCall(request).execute();
+            //progress = new Gson().fromJson(response.body().string(),Long.class);
+            progress = Double.valueOf(response.body().string());
+
+            if (response.code()>= 500){
+                System.out.println("error in server trying to progress ");
+            }
+            else if(response.code() >=200 && response.code() <300){
+                System.out.println("server " +"progress"+" succesfully");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return progress;
+
     }
 }

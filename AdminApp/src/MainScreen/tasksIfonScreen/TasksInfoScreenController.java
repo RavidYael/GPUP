@@ -1,34 +1,32 @@
 package MainScreen.tasksIfonScreen;
 
+import FXData.ServerDataManager;
+import MainScreen.adminDashboardScreen.UserInTable;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 
 public class TasksInfoScreenController {
 
     @FXML
-    private TableView<?> tasksTable;
+    private TableView<TaskInfoInTable> tasksTable;
 
     @FXML
-    private TableColumn<?, ?> taskNameColumn;
+    private TableColumn<TaskInfoInTable, String> taskNameColumn;
 
     @FXML
-    private TableColumn<?, ?> graphNameColumn;
+    private TableColumn<TaskInfoInTable, String> graphNameColumn;
 
     @FXML
-    private TableColumn<?, ?> totalTargetsColumn;
+    private TableColumn<TaskInfoInTable, Integer> totalTargetsColumn;
 
     @FXML
-    private TableColumn<?, ?> workesrColumn;
+    private TableColumn<TaskInfoInTable, Integer> workesrColumn;
 
     @FXML
-    private TableColumn<?, ?> taskProgressColumn;
+    private TableColumn<TaskInfoInTable, Double> taskProgressColumn;
 
     @FXML
     private TabPane submittedTaskTabPane;
@@ -56,6 +54,33 @@ public class TasksInfoScreenController {
 
     @FXML
     private Button stopButton;
+    private ServerDataManager serverDataManager;
+    private TasksInfoTableManager tableManager;
+
+
+    public void myInitializer(){
+        this.tableManager = new TasksInfoTableManager(serverDataManager);
+        initializeTaskInfoTable();
+        ToggleGroup scratchOrIncremental = new ToggleGroup();
+        scratchOrIncremental.getToggles().add(fromScratch);
+        scratchOrIncremental.getToggles().add(incrementally);
+    }
+
+    private void initializeTaskInfoTable() {
+        taskNameColumn.setCellValueFactory(new PropertyValueFactory<TaskInfoInTable,String>("name"));
+        graphNameColumn.setCellValueFactory(new PropertyValueFactory<TaskInfoInTable,String>("graphName"));
+        totalTargetsColumn.setCellValueFactory(new PropertyValueFactory<TaskInfoInTable,Integer>("totalTargets"));
+        workesrColumn.setCellValueFactory(new PropertyValueFactory<TaskInfoInTable,Integer>("numOfWorkers"));
+        taskProgressColumn.setCellValueFactory(new PropertyValueFactory<TaskInfoInTable,Double>("progress"));
+    }
+
+
+    public void populateTableWithNewTask(String name) {
+        reUploadTaskName.setText(name);
+        TaskInfoInTable taskInfoInTable = tableManager.getTaskInfoForTable(name);
+        tasksTable.setItems(FXCollections.observableArrayList(taskInfoInTable));
+
+    }
 
     @FXML
     void pauseButtonAction(ActionEvent event) {
@@ -75,6 +100,10 @@ public class TasksInfoScreenController {
     @FXML
     void stopButtonAction(ActionEvent event) {
 
+    }
+
+    public void setServerDataManager(ServerDataManager serverDataManager) {
+        this.serverDataManager = serverDataManager;
     }
 
 }
